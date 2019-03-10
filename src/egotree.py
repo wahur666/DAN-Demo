@@ -66,7 +66,7 @@ def map_probabilities(p: List[Node]) -> Dict:
     return {n: n.probability for n in p}
 
 
-def create_egotree(source: Node, p: List[Node], delta: int):
+def create_egotree(source: Node, p: List[Node], delta: int) -> EgoTree:
     p1 = map_probabilities(p)
     p1 = sorted(p1.items(), key=lambda kv: kv[1], reverse=True)
     egotree = EgoTree(source, delta)
@@ -97,3 +97,53 @@ for item in egotree.leaves:
 
 print(egotree.dept())
 print(egotree.weight())
+
+
+def sum_aa(aa):
+    return sum([sum(x) for x in aa])
+
+
+def normalize100(demand_distribution):
+    sum_of_items = sum_aa(demand_distribution)
+    multiplier = 100 / sum_of_items
+    normalized = [list(map(lambda z: z * multiplier, x)) for x in demand_distribution]
+    return normalized
+
+
+demand_distribution = [[0, 3, 4, 1, 1, 1, 1],
+                       [3, 0, 2, 0, 1, 0, 4],
+                       [4, 2, 0, 2, 0, 0, 4],
+                       [1, 0, 2, 0, 3, 0, 0],
+                       [1, 1, 0, 3, 0, 0, 0],
+                       [1, 0, 0, 0, 0, 0, 3],
+                       [1, 4, 4, 0, 0, 3, 0]]
+
+print( normalize100(demand_distribution) )
+
+print(sum_aa(normalize100(demand_distribution)))
+
+
+def calculate_all_egotrees(demand_distribution, delta):
+    egotrees = []
+
+    dd = demand_distribution
+
+    for i in range(len(demand_distribution)):
+
+        nodes = []
+        source: Node
+
+        for j in range(len(demand_distribution)):
+            if i == j:
+                source = Node("T"+str(i), 0)
+            else:
+                nodes.append(Node("T"+str(j), dd[i][j] + dd[j][i]))
+
+        egotrees.append(create_egotree(source, nodes, delta))
+
+    return egotrees
+
+v = calculate_all_egotrees(demand_distribution, 3)
+
+for tree in v:
+    print(tree.weight())
