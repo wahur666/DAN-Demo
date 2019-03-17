@@ -1,5 +1,5 @@
 from typing import List, Dict
-
+from itertools import cycle
 
 class Vertex:
 
@@ -7,10 +7,10 @@ class Vertex:
         self.label = label
 
     def __repr__(self):
-        return self.label
+        return "Vertex: " + self.label
 
     def __str__(self):
-        return self.label
+        return "Vertex: " + self.label
 
 
 class Edge:
@@ -32,6 +32,7 @@ class Graph:
     def __init__(self):
         self.vertices = []
         self.edges = []
+        self.avg_deg = 0
 
     def add_vertex(self, vertex: Vertex):
         self.vertices.append(vertex)
@@ -140,8 +141,8 @@ print("Root: " + str(egotree.root))
 for item in egotree.leaves:
     print(item)
 
-print(egotree.dept())
-print(egotree.weight())
+# print(egotree.dept())
+# print(egotree.weight())
 
 
 def sum_aa(aa):
@@ -163,9 +164,9 @@ demand_distribution = [[0, 3, 4, 1, 1, 1, 1],
                        [1, 0, 0, 0, 0, 0, 3],
                        [1, 4, 4, 0, 0, 3, 0]]
 
-print( normalize100(demand_distribution) )
-
-print(sum_aa(normalize100(demand_distribution)))
+# print( normalize100(demand_distribution) )
+#
+# print(sum_aa(normalize100(demand_distribution)))
 
 
 def calculate_all_egotrees(demand_distribution, delta):
@@ -190,8 +191,8 @@ def calculate_all_egotrees(demand_distribution, delta):
 
 v = calculate_all_egotrees(demand_distribution, 3)
 
-for tree in v:
-    print(tree.weight())
+# for tree in v:
+#     print(tree.weight())
 
 
 def build_graph(demand_distribution) -> Graph:
@@ -202,9 +203,7 @@ def build_graph(demand_distribution) -> Graph:
         g.vertices.append(Vertex("T" + str(i)))
 
     for i in range(len(demand_distribution)):
-        for j in range(len(demand_distribution)):
-            if i == j: # fail safe, for bad input
-                continue
+        for j in range(i + 1, len(demand_distribution)):
             if demand_distribution[i][j] > 0:
                 e = Edge(g.vertices[i], g.vertices[j], demand_distribution[i][j])
                 g.add_edge(e)
@@ -214,3 +213,36 @@ def build_graph(demand_distribution) -> Graph:
 g = build_graph(demand_distribution)
 
 print(g)
+
+def add_helpers(g, H, L):
+    c_L = cycle(L)
+    for edge in g.edges:
+        H_v = [ x[0] for x in H ]
+        if edge.v1 in H_v and edge.v2 in H_v:
+            print(edge.v1, edge.v2, "Helper:", next(c_L))
+
+
+def classify_points(g: Graph):
+    degs = []
+    for vert in g.vertices:
+        deg = sum( e.v1 is vert or e.v2 is vert for e in g.edges )
+        degs.append((vert, deg))
+    # print(degs)
+    g.avg_deg = sum(x[1] for x in degs) / len(degs)
+
+    degs.sort(key=lambda x: x[1], reverse=True)
+
+    H = degs[0:round(len(degs)/2)]
+    L = degs[round(len(degs)/2):]
+
+    while len(L) > 0 and L[0][1] > g.avg_deg:
+        H.append(L.pop(0))
+    L.sort(key=lambda x: x[1])
+
+    print(H)
+    print(L)
+
+    add_helpers(g, H, L)
+
+
+classify_points(g)
