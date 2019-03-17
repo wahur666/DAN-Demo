@@ -1,6 +1,51 @@
 from typing import List, Dict
 
 
+class Vertex:
+
+    def __init__(self, label: str):
+        self.label = label
+
+    def __repr__(self):
+        return self.label
+
+    def __str__(self):
+        return self.label
+
+
+class Edge:
+
+    def __init__(self, v1: Vertex, v2: Vertex, probability):
+        self.v1 = v1
+        self.v2 = v2
+        self.probability = probability
+
+    def __repr__(self):
+        return self.v1.label + "-" + str(self.probability) + "-" + self.v2.label
+
+    def __str__(self):
+        return self.v1.label + "-" + str(self.probability) + "-" + self.v2.label
+
+
+class Graph:
+
+    def __init__(self):
+        self.vertices = []
+        self.edges = []
+
+    def add_vertex(self, vertex: Vertex):
+        self.vertices.append(vertex)
+
+    def add_edge(self, edge: Edge):
+        self.edges.append(edge)
+
+    def __repr__(self):
+        return str(self.edges)
+
+    def __str__(self):
+        return str(self.edges)
+
+
 class Node:
 
     def __init__(self, label: str, probability: float):
@@ -147,3 +192,25 @@ v = calculate_all_egotrees(demand_distribution, 3)
 
 for tree in v:
     print(tree.weight())
+
+
+def build_graph(demand_distribution) -> Graph:
+
+    g = Graph()
+
+    for i in range(len(demand_distribution)):
+        g.vertices.append(Vertex("T" + str(i)))
+
+    for i in range(len(demand_distribution)):
+        for j in range(len(demand_distribution)):
+            if i == j: # fail safe, for bad input
+                continue
+            if demand_distribution[i][j] > 0:
+                e = Edge(g.vertices[i], g.vertices[j], demand_distribution[i][j])
+                g.add_edge(e)
+
+    return g
+
+g = build_graph(demand_distribution)
+
+print(g)
