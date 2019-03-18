@@ -1,5 +1,5 @@
 from typing import List, Dict
-from itertools import cycle
+from itertools import cycle, permutations
 
 class Vertex:
 
@@ -26,13 +26,22 @@ class Edge:
     def __str__(self):
         return self.v1.label + "-" + str(self.probability) + "-" + self.v2.label
 
+    def __eq__(self, other):
+        return {self.v1, self.v2} == {other.v1, other.v2}
+
 
 class Graph:
 
-    def __init__(self):
+    def __init__(self, demand_matix : List):
         self.vertices = []
         self.edges = []
         self.avg_deg = 0
+        self.demand_matrix = demand_matix
+
+        self.new_demand_matrix = demand_matix.copy()
+        self.routing_scheme = [] # a.k.a new edges
+
+        self.build_graph()
 
     def add_vertex(self, vertex: Vertex):
         self.vertices.append(vertex)
@@ -46,6 +55,19 @@ class Graph:
     def __str__(self):
         return str(self.edges)
 
+    def build_graph(self):
+
+        for i in range(len(self.demand_matrix)):
+            self.vertices.append(Vertex("T" + str(i)))
+
+        for i in range(len(self.demand_matrix)):
+            for j in range(i + 1, len(self.demand_matrix)):
+                if self.demand_matrix[i][j] > 0:
+                    e = Edge(self.vertices[i], self.vertices[j], self.demand_matrix[i][j])
+                    self.add_edge(e)
+
+    def get_vertex(self, label):
+        return list(filter(lambda x : x.label == label, self.vertices))
 
 class Node:
 
@@ -135,11 +157,11 @@ p = [Node("T1", 24),
      Node("T11", 1)]
 n = 4
 
-egotree = create_egotree(source, p, n)
-
-print("Root: " + str(egotree.root))
-for item in egotree.leaves:
-    print(item)
+# egotree = create_egotree(source, p, n)
+#
+# print("Root: " + str(egotree.root))
+# for item in egotree.leaves:
+#     print(item)
 
 # print(egotree.dept())
 # print(egotree.weight())
@@ -169,20 +191,22 @@ demand_distribution = [[0, 3, 4, 1, 1, 1, 1],
 # print(sum_aa(normalize100(demand_distribution)))
 
 
-def calculate_all_egotrees(demand_distribution, delta):
+def calculate_all_egotrees(demand_distribution, delta, indexes : List = None):
     egotrees = []
 
     dd = demand_distribution
 
     for i in range(len(demand_distribution)):
 
+        if indexes and i not in indexes:
+            continue
         nodes = []
         source: Node
 
         for j in range(len(demand_distribution)):
             if i == j:
                 source = Node("T"+str(i), 0)
-            else:
+            elif dd[i][j] + dd[j][i] > 0:
                 nodes.append(Node("T"+str(j), dd[i][j] + dd[j][i]))
 
         egotrees.append(create_egotree(source, nodes, delta))
@@ -195,34 +219,13 @@ v = calculate_all_egotrees(demand_distribution, 3)
 #     print(tree.weight())
 
 
-def build_graph(demand_distribution) -> Graph:
-
-    g = Graph()
-
-    for i in range(len(demand_distribution)):
-        g.vertices.append(Vertex("T" + str(i)))
-
-    for i in range(len(demand_distribution)):
-        for j in range(i + 1, len(demand_distribution)):
-            if demand_distribution[i][j] > 0:
-                e = Edge(g.vertices[i], g.vertices[j], demand_distribution[i][j])
-                g.add_edge(e)
-
-    return g
-
-g = build_graph(demand_distribution)
+g = Graph(demand_distribution)
 
 print(g)
 
-def add_helpers(g, H, L):
-    c_L = cycle(L)
-    for edge in g.edges:
-        H_v = [ x[0] for x in H ]
-        if edge.v1 in H_v and edge.v2 in H_v:
-            print(edge.v1, edge.v2, "Helper:", next(c_L))
 
-
-def classify_points(g: Graph):
+def create_dan(g: Graph):
+    # Classifying points
     degs = []
     for vert in g.vertices:
         deg = sum( e.v1 is vert or e.v2 is vert for e in g.edges )
@@ -237,7 +240,7 @@ def classify_points(g: Graph):
 
     while len(L) > 0 and L[0][1] > g.avg_deg:
         H.append(L.pop(0))
-    L.sort(key=lambda x: x[1])
+    # L.sort(key=lambda x: x[1])
 
     print(H)
     print(L)
@@ -245,4 +248,65 @@ def classify_points(g: Graph):
     add_helpers(g, H, L)
 
 
-classify_points(g)
+def add_helpers(g, H, L):
+    c_L = cycle(L)
+    for edge in g.edges:
+        H_v = [ x[0] for x in H ]
+        if edge.v1 in H_v and edge.v2 in H_v:
+            weight = edge.probability
+            u_index = int(edge.v1.label[1:])
+            v_index = int(edge.v2.label[1:])
+            l = next(c_L)
+            l_index = int(l[0].label[1:])
+            g.new_demand_matrix[u_index][v_index] = 0
+            g.new_demand_matrix[v_index][u_index] = 0
+
+            g.new_demand_matrix[u_index][l_index] += weight
+            g.new_demand_matrix[l_index][u_index] += weight
+
+            g.new_demand_matrix[v_index][l_index] += weight
+            g.new_demand_matrix[l_index][v_index] += weight
+
+
+            # print(u_index, weight, v_index, l_index)
+            print(edge.v1, edge.v2, "Helper:", l)
+    calculate_egotrees_with_new_demand(g, H, L)
+
+def calculate_egotrees_with_new_demand(g: Graph, H: List, L: List):
+    for i in g.new_demand_matrix:
+        print(i)
+
+    H_i= [ int(x[0].label[1:]) for x in H ]
+
+    v = calculate_all_egotrees(g.new_demand_matrix, 12 * int(round(g.avg_deg)), H_i)
+    for i in v:
+        print(i)
+
+    union_egotrees(g, v, L)
+
+def union_egotrees(g: Graph, egotrees: List[EgoTree], L: List):
+    for tree in egotrees:
+        for leave in tree.leaves:
+            v1 = g.get_vertex(tree.root.label)[0]
+            v2 = g.get_vertex(leave.root.label)[0]
+            weight = int(leave.weight()/2)
+            g.routing_scheme.append(Edge(v1, v2, weight))
+
+    L_v = [x[0] for x in L]
+
+    L_perms = permutations(L_v, 2)
+    print(str(g.routing_scheme))
+
+    for u, v in L_perms:
+        u_index = int(u.label[1:])
+        v_index = int(v.label[1:])
+        edge = Edge(u, v, g.new_demand_matrix[u_index][v_index])
+        if edge not in g.routing_scheme: g.routing_scheme.append(edge)
+
+    print(str(g.routing_scheme))
+
+
+
+
+
+create_dan(g)
