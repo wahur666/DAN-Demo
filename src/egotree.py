@@ -1,5 +1,6 @@
 from typing import List, Dict
-from itertools import cycle, permutations
+from itertools import cycle, combinations
+from copy import deepcopy
 
 class Vertex:
 
@@ -38,7 +39,7 @@ class Graph:
         self.avg_deg = 0
         self.demand_matrix = demand_matix
 
-        self.new_demand_matrix = demand_matix.copy()
+        self.new_demand_matrix = deepcopy(demand_matix)
         self.routing_scheme = [] # a.k.a new edges
 
         self.build_graph()
@@ -99,6 +100,23 @@ class Tree:
 
     def weight(self):
         return sum(n.weight() for n in self.leaves) + self.root.probability
+
+    def get_edges(self) -> List[Edge]:
+        edges = []
+        for leave in self.leaves:
+            v1 = g.get_vertex(self.root.label)[0]
+            v2 = g.get_vertex(leave.root.label)[0]
+            weight = int(leave.weight() / 2)
+            edges.append(Edge(v1, v2, weight))
+            edges.extend(leave.get_edges())
+        return edges
+
+    def get_dependent_nodes(self) -> List[Node]:
+        nodes = []
+        for leave in self.leaves:
+            nodes.append(leave.root)
+            nodes.extend(leave.get_dependent_nodes())
+        return nodes
 
 
 class BinTree(Tree):
@@ -250,6 +268,7 @@ def create_dan(g: Graph):
 
 def add_helpers(g, H, L):
     c_L = cycle(L)
+    helper_struct = []
     for edge in g.edges:
         H_v = [ x[0] for x in H ]
         if edge.v1 in H_v and edge.v2 in H_v:
@@ -270,38 +289,57 @@ def add_helpers(g, H, L):
 
             # print(u_index, weight, v_index, l_index)
             print(edge.v1, edge.v2, "Helper:", l)
-    calculate_egotrees_with_new_demand(g, H, L)
+            helper_struct.append((edge.v1, edge.v2, l))
+    calculate_egotrees(g, H, L, helper_struct, 2)
 
-def calculate_egotrees_with_new_demand(g: Graph, H: List, L: List):
-    for i in g.new_demand_matrix:
+def calculate_egotrees(g: Graph, H: List, L: List, helper_struct: List, delta = None):
+    for i in g.demand_matrix:
         print(i)
 
     H_i= [ int(x[0].label[1:]) for x in H ]
 
-    v = calculate_all_egotrees(g.new_demand_matrix, 12 * int(round(g.avg_deg)), H_i)
+    deltaN = delta or 12 * int(round(g.avg_deg))
+
+    v = calculate_all_egotrees(g.demand_matrix, deltaN, H_i)
     for i in v:
         print(i)
+
+    change_nodes_in_egotrees(g, v, H, L, helper_struct)
+
+def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List, helper_struct: List):
+
+    for tree in egotrees:
+        for leave in tree.leaves:
+            for struct in helper_struct:
+                if tree.root.label in [struct[0].label, struct[1].label] and leave.root.label in [struct[0].label, struct[1].label]:
+                    u_index = int(tree.root.label[1:])
+                    v_index = int(leave.root.label[1:])
+                    l_index = int(struct[2][0].label[1:])
+                    print("A")
+                    pass
+                    # a helper átveszi a V gyerekeit, ha van gyereke akkor azt visszaadja a treenek újra eloszlásra
+
+
 
     union_egotrees(g, v, L)
 
 def union_egotrees(g: Graph, egotrees: List[EgoTree], L: List):
     for tree in egotrees:
-        for leave in tree.leaves:
-            v1 = g.get_vertex(tree.root.label)[0]
-            v2 = g.get_vertex(leave.root.label)[0]
-            weight = int(leave.weight()/2)
-            g.routing_scheme.append(Edge(v1, v2, weight))
+        for edge in tree.get_edges():
+            if edge not in g.routing_scheme:
+                g.routing_scheme.append(edge)
 
     L_v = [x[0] for x in L]
 
-    L_perms = permutations(L_v, 2)
+    L_perms = combinations(L_v, 2)
     print(str(g.routing_scheme))
 
     for u, v in L_perms:
         u_index = int(u.label[1:])
         v_index = int(v.label[1:])
         edge = Edge(u, v, g.new_demand_matrix[u_index][v_index])
-        if edge not in g.routing_scheme: g.routing_scheme.append(edge)
+        if edge not in g.routing_scheme:
+            g.routing_scheme.append(edge)
 
     print(str(g.routing_scheme))
 
