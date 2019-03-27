@@ -266,7 +266,7 @@ def create_dan(g: Graph):
 
     while len(L) > 0 and L[0][1] > g.avg_deg:
         H.append(L.pop(0))
-    # L.sort(key=lambda x: x[1])
+    L.sort(key=lambda x: x[1])
 
     print(H)
     print(L)
@@ -277,13 +277,23 @@ def create_dan(g: Graph):
 def add_helpers(g, H, L):
     c_L = cycle(L)
     helper_struct = []
+    already_assinged = {}
     for edge in g.edges:
         H_v = [ x[0] for x in H ]
         if edge.v1 in H_v and edge.v2 in H_v:
             weight = edge.probability
             u_index = int(edge.v1.label[1:])
             v_index = int(edge.v2.label[1:])
+
+            a1 = [ x.label for x in already_assinged[edge.v1]] if edge.v1 in already_assinged else []
+            a2 = [ x.label for x in already_assinged[edge.v2]] if edge.v2 in already_assinged else []
+
+            a1.extend(a2)
+            s = set(a1)
             l = next(c_L)
+            while l[0].label in s:
+                l = next(c_L)
+
             l_index = int(l[0].label[1:])
             g.new_demand_matrix[u_index][v_index] = 0
             g.new_demand_matrix[v_index][u_index] = 0
@@ -297,8 +307,16 @@ def add_helpers(g, H, L):
 
             # print(u_index, weight, v_index, l_index)
             print(edge.v1, edge.v2, "Helper:", l[0])
+            if edge.v1 not in already_assinged:
+                already_assinged[edge.v1] = [l[0]]
+            else:
+                already_assinged[edge.v1].append(l[0])
+            if edge.v2 not in already_assinged:
+                already_assinged[edge.v2] = [l[0]]
+            else:
+                already_assinged[edge.v2].append(l[0])
             helper_struct.append((edge.v1, edge.v2, l[0]))
-    calculate_egotrees(g, H, L, helper_struct, 2)
+    calculate_egotrees(g, H, L, helper_struct, 3)
 
 def calculate_egotrees(g: Graph, H: List, L: List, helper_struct: List, delta = None):
     for i in g.demand_matrix:
