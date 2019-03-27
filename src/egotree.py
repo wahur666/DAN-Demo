@@ -116,7 +116,15 @@ class Tree:
         for leave in self.leaves:
             nodes.append(leave.root)
             nodes.extend(leave.get_dependent_nodes())
-        return nodes
+        return sorted(nodes, key=lambda x: x.probability, reverse=True)
+
+    def get_trees(self) -> List:
+        trees = []
+        for leave in self.leaves:
+            trees.append(leave)
+            trees.extend(leave.get_trees())
+        return trees
+
 
 
 class BinTree(Tree):
@@ -288,8 +296,8 @@ def add_helpers(g, H, L):
 
 
             # print(u_index, weight, v_index, l_index)
-            print(edge.v1, edge.v2, "Helper:", l)
-            helper_struct.append((edge.v1, edge.v2, l))
+            print(edge.v1, edge.v2, "Helper:", l[0])
+            helper_struct.append((edge.v1, edge.v2, l[0]))
     calculate_egotrees(g, H, L, helper_struct, 2)
 
 def calculate_egotrees(g: Graph, H: List, L: List, helper_struct: List, delta = None):
@@ -308,25 +316,98 @@ def calculate_egotrees(g: Graph, H: List, L: List, helper_struct: List, delta = 
 
 def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List, helper_struct: List):
 
+    print("---- EGO TREES BEFORE ----")
     for tree in egotrees:
-        for leave in tree.leaves:
-            for struct in helper_struct:
-                if tree.root.label in [struct[0].label, struct[1].label] and leave.root.label in [struct[0].label, struct[1].label]:
-                    u_index = int(tree.root.label[1:])
-                    v_index = int(leave.root.label[1:])
-                    l_index = int(struct[2][0].label[1:])
-                    print("A")
-                    pass
-                    # a helper átveszi a V gyerekeit, ha van gyereke akkor azt visszaadja a treenek újra eloszlásra
+        print(tree)
+    print("--------------------------")
+    for tree in egotrees:
+        print("Tree before", tree)
+        for struct in helper_struct:
+            leave_labels = [x.label for x in tree.get_dependent_nodes()]
+            if tree.root.label == struct[0].label and struct[1].label in leave_labels:
+                v_tree = [ x for x in tree.get_trees() if x.root.label == struct[1].label ][0]
+            elif tree.root.label == struct[1].label and struct[0].label in leave_labels:
+                v_tree = [ x for x in tree.get_trees() if x.root.label == struct[0].label ][0]
+            else:
+                continue
 
+            if v_tree in tree.leaves:
+                v_parent = tree
+            else:
+                v_parent = [x for x in tree.get_trees() if v_tree in x.leaves][0]
 
+            if not struct[2].label in leave_labels:
+                # Mikor L nincs benne a faban
+                print("L atveszi V helyet, L=0")
+                # print(tree)
+                # print("V", v_tree)
+                l_tree = BinTree(Node(struct[2].label, 0))
+                l_tree.leaves = v_tree.leaves
 
-    union_egotrees(g, v, L)
+                ind = v_parent.leaves.index(v_tree)
+                v_parent.leaves[ind] = l_tree
+                # print("L", l_tree)
+                # print(tree)
+
+            else:
+                # Mikor L benne van a faban
+                l_tree = [x for x in tree.get_trees() if x.root.label == struct[2].label][0]
+                if l_tree in tree.leaves:
+                    l_parent = tree
+                else:
+                    l_parent = [x for x in tree.get_trees() if l_tree in x.leaves][0]
+
+                u_index = int(tree.root.label[1:])
+                v_index = int(v_tree.root.label[1:])
+                l_index = int(l_tree.root.label[1:])
+
+                if g.demand_matrix[u_index][l_index] > g.demand_matrix[u_index][v_index]:
+                    # Toroljuk V-t a fabol
+                    nodes_to_redistribute = v_tree.get_dependent_nodes()
+                    ind = v_parent.leaves.index(v_tree)
+                    v_parent.leaves.pop(ind)
+                    print("V-t toroljuk a fabol")
+                else:
+                    # L atveszi V helyet
+                    nodes_to_redistribute = l_tree.get_dependent_nodes()
+                    if v_tree.root in nodes_to_redistribute:
+                        nodes_to_redistribute.remove(v_tree.root)
+                    ind = l_parent.leaves.index(l_tree)
+                    l_parent.leaves.pop(ind)
+                    l_tree.leaves = v_tree.leaves
+
+                    if len(v_parent.leaves) > 0:
+                        ind = v_parent.leaves.index(v_tree)
+                        v_parent.leaves[ind] = l_tree
+                    else:
+                        if v_parent != l_tree:
+                            v_parent.push(l_tree)
+                    print("L atveszi V helyet, L>0")
+
+                for item in nodes_to_redistribute:
+                    tree.push(BinTree(item))
+        print("Tree after", tree)
+
+    print("---- EGO TREES AFTER ----")
+
+    for tree in egotrees:
+        print(tree)
+
+    print("-------------------------")
+
+    union_egotrees(g, egotrees, L)
 
 def union_egotrees(g: Graph, egotrees: List[EgoTree], L: List):
+    for item in g.new_demand_matrix:
+        print(item)
     for tree in egotrees:
+        print(tree)
         for edge in tree.get_edges():
             if edge not in g.routing_scheme:
+                u_index = int(edge.v1.label[1:])
+                v_index = int(edge.v2.label[1:])
+                #TODO Újra kell számolni a trolódást
+                edge.probability = g.new_demand_matrix[u_index][v_index]
                 g.routing_scheme.append(edge)
 
     L_v = [x[0] for x in L]
