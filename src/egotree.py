@@ -40,6 +40,7 @@ class Graph:
         self.demand_matrix = demand_matix
 
         self.new_demand_matrix = deepcopy(demand_matix)
+        self.new_new_demand_matrix = deepcopy(demand_matix)
         self.routing_scheme = [] # a.k.a new edges
 
         self.build_graph()
@@ -106,7 +107,7 @@ class Tree:
         for leave in self.leaves:
             v1 = g.get_vertex(self.root.label)[0]
             v2 = g.get_vertex(leave.root.label)[0]
-            weight = int(leave.weight() / 2)
+            weight = leave.weight()
             edges.append(Edge(v1, v2, weight))
             edges.extend(leave.get_edges())
         return edges
@@ -316,7 +317,7 @@ def add_helpers(g, H, L):
             else:
                 already_assinged[edge.v2].append(l[0])
             helper_struct.append((edge.v1, edge.v2, l[0]))
-    calculate_egotrees(g, H, L, helper_struct, 3)
+    calculate_egotrees(g, H, L, helper_struct, 2)
 
 def calculate_egotrees(g: Graph, H: List, L: List, helper_struct: List, delta = None):
     for i in g.demand_matrix:
@@ -366,7 +367,22 @@ def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List
                 v_parent.leaves[ind] = l_tree
                 # print("L", l_tree)
                 # print(tree)
+                u_index = int(tree.root.label[1:])
+                v_index = int(v_tree.root.label[1:])
+                l_index = int(l_tree.root.label[1:])
 
+                weight = g.new_new_demand_matrix[u_index][v_index]
+
+                g.new_new_demand_matrix[u_index][v_index] = 0
+                g.new_new_demand_matrix[v_index][u_index] = 0
+
+                g.new_new_demand_matrix[u_index][l_index] += weight
+                g.new_new_demand_matrix[l_index][u_index] += weight
+
+                g.new_new_demand_matrix[v_index][l_index] += weight
+                g.new_new_demand_matrix[l_index][v_index] += weight
+
+                l_tree.root.probability = g.new_new_demand_matrix[u_index][l_index]
             else:
                 # Mikor L benne van a faban
                 l_tree = [x for x in tree.get_trees() if x.root.label == struct[2].label][0]
@@ -379,7 +395,7 @@ def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List
                 v_index = int(v_tree.root.label[1:])
                 l_index = int(l_tree.root.label[1:])
 
-                if g.demand_matrix[u_index][l_index] > g.demand_matrix[u_index][v_index]:
+                if g.new_new_demand_matrix[u_index][l_index] > g.new_new_demand_matrix[u_index][v_index]:
                     # Toroljuk V-t a fabol
                     nodes_to_redistribute = v_tree.get_dependent_nodes()
                     ind = v_parent.leaves.index(v_tree)
@@ -402,6 +418,18 @@ def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List
                             v_parent.push(l_tree)
                     print("L atveszi V helyet, L>0")
 
+                weight = g.new_new_demand_matrix[u_index][v_index]
+
+                g.new_new_demand_matrix[u_index][v_index] = 0
+                g.new_new_demand_matrix[v_index][u_index] = 0
+
+                g.new_new_demand_matrix[u_index][l_index] += weight
+                g.new_new_demand_matrix[l_index][u_index] += weight
+
+                g.new_new_demand_matrix[v_index][l_index] += weight
+                g.new_new_demand_matrix[l_index][v_index] += weight
+                l_tree.root.probability = g.new_new_demand_matrix[u_index][l_index]
+
                 for item in nodes_to_redistribute:
                     tree.push(BinTree(item))
         print("Tree after", tree)
@@ -418,15 +446,30 @@ def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List
 def union_egotrees(g: Graph, egotrees: List[EgoTree], L: List):
     for item in g.new_demand_matrix:
         print(item)
+    print("------")
+    for item in g.new_new_demand_matrix:
+        print(item)
+
+    queue = []
     for tree in egotrees:
         print(tree)
-        for edge in tree.get_edges():
-            if edge not in g.routing_scheme:
-                u_index = int(edge.v1.label[1:])
-                v_index = int(edge.v2.label[1:])
-                #TODO Újra kell számolni a trolódást
-                edge.probability = g.new_demand_matrix[u_index][v_index]
-                g.routing_scheme.append(edge)
+        queue.append(tree)
+        while queue:
+            tree_to_process = queue.pop(0)
+            for subtree in tree_to_process.leaves:
+                queue.append(subtree)
+                edge = Edge(tree_to_process.root, subtree.root, subtree.weight())
+                if edge not in g.routing_scheme:
+                    u_index = int(edge.v1.label[1:])
+                    v_index = int(edge.v2.label[1:])
+                    #edge.probability = g.new_new_demand_matrix[u_index][v_index]
+                    if edge.probability > 0:
+                        g.routing_scheme.append(edge)
+                else:
+                    print("Noveljuk az elet")
+                    ind = g.routing_scheme.index(edge)
+                    g.routing_scheme[ind].probability += edge.probability
+
 
     L_v = [x[0] for x in L]
 
@@ -436,8 +479,8 @@ def union_egotrees(g: Graph, egotrees: List[EgoTree], L: List):
     for u, v in L_perms:
         u_index = int(u.label[1:])
         v_index = int(v.label[1:])
-        edge = Edge(u, v, g.new_demand_matrix[u_index][v_index])
-        if edge not in g.routing_scheme:
+        edge = Edge(u, v, g.new_new_demand_matrix[u_index][v_index])
+        if edge not in g.routing_scheme and edge.probability > 0:
             g.routing_scheme.append(edge)
 
     print(str(g.routing_scheme))
