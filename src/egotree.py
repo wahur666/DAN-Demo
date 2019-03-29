@@ -431,6 +431,7 @@ def change_nodes_in_egotrees(g: Graph, egotrees: List[EgoTree], H: List, L: List
                 l_tree.root.probability = g.new_new_demand_matrix[u_index][l_index]
 
                 for item in nodes_to_redistribute:
+                    print("REEEEEEEEEE")
                     tree.push(BinTree(item))
         print("Tree after", tree)
 
