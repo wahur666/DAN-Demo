@@ -42,7 +42,8 @@ class Network:
     def get_vertex(self, label):
         return list(filter(lambda x : x.label == label, self.vertices))
 
-    def create_dan(self):
+    def create_dan(self, delta = None):
+        self.delta = delta
         # Classifying points
         degs = []
         for vert in self.vertices:
@@ -109,7 +110,7 @@ class Network:
                 else:
                     already_assinged[edge.v2].append(l[0])
                 helper_struct.append((edge.v1, edge.v2, l[0]))
-        self.calculate_egotrees(helper_struct, 2)
+        self.calculate_egotrees(helper_struct, self.delta)
 
     def calculate_egotrees(self, helper_struct: List, delta=None):
         for i in self.demand_matrix:
