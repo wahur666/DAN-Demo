@@ -48,7 +48,7 @@ print(g)
 # Itt adjuk meg, hogy mennyi legyen a Delta az egoree generalaskor
 # None -> 12 * atlag fokszam
 # x > 1 -> annyi fokszam
-g.create_dan(2)
+g.create_dan(3)
 
 G = nx.Graph()
 for i in range(len(demand_distribution)):

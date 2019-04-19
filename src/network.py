@@ -188,7 +188,8 @@ class Network:
                     v_index = int(v_tree.root.label[1:])
                     l_index = int(l_tree.root.label[1:])
 
-                    if self.new_new_demand_matrix[u_index][l_index] > self.new_new_demand_matrix[u_index][v_index]:
+                    if self.new_new_demand_matrix[u_index][l_index] > self.new_new_demand_matrix[u_index][v_index]\
+                            or tree.get_node_dept(v_tree.root) > tree.get_node_dept(l_tree.root):
                         # Toroljuk V-t a fabol
                         nodes_to_redistribute = v_tree.get_dependent_nodes()
                         ind = v_parent.leaves.index(v_tree)
@@ -202,7 +203,6 @@ class Network:
                         ind = l_parent.leaves.index(l_tree)
                         l_parent.leaves.pop(ind)
                         l_tree.leaves = v_tree.leaves
-
                         if len(v_parent.leaves) > 0:
                             ind = v_parent.leaves.index(v_tree)
                             v_parent.leaves[ind] = l_tree
@@ -226,6 +226,14 @@ class Network:
                     for item in nodes_to_redistribute:
                         print("REEEEEEEEEE")
                         tree.push(BinTree(item))
+
+            if len(tree.leaves) < self.delta:
+                for leave in tree.leaves:
+                    if len(leave.leaves) > 0:
+                        tree_to_move = leave.leaves.pop(0)
+                        tree.leaves.append(tree_to_move)
+                        break
+
             print("Tree after", tree)
 
         print("---- EGO TREES AFTER ----")

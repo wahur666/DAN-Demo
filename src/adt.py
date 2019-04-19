@@ -72,6 +72,20 @@ class Tree:
             trees.extend(leave.get_trees())
         return trees
 
+    def get_node_dept(self, node: Node):
+        dept = 1
+        queue : List[Tree] = self.leaves
+        while queue:
+            nq = []
+            for item in queue:
+                if item.root.label == node.label:
+                    return dept
+                else:
+                    nq.extend(item.leaves)
+            dept += 1
+            queue = nq
+        return -1
+
 
 
 class BinTree(Tree):
