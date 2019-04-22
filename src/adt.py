@@ -45,7 +45,7 @@ class Edge:
         return self.v1.label + "-" + str(self.probability) + "-" + self.v2.label
 
     def __eq__(self, other):
-        return {self.v1, self.v2} == {other.v1, other.v2}
+        return {self.v1.index, self.v2.index} == {other.v1.index, other.v2.index}
 
 class Tree:
 

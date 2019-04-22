@@ -15,7 +15,7 @@ class Network:
 
         self.new_demand_matrix = deepcopy(demand_matix)
         self.new_new_demand_matrix = deepcopy(demand_matix)
-        self.routing_scheme = [] # a.k.a new edges
+        self.routing_scheme = []  # a.k.a new edges
 
         self.build_graph()
 
@@ -74,7 +74,7 @@ class Network:
 
     def add_helpers(self):
         c_L = cycle(self.L)
-        helper_struct = []
+        self.helper_struct = []
         already_assinged = {}
         for edge in self.edges:
             H_v = [x[0] for x in self.H]
@@ -112,24 +112,25 @@ class Network:
                     already_assinged[edge.v2] = [l[0]]
                 else:
                     already_assinged[edge.v2].append(l[0])
-                helper_struct.append((edge.v1, edge.v2, l[0]))
-        self.calculate_egotrees(helper_struct, self.delta)
+                self.helper_struct.append((edge.v1, edge.v2, l[0]))
+        self.calculate_egotrees(self.delta)
 
-    def calculate_egotrees(self, helper_struct: List, delta=None):
+    def calculate_egotrees(self, delta=None):
         for i in self.demand_matrix:
             print(i)
 
         H_i = [x[0].index for x in self.H]
 
         deltaN = delta or 12 * int(round(self.avg_deg))
-
+        if not self.delta:
+            self.delta = deltaN
         self.egotrees = calculate_all_egotrees(self.demand_matrix, deltaN, H_i)
         for i in self.egotrees:
             print(i)
 
-        self.change_nodes_in_egotrees(helper_struct)
+        self.change_nodes_in_egotrees()
 
-    def change_nodes_in_egotrees(self, helper_struct: List):
+    def change_nodes_in_egotrees(self):
 
         print("---- EGO TREES BEFORE ----")
         for tree in self.egotrees:
@@ -137,7 +138,7 @@ class Network:
         print("--------------------------")
         for tree in self.egotrees:
             print("Tree before", tree)
-            for struct in helper_struct:
+            for struct in self.helper_struct:
                 leave_indices = [x.index for x in tree.get_dependent_nodes()]
                 if tree.root.index == struct[0].index and struct[1].index in leave_indices:
                     v_tree = [x for x in tree.get_trees() if x.root.index == struct[1].index][0]
@@ -239,52 +240,9 @@ class Network:
 
             print("Tree after", tree)
 
-        self.calculate_congestion_and_avglen(helper_struct)
 
         self.union_egotrees()
 
-    def calculate_congestion_and_avglen(self, helper_struct):
-        all_path = {}
-        for tree in self.egotrees:
-            tree.build_routes()
-            tree_paths = []
-            for struct in helper_struct:
-                if struct[0].index == tree.root.index or struct[1].index == tree.root.index:
-                    r = tree.get_path(struct[2])
-                    r.reverse()
-                    tree_paths.append(r)
-            all_path[tree_paths[0][0].index] = tree_paths
-
-        H_i = [x[0].index for x in self.H]
-        L_i = [x[0].index for x in self.L]
-
-        # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
-        congestion = 0
-
-        # sum az ut hossza megszorozva ut valoszinusege
-        avg_route_len = 0
-
-        for i in range(len(self.demand_matrix)-1):
-            for j in range(i + 1, len(self.demand_matrix)):
-                if self.demand_matrix[i][j]:
-                    print(i, j)
-                    if i in H_i and j in H_i:
-                        #Mikor H x H van
-                        #Ket kulonbozo pont osszeforgatasa
-                        pass
-                    elif i in H_i and j in L_i:
-                        #Megkeresessük az utat
-                        pass
-                    elif i in L_i and j in H_i:
-                        #Megkeresessük az utat
-                        pass
-                    else:
-                        # Mikor mindketto L
-                        # Direkt kapcsolat, hossz 1
-                        pass
-
-
-        print(all_path)
 
     def union_egotrees(self):
         for item in self.new_demand_matrix:
@@ -322,10 +280,135 @@ class Network:
             u_index = u.index
             v_index = v.index
             edge = Edge(u, v, self.new_new_demand_matrix[u_index][v_index])
-            if edge not in self.routing_scheme and edge.probability > 0:
-                self.routing_scheme.append(edge)
+            if edge.probability > 0:
+                if edge not in self.routing_scheme:
+                    self.routing_scheme.append(edge)
+                else:
+                    ind = self.routing_scheme.index(edge)
+                    self.routing_scheme[ind].probability += edge.probability
 
         print(str(self.routing_scheme))
+
+        self.calculate_congestion_and_avglen()
+
+    def calculate_congestion_and_avglen(self):
+        all_path = {}
+        for tree in self.egotrees:
+            tree.build_routes()
+            tree_paths = []
+            for struct in self.helper_struct:
+                if struct[0].index == tree.root.index or struct[1].index == tree.root.index:
+                    r = tree.get_path(struct[2])
+                    r.reverse()
+                    tree_paths.append(r)
+            all_path[tree_paths[0][0].index] = tree_paths
+
+        H_i = [x[0].index for x in self.H]
+        L_i = [x[0].index for x in self.L]
+
+        # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
+        congestion = 0
+        most_congested_route = None
+
+        # sum az ut hossza megszorozva ut valoszinusege
+        avg_route_len = 0
+
+        for i in range(len(self.demand_matrix)-1):
+            for j in range(i + 1, len(self.demand_matrix)):
+                if self.demand_matrix[i][j]:
+                    print(i, j)
+                    if i in H_i and j in H_i:
+                        #Mikor H x H van
+                        #Ket kulonbozo pont osszeforgatasa
+                        route = []
+                        for struct in self.helper_struct:
+                            if struct[0].index == i and struct[1].index == j:
+                                route = self.find_route(all_path, i, struct[2].index)
+                                route2 = self.find_route(all_path, j, struct[2].index)[:-1]
+                                route2.reverse()
+                                route.extend(route2)
+                                break
+
+                        if route:
+                            con = self.calculate_congestion(route)
+                            congestion, most_congested_route = self.update_congestion(con, congestion,
+                                                                                      most_congested_route,
+                                                                                      route)
+                            avg_route_len += self.demand_matrix[i][j] * len(route)
+                            print("Congestion:", con, route)
+                            print("Route Length:", self.demand_matrix[i][j] * len(route))
+
+
+                        #print("Full combined:", route1)
+                    elif i in H_i and j in L_i:
+                        #Megkeresessük az utat
+                        route = self.find_route(all_path, i, j)
+                        con = self.calculate_congestion(route)
+                        congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
+                                                                                  route)
+                        avg_route_len += self.demand_matrix[i][j] * len(route)
+                        print("Congestion:", con, route)
+                        print("Route Length:", self.demand_matrix[i][j] * len(route))
+                        #print(route)
+
+                    elif i in L_i and j in H_i:
+                        route = self.find_route(all_path, j, i)
+                        con = self.calculate_congestion(route)
+                        congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
+                                                                                  route)
+                        avg_route_len += self.demand_matrix[i][j] * len(route)
+                        print("Congestion:", con, route)
+                        print("Route Length:", self.demand_matrix[i][j] * len(route))
+
+                        #print(route)
+                    else:
+                        # Mikor mindketto L
+                        # Direkt kapcsolat, hossz 1
+                        con, route = 0, []
+                        for edge in self.routing_scheme:
+                            if edge.v1.index == i and edge.v2.index == j or edge.v1.index == j and edge.v2.index == i:
+                                con = edge.probability
+                                route = [edge.v1, edge.v2]
+                                break
+                        congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
+                                                                                  route)
+                        avg_route_len += self.demand_matrix[i][j] * len(route)
+                        print("Congestion:", con, route)
+                        print("Route Length:", self.demand_matrix[i][j] * len(route))
+
+        full_weight = sum_aa(self.demand_matrix)
+        print("------- Summary -------")
+
+        print("Most congested route:", congestion, congestion/full_weight, most_congested_route)
+        print("Average weighted routlength:", avg_route_len/full_weight)
+
+        print("-----------------------")
+        #print(all_path)
+
+    def update_congestion(self, con, congestion, most_congested_route, route):
+        if con > congestion:
+            congestion = con
+            most_congested_route = route
+        return congestion, most_congested_route
+
+    def calculate_congestion(self, route):
+        con = 0
+        for k in range(len(route) - 1):
+            start = route[k]
+            end = route[k + 1]
+            self.routing_scheme: List[Edge]
+            for edge in self.routing_scheme:
+                if edge.v1.index == start.index and edge.v2.index == end.index or \
+                        edge.v1.index == end.index and edge.v2.index == start.index:
+                    con += edge.probability
+                    break
+        return con
+
+    def find_route(self, all_path, i, j) -> List[Node]:
+        for route in all_path[i]:
+            assert route, List[Node]
+            if route[0].index == i and route[-1].index == j:
+                return route.copy()
 
 
 def map_probabilities(p: List[Node]) -> Dict:
