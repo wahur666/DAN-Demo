@@ -1,27 +1,34 @@
 from typing import List, Dict
 
-class Node:
-
-    def __init__(self, label: str, probability: float):
-        self.label = label
-        self.probability = probability
-
-    def __str__(self):
-        return self.label + " W: " + str(self.probability)
-
-    def __repr__(self):
-        return self.label + " W: " + str(self.probability)
 
 class Vertex:
 
-    def __init__(self, label: str):
-        self.label = label
+    def __init__(self, prefix: str, index: int):
+        self.label = prefix + str(index)
+        self.index = index
 
     def __repr__(self):
         return "Vertex: " + self.label
 
     def __str__(self):
         return "Vertex: " + self.label
+
+
+class Node(Vertex):
+
+    def __init__(self, prefix: str, index: int, probability: float):
+        super(Node, self).__init__(prefix, index)
+        self.probability = probability
+        self.parent = None
+
+    def __str__(self):
+        return self.label + " W: " + str(self.probability)
+
+    def __repr__(self):
+        return self.label + " W: " + str(self.probability)
+
+    def set_parent(self, parent):
+        self.parent = parent
 
 
 class Edge:
@@ -45,6 +52,7 @@ class Tree:
     def __init__(self, root: Node):
         self.root = root
         self.leaves: List = []
+        self.routes_built = False
 
     def dept(self):
         return 1 + max(self.leaves, key=lambda x: x.dept()).dept() if self.leaves else 0
@@ -74,11 +82,11 @@ class Tree:
 
     def get_node_dept(self, node: Node):
         dept = 1
-        queue : List[Tree] = self.leaves
+        queue: List[Tree] = self.leaves
         while queue:
             nq = []
             for item in queue:
-                if item.root.label == node.label:
+                if item.root.index == node.index:
                     return dept
                 else:
                     nq.extend(item.leaves)
@@ -86,6 +94,27 @@ class Tree:
             queue = nq
         return -1
 
+    def build_routes(self):
+        for leave in self.leaves:
+            leave : Tree
+            leave.root.set_parent(self.root)
+            leave.build_routes()
+        self.routes_built = True
+
+    def get_path(self, vertex: Vertex) -> List:
+        route = []
+        if not self.routes_built:
+            self.build_routes()
+        for node in self.get_dependent_nodes():
+            if node.index == vertex.index:
+                nx = node
+                while nx:
+                    route.append(nx)
+                    if nx.parent is not None:
+                        nx = nx.parent
+                    else:
+                        return route
+        return route
 
 
 class BinTree(Tree):

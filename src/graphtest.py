@@ -48,7 +48,7 @@ print(g)
 # Itt adjuk meg, hogy mennyi legyen a Delta az egoree generalaskor
 # None -> 12 * atlag fokszam
 # x > 1 -> annyi fokszam
-g.create_dan(3)
+g.create_dan(2)
 
 G = nx.Graph()
 for i in range(len(demand_distribution)):
@@ -73,7 +73,7 @@ for i in range(len(demand_distribution)):
     Gn.add_node(i, label=str(i))
 
 for edge in g.routing_scheme:
-    Gn.add_edge(int(edge.v1.label[1:]), int(edge.v2.label[1:]), w=edge.probability)
+    Gn.add_edge(edge.v1.index, edge.v2.index, w=edge.probability)
 
 pos = nx.circular_layout(Gn)
 plt.figure(300)
