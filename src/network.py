@@ -303,8 +303,8 @@ class Network:
                     tree_paths.append(r)
             all_path[tree_paths[0][0].index] = tree_paths
 
-        H_i = [x[0].index for x in self.H]
-        L_i = [x[0].index for x in self.L]
+        self.H_i = [x[0].index for x in self.H]
+        self.L_i = [x[0].index for x in self.L]
 
         # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
         congestion = 0
@@ -317,7 +317,7 @@ class Network:
             for j in range(i + 1, len(self.demand_matrix)):
                 if self.demand_matrix[i][j]:
                     print(i, j)
-                    if i in H_i and j in H_i:
+                    if i in self.H_i and j in self.H_i:
                         #Mikor H x H van
                         #Ket kulonbozo pont osszeforgatasa
                         route = []
@@ -340,25 +340,27 @@ class Network:
 
 
                         #print("Full combined:", route1)
-                    elif i in H_i and j in L_i:
+                    elif i in self.H_i and j in self.L_i:
                         #Megkeresessük az utat
                         route = self.find_route(all_path, i, j)
-                        con = self.calculate_congestion(route)
-                        congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
-                                                                                  route)
-                        avg_route_len += self.demand_matrix[i][j] * len(route)
-                        print("Congestion:", con, route)
-                        print("Route Length:", self.demand_matrix[i][j] * len(route))
-                        #print(route)
+                        if route:
+                            con = self.calculate_congestion(route)
+                            congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
+                                                                                      route)
+                            avg_route_len += self.demand_matrix[i][j] * len(route)
+                            print("Congestion:", con, route)
+                            print("Route Length:", self.demand_matrix[i][j] * len(route))
+                            #print(route)
 
-                    elif i in L_i and j in H_i:
+                    elif i in self.L_i and j in self.H_i:
                         route = self.find_route(all_path, j, i)
-                        con = self.calculate_congestion(route)
-                        congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
-                                                                                  route)
-                        avg_route_len += self.demand_matrix[i][j] * len(route)
-                        print("Congestion:", con, route)
-                        print("Route Length:", self.demand_matrix[i][j] * len(route))
+                        if route:
+                            con = self.calculate_congestion(route)
+                            congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
+                                                                                      route)
+                            avg_route_len += self.demand_matrix[i][j] * len(route)
+                            print("Congestion:", con, route)
+                            print("Route Length:", self.demand_matrix[i][j] * len(route))
 
                         #print(route)
                     else:
