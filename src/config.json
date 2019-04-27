@@ -9,7 +9,7 @@
     {
       "graph": "barabasi-albert",
       "vertex_num": 11,
-      "dan": null,
+      "dan": 3,
       "m": 4
     },
     {
