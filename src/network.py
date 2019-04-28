@@ -197,15 +197,20 @@ class Network:
                     if self.new_new_demand_matrix[u_index][l_index] > self.new_new_demand_matrix[u_index][v_index]\
                             or tree.get_node_dept(v_tree.root) > tree.get_node_dept(l_tree.root):
                         # Toroljuk V-t a fabol
-                        nodes_to_redistribute = v_tree.get_dependent_nodes()
+
+                        leaves: List[BinTree] = v_tree.leaves
                         ind = v_parent.leaves.index(v_tree)
                         v_parent.leaves.pop(ind)
+
+                        self.rebalance_tree(v_parent, leaves)
+
                         print("V-t toroljuk a fabol")
                     else:
                         # L atveszi V helyet
-                        nodes_to_redistribute = l_tree.get_dependent_nodes()
-                        if v_tree.root in nodes_to_redistribute:
-                            nodes_to_redistribute.remove(v_tree.root)
+                        leaves: List[BinTree] = l_tree.leaves
+                        if v_tree in leaves:
+                            leaves.remove(v_tree)
+
                         ind = l_parent.leaves.index(l_tree)
                         l_parent.leaves.pop(ind)
                         l_tree.leaves = v_tree.leaves
@@ -215,6 +220,9 @@ class Network:
                         else:
                             if v_parent != l_tree:
                                 v_parent.push(l_tree)
+
+                        self.rebalance_tree(l_parent, leaves)
+
                         print("L atveszi V helyet, L>0")
 
                     weight = self.new_new_demand_matrix[u_index][v_index]
@@ -229,9 +237,6 @@ class Network:
                     self.new_new_demand_matrix[l_index][v_index] += weight
                     l_tree.root.probability = self.new_new_demand_matrix[u_index][l_index]
 
-                    for item in nodes_to_redistribute:
-                        print("REEEEEEEEEE")
-                        tree.push(BinTree(item))
 
             if len(tree.leaves) < self.delta:
                 for leave in tree.leaves:
@@ -245,6 +250,24 @@ class Network:
 
         self.union_egotrees()
 
+    def rebalance_tree(self, l_parent, leaves):
+        while leaves:
+            if len(leaves) == 2:
+                if leaves[0].weight() > leaves[1].weight():
+                    new_leaves = leaves[0].leaves
+                    leaves[0].leaves = [leaves[1]]
+                    l_parent.leaves.append(leaves[0])
+                    l_parent = leaves[0]
+                    leaves = new_leaves
+                else:
+                    new_leaves = leaves[1].leaves
+                    leaves[1].leaves = [leaves[0]]
+                    l_parent.leaves.append(leaves[1])
+                    l_parent = leaves[1]
+                    leaves = new_leaves
+            elif len(leaves) == 1:
+                l_parent.leaves.extend(leaves)
+                break
 
     def union_egotrees(self):
         for item in self.new_demand_matrix:

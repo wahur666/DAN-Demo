@@ -121,7 +121,7 @@ def render_everyting(network: Network):
 
 def main():
     configurations = load_configurations()
-    active_config = configurations[1]
+    active_config = configurations[2]
 
     demand_matrix = create_demand_matrix_for_configuration(active_config)
 
