@@ -21,6 +21,7 @@
 
 \newtheorem{mydef}{Definició}
 \newtheorem{mytetel}{Tétel}
+\newtheorem{mylemma}{Lemma}
 
 \begin{document}
 
@@ -142,24 +143,148 @@ Egy véletlen gráfok generálására egy külső csomag lett használva \cite{n
 \subsection{Torlódás}
 
 \begin{mydef}
-	A torlós jó
+	A torlódást egy \(\Gamma(N)\) útválasztási sémán a \(D\) demand mátrix segítségével írjuk fel: \[C(D, \Gamma(N)) = \max_{e \in \Gamma(N)}  \sum_{e \in \Gamma(uv)} p(u,v) \]
 \end{mydef}
 
 \subsection{Úthossz}
 
 \begin{mydef}
-	Az úthossz is jó
+	Az átlag súlyozott úthosszt egy \(\Gamma(N)\) útválasztási sémán a \(D\) demand mátrix segítségével írjuk fel: \[L(D, \Gamma(N)) = \sum_{(u,v) \in D}  p(u,v)  \cdot d_{\Gamma(N)}(u, v) \] ahol a \(d_{\Gamma(N)}(u, v)\) az útvonal hosszát jelöli
 \end{mydef}
 
 \subsection{Skálázhatóság}
 
-\begin{mytetel}
-	Itt a kapitány tétel, vétel
-\end{mytetel}
+\begin{itemize}
+	\item A hálózatot skálázhatóra kell tervezni, ezért meghatározunk egy \(\Delta\) konstans fokszámot, ami a maximális csatlakozások számát fogja meghatározni egy adott csomóponthoz
+	\item \(N_\Delta\) jelölje az összes \(\Delta\) fokszámú gráfot, és elváruk, hogy \(N \in N_\Delta\)
+\end{itemize}
+
+\subsection{Optimális torlódás}
+
+Az optimális torlódást egy  hálózatra, úgy határozzuk meg, hogy a csak a torlódást vesszük figyelembe számításkor \[C^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} C(D, \Gamma(N))\]
+
+\subsection{Optimális úthossz}
+
+Az optimális úthosszt egy  hálózatra, úgy határozzuk meg, hogy a csak az úthosszt vesszük figyelembe számításkor \[L^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} L(D, \Gamma(N))\]
+
+\section{cl-DAN hálózat tervezése}
+	
+\begin{mydef}
+	Adott egy \(D\) demand mátrix, és egy \(\Delta\) maximális fokszám, az \((\alpha, \beta)\)-cl-DAN hálózat tervezési probléma:
+	\begin{itemize}
+		\item Hogy tervezzünk egy olyan \(N \in N_\Delta\) hálózatot, és egy hozzá tartozó \(\Gamma(N)\) útválasztási sémát, ami közel optimális torlódásra és úthosszra is
+	\end{itemize}
+
+	Az algoritmus egy felső korlátot tud adni arra, hogy mennyivel fog eltérni a megoldás az optimálistól.
+	\begin{itemize}
+		\item Torlódásra: \(C(D, \Gamma(N)) \le \alpha \cdot C^*(D, \Delta) + \alpha'\)
+		\item Úthosszra: \(L(D, \Gamma(N)) \le \beta \cdot L^*(D, \Delta) + \beta'\)
+	\end{itemize}
+	Az alfa vessző és béta vesszők olyan tényezők aki amik függetlenek a problémától
+\end{mydef}
 
 \section{EgoTree}
 
+\begin{itemize}
+	\item Az Egofa egy torlódásra és úthosszra optimalizált fa hálózat egy csomópontra nézve
+	\item Az Egotree-t definiáljuk a következő módon, 
+	
+	\(EgoTree(s, \bar{p}, \Delta) \):
+	\begin{itemize}
+		\item \(s\) a forrás csomópont
+		\item \(\bar{p}\) a szomszédainak eloszlásai
+		\item \(\Delta\) fokszám
+	\end{itemize}
+	\item Ez közel optimális megoldást ad torlódásra és úthosszra
+\end{itemize}
+
+\begin{mytetel}
+	Adott egy  \(\bar{p}\) frekvencia eloszlás az \(s\) forrás ponthoz, és adott egy \(\Delta\) fokszám, ekkor az \(EgoTree(s, \bar{p}, \Delta)\) egy \((\alpha, \beta)\)-cl-DAN a következő paraméterekkel:
+	\begin{itemize}
+		\item \(\alpha = \frac{4}{3}\)
+		\item \(\beta = log^2(\Delta + 1)\)
+	\end{itemize}
+\end{mytetel}
+
+\section{\(EgoTree(s, \bar{p}, \Delta)\) algoritmus}
+
+\begin{enumerate}
+	\item \(s\) a gyökér elem, \(\Delta\) fokszámmal, üres fa
+	\item Rendezzük sorba \(\bar{p} = \{p1, p2, ..., p_k\}\) valószínűségeket csökkenő sorrendben
+	\item Kezdjük rárakni a fára a csomópontokat, a gyökér elemre legfeljebb \(\Delta\) levél kerülhet
+	\item Mikor elértük a \(\Delta\) levelet, a következő csomópontokat mindig a legkisebb összesített súlyú levélre kapcsolok rá, itt már legfeljebb két levele lehet minden fának
+\end{enumerate}
+
+\subsection{Algoritmus elemzése}
+
+\begin{itemize}
+	\item A kapott eredményben látható, hogy a maximális torlódás a legnagyobb súlyú élen van
+	\item Minimalizálni ezt, lényegében egy időzítés probléma, hogy osszuk ki a munkákat \(\Delta\) processzornak, hogy minden leghamarabb kész legyen
+	\item Erre az optimális algoritmus NP-nehéz, de van közelítő módszer
+\end{itemize}
+
+\subsection{Longest Processing Time (LPT)}
+
+\begin{itemize}
+	\item Először sorba rendezzük a feladatokat hossz szerint csökkenő sorrendben
+	\item Ha van szabad processzor, akkor ahhoz rendeli a leghosszabb munkát
+	\item Ha nincs akkor ahhoz a processzorhoz rendeli, ahol a legkevesebb ideig tart a munka
+\end{itemize}
+\begin{mytetel}
+	Legyen \(\omega_L\) a maximum idő, mielőtt egy processzor befejezi az összes munkát a mohó LPT algoritmus szerint, és \(\omega_0\) az optimális, ekkor \[\frac{\omega_L}{\omega_0} \le \frac{4}{3} - \frac{1}{3\Delta}\]
+\end{mytetel}
+
+Ez az algoritmus polinom időben lefut
+
+\begin{mylemma}
+	Az \(EgoTree(s, \bar{p}, \Delta)\) ad egy \(\frac{4}{3}\) szorzóval nagyobb közelítést a minimális torlódásra az optimális \(\Delta\) fokú fához képest, ami kiszolgál \(\bar{p}\) frekvencia eloszlást egy adott \(s\) forrás csomópontra
+\end{mylemma}
+
+\begin{mylemma}
+	Az \(EgoTree(s, \bar{p}, \Delta)\) ad egy \(log^2(\Delta + 1)\) szorzóval nagyobb közelítést a minimális úthosszra az optimális \(\Delta\) fokú fához képest, ami kiszolgál \(\bar{p}\) frekvencia eloszlást egy adott \(s\) forrás csomópontra
+\end{mylemma}
+
 \section{cl-DAN algoritmus}
+
+\begin{mytetel}
+	Legyen \(D\) egy szimmetrikus kommunikáció kéréseloszlás , ahol az átlag csúcs fokszáma \(\rho\), (azaz az élek száma \(\rho \cdot \frac{n}{2}\). Ekkor a maximum fokszám \(\Delta = 12\rho\), ehhez lehetséges generálni egy \((\alpha, \beta)\)-cl-DAN hálózatot, ahol:
+	\begin{itemize}
+		\item \(\alpha = 1 + (\frac{8}{9})\Delta\)
+		\item \(\beta = 1 + 4log^2(\Delta + 1)\)
+	\end{itemize}
+\end{mytetel}
+Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra és az optimális úthosszra
+
+\begin{enumerate}
+	\item Felosszuk a hálózat csúcsait két halmazra, \(H\) - magas és \(L\) - alacsony fokszámúakra fele-fele arányban
+	\begin{itemize}
+		\item Az alacsony fokszámú csúcsok fokszáma legfeljebb \(2\rho\)
+	\end{itemize}
+	\item Megkeressük az összes olyan \((u, v)\) élt, ahol \(u\) és \(v\) is a magas fokszámú halmazba tartozik
+	\item Az ilyen éleket a gráfban kiegészítjük egy segítő csomóponttal, \(l \in L\), az eredeti csomópontok között megszüntetjük az élt, és felveszünk két új élt \((u, l)\) és \((v, l)\)
+	\begin{itemize}
+		\item Minden segítő \(l\) csúcs választásakor egy még nem felhasználtat válasszunk az \(L\) halmazból
+	\end{itemize}
+	\item Meghatározunk egy mátrixot, ami első lépésben az eredeti
+	\begin{itemize}
+		\item Ahol segítő csomópontot vettünk fel, ott az útvonal hosszúhoz hozzá kell még adni az \(l\)-el való áthaladást is, és törölni kell az eredeti pontok közti élt
+		\item Ezután elkészítjük a magas halmaz csúcsaira a \(T_u\) fát, ahol a valószínűségeket a mátrixból kiolvassuk, \(\Delta = 12\rho\) fokszámmal, ez közel optimális megoldást ad mindkét fel
+	\end{itemize}
+	\item Mivel \(u\) és \(v\) pontok közt egy \(l\) segítő csomópont van használva ezért \(T_u\) és \(T_v\) módosításra szorul. Alakítsuk át először \(T_u\)-t \(T'_u\)-ra
+	\begin{itemize}
+		\item Ha \(l \notin T_u\), \((p(u, l) = 0)\), akkor \(l\) átveszi \(v\) helyét \(T'_u\)-ban
+		\item Ha \(l \in T_u\), \((p(u, l) > 0)\), akkor két lehetőségünk van:
+		\begin{itemize}
+			\item Ha \((p(u, l) > (p(u, v))\), akkor töröljük \(v\)-t a fából
+			\item Ha \((p(u, l) \le (p(u, v))\), akkor \(l\) átveszi \(v\) helyét \(T'_u\)-ban
+		\end{itemize}
+		\item \(T'_v\) hasonlóan számítjuk ki, ezzel garantálva, hogy \(T'_u\) és \(T'_v\) közötti kommunikáció az \(l\) csomóponton keresztül fog áthaladni
+	\end{itemize}
+	\item Konstruáljuk meg az új N hálózatot, vegyük az előbb készített egofákat és vegyük az uniójukat, azaz húzzuk be az összes olyan élet amik szerepeltek a fákban
+	\begin{itemize}
+		\item     De mivel nem csak magas fokú csomópontok közt történhetett adatforgalom, ezért még vegyük hozzá az N hálózathoz azokat az éleket is, ahol mindkét csomópont alacsony fokszámú volt
+	\end{itemize}
+\end{enumerate}
 
 \chapter{Megvalósítás}
 
