@@ -1,0 +1,174 @@
+\documentclass[12pt]{report}
+
+\usepackage[a4paper,
+			inner = 35mm,
+			outer = 25mm,
+			top = 25mm,
+			bottom = 25mm]{geometry}
+\usepackage{lmodern}
+\usepackage[magyar]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage{amsthm}
+
+% \setcounter{secnumdepth}{3}
+\onehalfspacing
+
+\newtheorem{mydef}{Definició}
+\newtheorem{mytetel}{Tétel}
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+		\vspace*{1cm}
+		
+		\textbf{\LARGE 
+			Forgalom igény tudatos hálózat tervezés minimális torlódással és úthosszal
+		}
+	
+	
+		\vspace{0.5cm}
+	
+		\textbf{\normalsize Tudáskezelő rendszerek II. labor összefoglaló}
+		
+		\vfill
+		
+		\Large Szecsődi Imre
+		
+		\vspace{2.8cm}
+		
+		\the\year
+		
+	\end{center}
+\end{titlepage}
+
+\tableofcontents
+	
+\chapter{Bevezetés}
+
+A labor munka a Demand-Aware Network Design with Minimal Congestion and Route Lengths \cite{avin_demand-aware_nodate} cikk alapján készült.
+
+\section{Motiváció}
+
+\begin{itemize}
+	\item A technika előrehaladásával egyre nagyobb lett a feldolgozandó adatok mennyisége
+	\item Adattárházakban a szerverek közötti kommunikáció is ezáltal megnövekedett
+	\item A jelenlegi hálózatok a legrosszabb esetre vannak tervezve, azaz, hogy majdnem teljes sávszélességű, kétirányú kapcsolat álljon fent bármelyik két szerver között
+	\item A valós kommunikáció nem ezt a sémát követi, hanem túlnyomó részt megadott párok között történik a legtöbb kommunikáció
+\end{itemize}
+
+Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}.
+
+\begin{itemize}
+	\item Nézzünk meg pár valós példát, Microsoft adattárházában  250 ezer szervert 5 production klaszterben elosztva
+\end{itemize}
+
+\subsection{Hálózat tervezési stratégiák}
+
+\begin{itemize}
+	\item A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újra konfiguráljunk, attól függően milyen terhelés éri
+	\begin{itemize}
+		\item pl, korábbi kommunikációs minták alapján
+	\end{itemize}
+	\item Két fő optimalizációs lehetőség van, legyen rövid az út (a) vagy legyen minimális a torlódás (b)
+	\item A cikk bemutat egy módszert arra, hogy lehet mindkettőre majdnem optimális megoldást adni egyszerre (c)
+\end{itemize}
+
+
+\subsection{Adattárházak hálózati felépítése}
+
+\begin{itemize}
+	\item Core switch
+	\item Aggregation Swtiches
+	\item Top of Rack Switches
+	\item In-Rack Switches
+\end{itemize}
+
+\subsection{Újrakonfigurálás megvalósítása}
+
+\begin{itemize}
+	\item Átlag hálózatok statikusan vannak konfigurálva, nem  sok lehetőséget adva annak, hogy változtassunk 
+	\begin{itemize}
+		\item pl. Ethernet switchek
+	\end{itemize}
+	\item Optikai switchek már újra tudják konfigurálni magukat, de ezek "lassúak"
+	\item Microsoft Research - ProjecToR\cite{ghobadi_projector:_2016}, lézer segítségével kiváltani az optikai swticheket
+	\begin{itemize}
+		\item 12 $\mu s$ váltás idő ( 2500x gyorsabb mint egy optikai hálózati switch)
+	\end{itemize}
+	
+\end{itemize}
+
+\section{Labor célja}
+
+A labor célja a cikkben\cite{avin_demand-aware_nodate} bemutatott algoritmus implementálása, és annak alkalmazása különböző véletlenszerűen generált gráfokra. 
+A kapott eredményeket össze lehet hasonlítani a megadott elméleti korlátokkal.
+
+\section{Laborban megvalósított munka}
+
+A labor ideje alatt elkészült egy keretrendszer, ami segítségével tesztelhető a szerzők által felvázolt algoritmus. 
+A keretrendszer Python \cite{noauthor_python_nodate} nyelven íródott.
+Egy véletlen gráfok generálására egy külső csomag lett használva \cite{noauthor_networkx_nodate}
+
+\chapter{Modell}
+
+\section{Forgalom igény tudatos hálózat tervezés probléma}
+
+\begin{itemize}
+	\item Vegyünk egy hálózatot meghatározott számú csomóponttal
+	\item A hálózathoz tartozik egy demand mátrix, ami leírja a valószínűségét annak, hogy $i$ forrásból mekkora eséllyel lesz adat küldve $j$ célba
+	\item A cél, hogy ezen adatból egy olyan hálózati séma készítése, ami kis torlódást és rövid utakat eredményez, ez mellett még skálázható is
+\end{itemize}
+
+\section{Formális felírás}
+
+\begin{itemize}
+	\item Adott $N$ darab csúcspont  $V = \{1, ..., N\}$, és egy kommunikációs séma $M_D$ ami egy $N\times N$ mátrix
+	\item A mátrix $(i, j)$ eleméhez tartozik egy $p(i, j)$ valószínűség, ahol $i$ a forrás csomópont és $j$ a cél
+	\item A bemeneti mátrix ábrázolható egy irányított
+	$G_D$ gráfban, ahol az élsúlyok a két pont közötti kommunikációs valószínűség
+	\item Az algoritmus feltétele, hogy a mátrix ritka legyen
+	\item Egy $N$ hálózatra a torlódást és az úthosszt útválasztási sémával fogjuk definiálni
+	\item Egy útválasztási séma az $N$ hálózatra $\Gamma(N)$, ami $\Gamma_{uv}$ utak halmaza, ahol $(u, v)$ párok különböző utakat jelölnek
+	\item $\Gamma_{uv}$ egy útsorozat, ami összeköti az $u$ pontot $v$ ponttal
+\end{itemize}
+
+\subsection{Torlódás}
+
+\begin{mydef}
+	A torlós jó
+\end{mydef}
+
+\subsection{Úthossz}
+
+\begin{mydef}
+	Az úthossz is jó
+\end{mydef}
+
+\subsection{Skálázhatóság}
+
+\begin{mytetel}
+	Itt a kapitány tétel, vétel
+\end{mytetel}
+
+\section{EgoTree}
+
+\section{cl-DAN algoritmus}
+
+\chapter{Megvalósítás}
+
+\chapter{Teszt eredmények}
+
+\chapter{Összefoglalás}
+
+\bibliographystyle{abbrv}
+\bibliography{refrences}
+
+	
+\end{document}
