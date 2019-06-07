@@ -1,6 +1,7 @@
 from itertools import cycle, combinations
 from copy import deepcopy
 from adt import *
+import re
 
 PREFIX = "T"
 
@@ -115,18 +116,23 @@ class Network:
                 else:
                     already_assinged[edge.v2].append(l[0])
                 self.helper_struct.append((edge.v1, edge.v2, l[0]))
-        self.calculate_egotrees(self.delta)
+        self.calculate_egotrees()
 
-    def calculate_egotrees(self, delta=None):
+    def calculate_egotrees(self):
         for i in self.demand_matrix:
             print(i)
 
         H_i = [x[0].index for x in self.H]
 
-        deltaN = delta or 12 * int(round(self.avg_deg))
-        if not self.delta:
-            self.delta = deltaN
-        self.egotrees = calculate_all_egotrees(self.demand_matrix, deltaN, H_i)
+        if self.delta is None:
+            self.delta = 12 * int(round(self.avg_deg))
+        elif re.match('\d+$', str(self.delta)):
+            self.delta = int(self.delta)
+        elif re.match("\d+d$", str(self.delta)):
+            self.delta = int(self.delta[:-1]) * int(round(self.avg_deg))
+        else:
+            raise Exception("Invalid delta format, accepted format \d+$ or \d+d$")
+        self.egotrees = calculate_all_egotrees(self.demand_matrix, self.delta, H_i)
         for i in self.egotrees:
             print(i)
 
@@ -326,7 +332,8 @@ class Network:
                     r = tree.get_path(struct[2])
                     r.reverse()
                     tree_paths.append(r)
-            all_path[tree_paths[0][0].index] = tree_paths
+            if tree_paths:
+                all_path[tree_paths[0][0].index] = tree_paths
 
         self.H_i = [x[0].index for x in self.H]
         self.L_i = [x[0].index for x in self.L]
@@ -410,6 +417,8 @@ class Network:
         self.summary['real_congestion'] = congestion / full_weight
         self.summary['most_congested_route'] = most_congested_route
         self.summary['avg_route_len'] = avg_route_len/full_weight
+        self.summary['delta'] = self.delta
+
 
         self.print_summary()
         #print(all_path)
@@ -419,6 +428,7 @@ class Network:
         print("Most congested route:", self.summary['congestion'], self.summary['real_congestion'],
               self.summary['most_congested_route'])
         print("Average weighted route length:", self.summary['avg_route_len'])
+        print("Delta:", self.delta)
         print("-----------------------")
 
     def update_congestion(self, con, congestion, most_congested_route, route):
@@ -441,11 +451,15 @@ class Network:
         return con
 
     def find_route(self, all_path, i, j) -> List[Node]:
+        if not i in all_path:
+            return None
         for route in all_path[i]:
             assert route, List[Node]
             if route[0].index == i and route[-1].index == j:
                 return route.copy()
 
+    def get_summary(self):
+        return self.summary
 
 def map_probabilities(p: List[Node]) -> Dict:
     return {n: n.probability for n in p}
