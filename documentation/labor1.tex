@@ -15,6 +15,12 @@
 \usepackage{setspace}
 \usepackage[nottoc,numbib]{tocbibind}
 \usepackage{amsthm}
+\usepackage{minted}
+\usepackage{mdframed}
+\usepackage{etoolbox}
+\usepackage{svg}
+
+
 
 % \setcounter{secnumdepth}{3}
 \onehalfspacing
@@ -22,6 +28,17 @@
 \newtheorem{mydef}{Definició}
 \newtheorem{mytetel}{Tétel}
 \newtheorem{mylemma}{Lemma}
+
+\BeforeBeginEnvironment{minted}{\begin{mdframed}[backgroundcolor=bg, hidealllines=true]}
+\AfterEndEnvironment{minted}{\end{mdframed}}
+
+\newcommand{\cmd}[1]{\colorbox{gray!10}{\strut #1}}
+
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\newminted[mintedJson]{js}{breaklines, breaksymbolleft=\quad}
+\newminted[mintedBash]{bash}{breaklines, breaksymbolleft=\quad}
+
+
 
 \begin{document}
 
@@ -72,6 +89,10 @@ Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}.
 
 \subsection{Hálózat tervezési stratégiák}
 
+\begin{center}
+	\includegraphics[width=14cm]{pictures/example.png}
+\end{center}
+
 \begin{itemize}
 	\item A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újra konfiguráljunk, attól függően milyen terhelés éri
 	\begin{itemize}
@@ -82,7 +103,12 @@ Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}.
 \end{itemize}
 
 
+
 \subsection{Adattárházak hálózati felépítése}
+
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{pictures/Traditional+Data+Center+Topology.jpg}
+\end{center}
 
 \begin{itemize}
 	\item Core switch
@@ -99,10 +125,17 @@ Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}.
 		\item pl. Ethernet switchek
 	\end{itemize}
 	\item Optikai switchek már újra tudják konfigurálni magukat, de ezek "lassúak"
-	\item Microsoft Research - ProjecToR\cite{ghobadi_projector:_2016}, lézer segítségével kiváltani az optikai swticheket
+	\item Microsoft Research - ProjecToR\cite{ghobadi_projector:_2016}, lézer segítségével kiváltani az optikai swticheket, \ref{projector-fig} ábrán látható a maga az eszköz
 	\begin{itemize}
 		\item 12 $\mu s$ váltás idő ( 2500x gyorsabb mint egy optikai hálózati switch)
 	\end{itemize}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.9\linewidth]{pictures/laserswitch.png}
+		\caption{ProjecToR}\label{projector-fig}
+	\end{figure}
+	
 	
 \end{itemize}
 
@@ -288,7 +321,104 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 
 \chapter{Megvalósítás}
 
+\section{Keretrendszer}
+
+A keretrendszer Python 3 nyelven íródott, és a Networkx külső csomag volt használva a véletlen gráfok generálására.
+A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban.  
+
+\section{Adatszerkezetek}
+
+A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
+\begin{itemize}
+	\item \textbf{Vertex} - az általános gráf csúcspont
+	\item \textbf{Node} - az \textit{Egófák} készítésekor használt csomópontok amik tartalmazzák a valószínűségét annak, hogy a forrás csomópont mekkora valószínűséggel fog kommunikálni a másik \textit{Node} csomóponttal
+	\item \textbf{Edge} - az gráf csomópontjait reprezentáló szakasz, ami \textit{Vertexet} vár paraméterként, és tárolja a valószínűséget, hasonlóan mint a \textit{Node}
+	\item \textbf{Tree} - ami adja az alapját majd a útvonal tervezési sémának. A fának két fajtája lehet:
+	\begin{itemize}
+		\item \textbf{BinTree} - a kettő fokú fa
+		\item \textbf{EgoTree} - a $\Delta$ fokú fa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet, és a levelek pedig \textit{BinTree} típúsuak.
+	\end{itemize}
+	
+\end{itemize}
+	
+\section{Modell}
+
+A \textbf{Network} osztály valósítja meg az algoritmust, bemenete egy konfiguráció, kimenete egy útválasztási séma.
+Az útválasztási séma mellett még metaadatként ki van számolva az átlag súlyozott úthossz és a torlódás az adott hálózatra.
+
+Bementi konfigurációt többféle módon lehet megadni attól függően milyen gráfot akarunk használni. 
+Lehetőség van kézileg megadni a demand mátrixot vagy generálhatunk kétféle véletlen gráfot.
+Véletlen gráfok amit tud generálni a program:
+\begin{itemize}
+	\item Erdős-Rényi gráf
+	\item Barabási-Albert gráf
+\end{itemize}
+
+Egy minta konfiguráció, ami tartalmaz példát mind három esetre:
+
+
+\begin{mintedJson}
+{
+  "config": [ {
+	"graph": "erdos-renyi",
+	"vertex_num": 11,
+	"dan": null,
+	"constant": 3
+  }, {
+	"graph": "barabasi-albert",
+	"vertex_num": 11,
+	"dan": 3,
+	"m": 4
+  }, {
+	"graph": "manual",
+	"vertex_num": null,
+	"dan": 3,
+	"demand": [
+		[0, 3, 4, 1, 1, 1, 1],
+		[3, 0, 2, 0, 1, 0, 4],
+		[4, 2, 0, 2, 0, 0, 4],
+		[1, 0, 2, 0, 3, 0, 0],
+		[1, 1, 0, 3, 0, 0, 0],
+		[1, 0, 0, 0, 0, 0, 3],
+		[1, 4, 4, 0, 0, 3, 0]]	
+	} ]
+}
+\end{mintedJson}
+
+\section{Kimenet}
+
+Az program kimenete, az algoritmus által kiszámolt metrikák, átlag súlyozott úthossz és torlódás. 
+Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egófák és az új hálózat választási séma ki lesz rajzolva.
+
 \chapter{Teszt eredmények}
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio25_delta.png}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_delta.png}		
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_delta.png}
+		\caption{Delta fokszám}
+	\end{center}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio25_avg_route_len.png}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_avg_route_len.png}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_avg_route_len.png}
+		\caption{Átlag súlyozott úthossz}
+	\end{center}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio25_congestion.png}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_congestion.png}
+		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_congestion.png}
+		\caption{Átlag súlyozott úthossz}
+	\end{center}
+\end{figure}
+
 
 \chapter{Összefoglalás}
 

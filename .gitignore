@@ -104,3 +104,11 @@ venv.bak/
 .mypy_cache/
 .idea/
 .scannerwork/
+*.aux
+*.blg
+documentation/_minted-labor1/
+*.toc
+*.gz
+*.out
+*.bbl
+sonar-project.properties
