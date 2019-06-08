@@ -2,6 +2,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import csv
+from math import ceil
 
 from typing import Dict, List
 
@@ -119,19 +121,46 @@ def render_everyting(network: Network):
     render_egotrees(network)
     render_new_network(network)
 
-def main():
+def main(show=False):
     configurations = load_configurations()
-    active_config = configurations[2]
+    active_config = configurations[0]
 
-    demand_matrix = create_demand_matrix_for_configuration(active_config)
+    res = []
 
-    network = Network(demand_matrix)
+    vertex_nums = [11, 15, 35, 50, 75, 100, 125, 150, 175, 200]
+    delta_nums = [10, 16, 24, 48]
+    ratios = [0.25, 0.33, 0.45]
 
-    network.create_dan(active_config['dan'])
+    for vertex_num in vertex_nums:
+        for delta_num in delta_nums:
+            for ratio in ratios:
+                for i in range(5):
+                    active_config['vertex_num'] = vertex_num
+                    active_config['constant'] = int(ceil(vertex_num * ratio))
+                    demand_matrix = create_demand_matrix_for_configuration(active_config)
 
-    render_everyting(network)
+                    network = Network(demand_matrix)
 
-    plt.show()
+                    active_config['dan'] = delta_num
+                    network.create_dan(active_config['dan'])
+
+
+                    summary = network.get_summary()
+                    print(active_config)
+                    print(summary)
+                    res.append({**summary, **active_config, "ratio": ratio})
+
+    with open("results2.csv", "w") as csvFile:
+        fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'dan', 'most_congested_route', 'ratio']
+        writer = csv.DictWriter(csvFile, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(res)
+
+    csvFile.close()
+
+    if show:
+        render_everyting(network)
+        plt.show()
 
 
 if __name__ == '__main__':
