@@ -54,8 +54,6 @@ class Tree:
         self.leaves: List = []
         self.routes_built = False
 
-    def dept(self):
-        return 1 + max(self.leaves, key=lambda x: x.dept()).dept() if self.leaves else 0
 
     def __str__(self):
         return self.root.label + " L: " + str(self.leaves)

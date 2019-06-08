@@ -1,5 +1,6 @@
 from itertools import cycle, combinations
 from copy import deepcopy
+import numpy as np
 from adt import *
 import re
 
@@ -412,12 +413,31 @@ class Network:
 
         full_weight = sum_aa(self.demand_matrix)
 
+        control_demand_matrix = np.zeros((len(self.demand_matrix), len(self.demand_matrix)))
+
+        for edge in self.routing_scheme:
+            control_demand_matrix[edge.v1.index][edge.v2.index] += edge.probability
+            control_demand_matrix[edge.v2.index][edge.v1.index] += edge.probability
+
+        mismatch_counter = 0
+        for i in range(len(self.demand_matrix)):
+            for j in range(len(self.demand_matrix)):
+                if control_demand_matrix[i][j] != self.new_new_demand_matrix[i][j]:
+                    mismatch_counter += 1
+        print("Mismatching items count:",mismatch_counter)
+
+        max_delta = 0
+        for row in control_demand_matrix:
+            delta = sum(1 if x > 0 else 0 for x in row)
+            max_delta = max(max_delta, delta)
+
         self.summary = {}
         self.summary['congestion'] = congestion
         self.summary['real_congestion'] = congestion / full_weight
         self.summary['most_congested_route'] = most_congested_route
         self.summary['avg_route_len'] = avg_route_len/full_weight
         self.summary['delta'] = self.delta
+        self.summary['max_delta'] = max_delta
 
 
         self.print_summary()
@@ -429,6 +449,7 @@ class Network:
               self.summary['most_congested_route'])
         print("Average weighted route length:", self.summary['avg_route_len'])
         print("Delta:", self.delta)
+        print("max delta:", self.summary['max_delta'])
         print("-----------------------")
 
     def update_congestion(self, con, congestion, most_congested_route, route):
