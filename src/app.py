@@ -4,6 +4,7 @@ import numpy as np
 import json
 import csv
 from math import ceil
+import multiprocessing as mp
 
 from typing import Dict, List
 
@@ -127,40 +128,53 @@ def main(show=False):
 
     res = []
 
-    vertex_nums = [11, 15, 35, 50, 75, 100, 125, 150, 175, 200]
-    delta_nums = [10, 16, 24, 48]
-    ratios = [0.25, 0.33, 0.45]
+    vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
+    delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
+    ratios = [0.25, 0.33, 0.45, 0.6]
+
+    with open(f"res/results.csv", "w") as csvFile:
+        fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
+                  'max_delta', 'dan', 'most_congested_route', 'ratio']
+        writer = csv.DictWriter(csvFile, fieldnames=fields)
+        writer.writeheader()
+    csvFile.close()
 
     for vertex_num in vertex_nums:
         for delta_num in delta_nums:
+            configs = []
             for ratio in ratios:
                 for i in range(5):
-                    active_config['vertex_num'] = vertex_num
-                    active_config['constant'] = int(ceil(vertex_num * ratio))
-                    demand_matrix = create_demand_matrix_for_configuration(active_config)
+                    active_cfg = active_config.copy()
+                    active_cfg['vertex_num'] = vertex_num
+                    active_cfg['constant'] = int(ceil(vertex_num * ratio))
+                    active_cfg['dan'] = delta_num
+                    active_cfg['ratio'] = ratio
+                    configs.append(active_cfg)
 
-                    network = Network(demand_matrix)
+            with mp.Pool() as p:
+                res = p.map(run_dan, configs)
 
-                    active_config['dan'] = delta_num
-                    network.create_dan(active_config['dan'])
+                with open(f"res/results.csv", "a+") as csvFile:
+                    fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio']
+                    writer = csv.DictWriter(csvFile, fieldnames=fields)
+                    #writer.writeheader()
+                    writer.writerows(res)
+
+                csvFile.close()
+
+    # if show:
+    #     render_everyting(network)
+    #     plt.show()
 
 
-                    summary = network.get_summary()
-                    print(active_config)
-                    print(summary)
-                    res.append({**summary, **active_config, "ratio": ratio})
-
-    with open("results2.csv", "w") as csvFile:
-        fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'dan', 'most_congested_route', 'ratio']
-        writer = csv.DictWriter(csvFile, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(res)
-
-    csvFile.close()
-
-    if show:
-        render_everyting(network)
-        plt.show()
+def run_dan(active_config):
+    demand_matrix = create_demand_matrix_for_configuration(active_config)
+    network = Network(demand_matrix)
+    network.create_dan(active_config['dan'])
+    summary = network.get_summary()
+    print(active_config)
+    print(summary)
+    return {**summary, **active_config, "ratio": active_config["ratio"]}
 
 
 if __name__ == '__main__':
