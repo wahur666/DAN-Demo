@@ -18,7 +18,6 @@
 \usepackage{minted}
 \usepackage{mdframed}
 \usepackage{etoolbox}
-\usepackage{svg}
 
 
 
@@ -325,6 +324,9 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 
 A keretrendszer Python 3 nyelven íródott, és a Networkx külső csomag volt használva a véletlen gráfok generálására.
 A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban.  
+Networkx csomag továbbá biztosít számunkra egy megjelenítési lehetőséget, amit a Jupyter notebookban tudunk legjobban kihasználni.
+
+
 
 \section{Adatszerkezetek}
 
@@ -332,7 +334,7 @@ A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
 \begin{itemize}
 	\item \textbf{Vertex} - az általános gráf csúcspont
 	\item \textbf{Node} - az \textit{Egófák} készítésekor használt csomópontok amik tartalmazzák a valószínűségét annak, hogy a forrás csomópont mekkora valószínűséggel fog kommunikálni a másik \textit{Node} csomóponttal
-	\item \textbf{Edge} - az gráf csomópontjait reprezentáló szakasz, ami \textit{Vertexet} vár paraméterként, és tárolja a valószínűséget, hasonlóan mint a \textit{Node}
+	\item \textbf{Edge} - az gráf csomópontjait reprezentáló él, ami \textit{Vertexet} vár paraméterként, és tárolja a valószínűséget, hasonlóan mint a \textit{Node}
 	\item \textbf{Tree} - ami adja az alapját majd a útvonal tervezési sémának. A fának két fajtája lehet:
 	\begin{itemize}
 		\item \textbf{BinTree} - a kettő fokú fa
@@ -344,10 +346,15 @@ A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
 \section{Modell}
 
 A \textbf{Network} osztály valósítja meg az algoritmust, bemenete egy konfiguráció, kimenete egy útválasztási séma.
-Az útválasztási séma mellett még metaadatként ki van számolva az átlag súlyozott úthossz és a torlódás az adott hálózatra.
+Ez mellett sok metaadatot is kiszámol a program amik között szerepel az átlag súlyozott úthossz és a torlódás.
+A konfigurációban lehetőségünk van dinamikus delta fokszámot megadni, ezért metaadatok között szerepel a fokszám, amit az algoritmus használt számoláskor.
+Az új hálózat létrehozásakor a csere lépéssorozat után, megváltozik a demand mátrix, ezért fontos, hogy a \(\Delta\) fokszámot ne haladjuk meg.
+A metaadatok ezért tartalmazzák a delta fokszámot és a valós fokszámot, ami az algoritmus végeredménye lett.  
+Ebből az adatból lehet következtetést levonni, hogy valóban megfelelő-e felső korlátja amit a szerzők adtak és lehet-e jobb felső korlátot adni. 
 
-Bementi konfigurációt többféle módon lehet megadni attól függően milyen gráfot akarunk használni. 
-Lehetőség van kézileg megadni a demand mátrixot vagy generálhatunk kétféle véletlen gráfot.
+A bemeneti konfiguráció egy \textit{JSON} fájl, amit tartalmazhat több konfigurációt egyszerre.
+Többféle módon lehet megadni konfigurációt attól függően milyen gráfot akarunk használni. 
+Lehetőség van kézileg megadni a demand mátrixot vagy generálhatunk kétféle gráfot.
 Véletlen gráfok amit tud generálni a program:
 \begin{itemize}
 	\item Erdős-Rényi gráf
@@ -355,7 +362,6 @@ Véletlen gráfok amit tud generálni a program:
 \end{itemize}
 
 Egy minta konfiguráció, ami tartalmaz példát mind három esetre:
-
 
 \begin{mintedJson}
 {
@@ -385,6 +391,34 @@ Egy minta konfiguráció, ami tartalmaz példát mind három esetre:
 }
 \end{mintedJson}
 
+A konfigurációnak van három kötelező mezője, és a egy kiegészítő mező, attól függően, hogy melyik típusú gráfot választottuk. 
+
+Kötelező mezők: 
+\begin{enumerate}
+	\item \textbf{graph} - a gráf típusa, három érték közül lehet választani:
+	\begin{itemize}
+		\item \textit{"erdos-renyi"} - Erdős-Rényi gráf 
+		\item \textit{"barabasi-albert"} - Barabási-Albert gráf
+		\item \textit{"manual"} - Kézzel megadott gráf
+	\end{itemize}
+	\item \textbf{vertex\_num} - A gráf csúcsainak száma. Ez nincs figyelembe véve kézzel adott gráf esetén, mivel meg van adva a demand mátrix és nem kell azt kigenerálni.
+	\item \textbf{dan} - A Demand-Aware Network fokszámára ad megkötést. Értékek amit felvehet:
+	\begin{itemize}
+		\item \textit{null} - Alap beállítás szerint a cikkben ajánlott $12\rho$ fokszámot fogja használni
+		\item \textit{12} - A megadott szám lesz a fokszám, példában most 12.
+		\item \textit{"6d"} - A szám és egy "d" betűvel a végén hasonlóan működik mint az első eset, annyi különbséggel, hogy itt meg lehet adni, hogy mi legyen a $\rho$ szorzója, példa most $6\rho$
+	\end{itemize}
+\end{enumerate}
+
+Konfiguráció függő mezők:
+\begin{itemize}
+	\item \textbf{constant} - \textit{Erdő-Rényi} gráf esetén a modell vár egy \(p\) valószínűséget ami annak a valószínűsége, hogy egy él be legyen húzva az új pontba, és ez független minden a korábban behúzott élektől. 
+	A ritka mátrix eléréséhez a következő formulát használja a generáló algoritmus:  \[p = constant \cdot \frac{1}{vertex\_num}\]
+	\item \textbf{m} - \textit{Barabási-Albert} gráf esetén a modell vár egy \(m\) számot, ami azt adja meg, hány olyan gráf ponthoz kell csatlakozzon az új, ami már eddig benne van a gráfban. 
+	\item \textbf{demand} -  \textit{kézzel megadott} gráf esetén direkt módon megadható a mátrix, aminek a formája listák listája. 
+	Figyeljünk arra, hogy négyzetes lehet csak a demand mátrix!
+\end{itemize}
+
 \section{Kimenet}
 
 Az program kimenete, az algoritmus által kiszámolt metrikák, átlag súlyozott úthossz és torlódás. 
@@ -394,36 +428,51 @@ Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egóf�
 	\begin{center}
 		\includegraphics[width=0.49\linewidth]{pictures/starting_network.png}
 		\caption{Kiindulási hálózat}
+		\label{starting-network}
 	\end{center}
 \end{figure}
+
+A \ref{starting-network} ábrán látható a bemeneti hálózat, aminek a demand mátrixa már a korábban fel lett írva. Az algoritmus ezek után a cl-DAN algoritmust használva, először elkészíti az egófákat \ref{ego-trees} ábra, majd végül az új hálózat választási sémát ami a \ref{routing-scheme} ábrán látható.
 
 \begin{figure}[h]
 	\begin{center}
 		\includegraphics[width=0.40\linewidth]{pictures/egotree1.png}
 		\includegraphics[width=0.40\linewidth]{pictures/egotree2.png}
-		\includegraphics[width=0.40\linewidth]{pictures/egotree3.png}
-		\includegraphics[width=0.40\linewidth]{pictures/egotree4.png}
+		%\includegraphics[width=0.40\linewidth]{pictures/egotree3.png}
+		%\includegraphics[width=0.40\linewidth]{pictures/egotree4.png}
 		\caption{Egófák}
+		\label{ego-trees}
 	\end{center}
 \end{figure}
+
+A \ref{routing-scheme} ábrán látható gráfon pár extra információ megfigyelhető. 
+Pirosra vannak festve a magas fokszámú csúcsok és zöldre az alacsony fokszámúak.
+Az algoritmus fő célja az volt, hogy ne legyen egymással közvetlen kapcsolatban két magas fokszámú csúcs, azaz ne legyen két piros csúcs összekötve, és ez maradéktalanul teljesül is.
+Két magas fokszú csúcs csak egy alacsony fokszámú segítő csúcson keresztül tud kommunikálni.
+Fokszámok szempontjából a csúcsok rendben vannak, mivel nem haladják meg $\Delta$ fokszámot. 
+A gráf esetén a delta \(\Delta = 12\rho = 12 \cdot \lceil\frac{25}{7}\rceil = 43  \).
 
 \begin{figure}[h]
 	\begin{center}
 		\includegraphics[width=0.49\linewidth]{pictures/new_network.png}
 		\caption{Új hálózat}
+		\label{routing-scheme}
 	\end{center}
 \end{figure}
 
 \chapter{Teszt eredmények}
 
-\begin{figure}[h]
-	\begin{center}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio25_delta.png}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_delta.png}		
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_delta.png}
-		\caption{Delta fokszám}
-	\end{center}
-\end{figure}
+\section{Tesztelés menete}
+
+A tesztelés során Erdős-Rényi gráfok voltak használva az egyszerű skálázhatóságból kifolyólag.
+Három fő csoportba lehet a méréseket osztani a valószínűségi érték alapján, p = 0.25, p = 0.33 és p = 0.45.
+A skálázhatóság tesztelésére különböző számú csúcspont volt használva, ezek rendre: 11, 15, 35, 50, 75, 100, 125, 150, 175 és 200.
+A skálázhatósághoz még hozzátartozik a maximum fokszám, hogy mennyi gráf csúcs tud egyszerre kommunikálni, ezért az is meg van adva.
+A valóságban van egy fizikai határ, hogy mennyi kliens tud csatlakozni egyszerre, ezért az értékek így lettek megválasztva, 3, 10, 16, 24 és 48.
+A fenti paraméterek összes kombinációjára öt teszt lett futtat, majd azok átlagolva lettek.
+Az adatok egy CSV fájlban lettek összegyűjtve, majd RapidMiner segítségével lett kiértékelve.
+
+\section{Átlag súlyozott úthossz}
 
 \begin{figure}[h]
 	\begin{center}
@@ -431,20 +480,73 @@ Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egóf�
 		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_avg_route_len.png}
 		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_avg_route_len.png}
 		\caption{Átlag súlyozott úthossz}
+		\label{avg-len}
 	\end{center}
 \end{figure}
+
+
+Az \ref{avg-len} ábrán látható az átlag súlyozott úthossz csúcspontok függvényében, és a delta fokszámra lebontva.
+Az átlag súlyozott úthossz mind három esetben hasonlóan néz ki.
+A konstans fokszám miatt egyértelműen látszik, hogy az értékek növekednek, kicsi delta esetén, pl. 3, ez nagyon jól megfigyelhető.
+Az eredmények hasonlóak mind három esetben, a kitöltöttség növekedésével az értékek is növekednek, de a grafikon iránya nem változik.
+
+\section{Átlag torlódás}
+
+A \ref{congestion} ábrán látható az átlag torlódás. 
+Hasonlóan mint az úthossznál a fő tényezők a csúcsok száma és az, hogy hogyan választjuk meg a fokszámot.
+Ám ha megnézzük a két diagram irányát, két különböző dolgot mutatnak. 
+A súlyozott úthossz növekedik ahogy hozzáveszünk további pontokat a hálózathoz, addig a torlódás mértéke közel exponenciálisan csökken.
+Ennek egyszerű oka van, mert minél több csomópont közül tudunk választani, a terhelést egyre több pont között lehet elosztani és így a torlódás egészében csökken a hálózatban.
 
 \begin{figure}[h]
 	\begin{center}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio25_congestion.png}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_congestion.png}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_congestion.png}
-		\caption{Átlag súlyozott úthossz}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio25_congestion.png}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio33_congestion.png}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio45_congestion.png}
+		\caption{Átlag torlódás}
+		\label{congestion}
 	\end{center}
 \end{figure}
 
+\section{Fokszám}
+
+A fentiekben már volt említve, hogy adott számú csomópontot használunk.
+A cikkben szereplő felső korlátok az átlag fokszám függvényében van megadva, ami azt eredményezi, minden hálózatnak más $\Delta$ fokszám ad közel optimális megoldást.
+Ez elméletben teljesül is, de ha megnézzük a \ref{delta} ábrát, rögtön észrevehető egy érdekes jelenség. 
+A delta fokszám majdnem minden esetben nagyobb mint a csúcsok száma ami a hálózatban van.
+Ez azt eredményezi, hogy minden csomópont közel két lépésből elérhető, és csak akkor van szükség az algoritmus újra rendező részére, 5. lépés, ha egy csomóponttal kommunikál több mint a fele pont a hálózatban.
+Erre egy példa a 200 pontból álló hálózat, ami a képen látható, hogy már ha a $4\Delta$ a fokszámot annyi mint a pontok száma a hálózatban.
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio25_delta.png}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio33_delta.png}		
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio45_delta.png}
+		\caption{Delta fokszám}
+		\label{delta}
+	\end{center}
+\end{figure}
 
 \chapter{Összefoglalás}
+
+\section{Cikk eredménye}
+
+Az technológia fejlődésével lehetőség nyílt arra, hogy a hálózatokat újrakonfiguráljuk futás időben.
+A változó topológiának köszönhetően hatékonyabb lesz az adattárházak működése.
+Az forgalom igény tudatos hálózatok tervezése körül jelenleg intenzív kutatás folyik ebből kifolyólag. 
+A feldogozott cikk és a benne található algoritmus ad egy megoldást arra, hogy lehet ilyent tervezni.
+Az algoritmus lényege, hogy a túlterhelt csomópontok között irányítsuk át forgalmat egy segéd csomóponton.
+Ennek a megvalósítása az egófákkal van megadva, ahol lekorlátozzuk a maximális csatlakozások számát a jobban terhelt szerverekhez.
+A szerzők által meghatároztak egy felső korlátot az átlag súlyozott úthosszra és torlódásra megadott fokszám mellett ami valóban megfelelő.
+
+
+\section{Megjegyzések}
+
+A teszt eredményekből látszik, hogy a $12\Delta$ fokszám egy nagyon magas korlát, mivel bőven túlmutat a rendelkezésre álló csúcsok számán. Feltételezhető, hogy ettől lehet jobb felső becslést is adni. 
+Egy érdekes megfigyelés az algoritmus esetén, ha egy olyan fokszámot adunk meg, ami nem mutat túl a létező csúcspontok számán, hanem ellenkezőleg, elég szigorúra van véve.
+Ilyenkor csak a magas fokszámú pontokra van garantálva, hogy a megadott fokszámú ponthoz csatlakoznak és ez nem fog teljesülni az alacsony fokszámúakra.
+Egy ilyen eset legegyszerűbben akkor fordul elő, ha már telített a fokszáma a segítő pontnak magas fokú pontokkal. 
+Mivel nem csak magas fokú csomópont fog kommunikálni egy segítővel, ezért még azokat is be kell húzni, mikor két segítő fog kommunikál, és ilyenkor nincs figyelve arra, hogy mi a jelenlegi fokszám. 
 
 \bibliographystyle{abbrv}
 \bibliography{refrences}
