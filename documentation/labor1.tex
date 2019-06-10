@@ -73,24 +73,44 @@ A labor munka a Demand-Aware Network Design with Minimal Congestion and Route Le
 
 \section{Motiváció}
 
-\begin{itemize}
-	\item A technika előrehaladásával egyre nagyobb lett a feldolgozandó adatok mennyisége
-	\item Adattárházakban a szerverek közötti kommunikáció is ezáltal megnövekedett
-	\item A jelenlegi hálózatok a legrosszabb esetre vannak tervezve, azaz, hogy majdnem teljes sávszélességű, kétirányú kapcsolat álljon fent bármelyik két szerver között
-	\item A valós kommunikáció nem ezt a sémát követi, hanem túlnyomó részt megadott párok között történik a legtöbb kommunikáció
-\end{itemize}
+Az adatközpontok kritikus infrastruktúrák lettek a mai digitális társadalomban. 
+A megnövekedett adatmennyiség miatt, hatékony hálózati megoldások szükségesek arra, hogy az adatközpontok minél hamarabb fel tudják dolgozni az adatokat. 
+A jelenlegi hálózatok egy adatközpontban a legrosszabb esetre vannak optimalizálva, azaz az infrastruktúra által biztosított kapcsolatokon közel maximális sebességgel tudjon kommunikálni bármelyik kettő szerver. 
+A gyakorlati tapasztalatok azt mutatják, hogy a kommunikáció túlnyomó része néhány szerverek között történik. 
+Mikor a kommunikációs mintát ábrázoljuk egy gráfban, ahol az élek az egymással kommunikáció szervereket ábrázolják, akkor ez egy ritka gráfot eredményez.
 
-Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}.
+A kommunikációs technológiák fejlődésével lehetőségünk van futás időben a fizikai hálózatok újra konfigurálására. 
+Az ilyen technológiák segítségével lehet növelni az adatközpontok hatékonyságát. 
+A változó adatforgalomhoz lehet alkalmazkodni és a topológiát átalakítani az szerint, hogy mekkora terhelés éri a hálózat egyes részeit. 
+A hálózat fizikai újra konfigurálására egy megoldás a Microsoft Research ProjecToR\cite{ghobadi_projector:_2016}, ami lézer technológia segítségével köti össze a szervereket egy adattárházban. 
+Az új technológiák új problémákat eredményeztek és új kihívások elé állították a hálózat tervezést.
+Napjainkban intenzív kutatás folyik ezen a területen.
 
-\begin{itemize}
-	\item Nézzünk meg pár valós példát, Microsoft adattárházában  250 ezer szervert 5 production klaszterben elosztva
-\end{itemize}
+\pagebreak
+
+\subsection{Microsoft adattárház adatok}
+
+Microsoft Research ProjecToR keretén belül, a szerzők adatokat gyűjtöttek Microsoft adattárházában. 
+Adatokat kétszázötvenezer szerverről rögzítettek, ami öt prductionban használt klaszterben voltak elosztva. 
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR1.png}
+	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR2.png}
+	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR3.png}
+	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR4.png}
+	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR5.png}
+	\caption{Microsoft adattárház adatok klaszterenként}
+	\label{microsoft-clasters}
+\end{figure}
+
+Amint a \ref{microsoft-clasters} ábrán látható, a kommunikáció főleg megadott szerverek között történik.
+Korábban már említve volt, az adattárházak jelenleg a legrosszabb esetre vannak tervezve, hogy bármelyik két szerver tudjon kommunikálni.
+Az ábrán látszik, hogy melyik szerverek között nem szükséges feltétlen direkt kapcsolatot kiépíteni, hanem elég egy már meglévő közvetett útvonalat használni, ahol kicsi a torlódás.
+Az ilyen hálózat megtervezéséhez először szükségünk van arra, hogy tudjuk milyen tervezési stratégiák vannak és, hogy az adattárházak milyen topológiával rendelkeznek jelenleg.
 
 \subsection{Hálózat tervezési stratégiák}
-
-\begin{center}
-	\includegraphics[width=14cm]{pictures/example.png}
-\end{center}
 
 \begin{itemize}
 	\item A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újra konfiguráljunk, attól függően milyen terhelés éri
@@ -101,7 +121,12 @@ Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}.
 	\item A cikk bemutat egy módszert arra, hogy lehet mindkettőre majdnem optimális megoldást adni egyszerre (c)
 \end{itemize}
 
-
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=8cm]{pictures/optimalshemes.png}
+	\caption{Hálózat tervezési stratégiák, (a) rövid utakra való optimalizálás, (b) minimális torlódásra való optimalizálás, (c) mindkét esetre való optimalizálás}
+	\label{network-strategies}
+\end{figure}
 
 \subsection{Adattárházak hálózati felépítése}
 
@@ -158,6 +183,13 @@ Egy véletlen gráfok generálására egy külső csomag lett használva \cite{n
 	\item A hálózathoz tartozik egy demand mátrix, ami leírja a valószínűségét annak, hogy $i$ forrásból mekkora eséllyel lesz adat küldve $j$ célba
 	\item A cél, hogy ezen adatból egy olyan hálózati séma készítése, ami kis torlódást és rövid utakat eredményez, ez mellett még skálázható is
 \end{itemize}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=14cm]{pictures/example.png}
+	\caption{Forgalom igény tudatos hálózat tervezés probléma, (a) demand mátrix, (b) hálózat optimális úthosszra és (c) hálózat optimális torlódásra}
+	\label{network-strategies}
+\end{figure}
 
 \section{Formális felírás}
 
@@ -476,9 +508,9 @@ Az adatok egy CSV fájlban lettek összegyűjtve, majd RapidMiner segítségéve
 
 \begin{figure}[h]
 	\begin{center}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio25_avg_route_len.png}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio33_avg_route_len.png}
-		\includegraphics[width=0.49\linewidth]{pictures/constant_dan_ratio45_avg_route_len.png}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio25_avg_route_len.png}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio33_avg_route_len.png}
+		\includegraphics[width=0.40\linewidth]{pictures/constant_dan_ratio45_avg_route_len.png}
 		\caption{Átlag súlyozott úthossz}
 		\label{avg-len}
 	\end{center}
@@ -515,7 +547,7 @@ A cikkben szereplő felső korlátok az átlag fokszám függvényében van mega
 Ez elméletben teljesül is, de ha megnézzük a \ref{delta} ábrát, rögtön észrevehető egy érdekes jelenség. 
 A delta fokszám majdnem minden esetben nagyobb mint a csúcsok száma ami a hálózatban van.
 Ez azt eredményezi, hogy minden csomópont közel két lépésből elérhető, és csak akkor van szükség az algoritmus újra rendező részére, 5. lépés, ha egy csomóponttal kommunikál több mint a fele pont a hálózatban.
-Erre egy példa a 200 pontból álló hálózat, ami a képen látható, hogy már ha a $4\Delta$ a fokszámot annyi mint a pontok száma a hálózatban.
+Erre egy példa a 200 pontból álló hálózat, ami a képen látható, hogy már ha a $\Delta=4\rho$ a fokszámot annyi mint a pontok száma a hálózatban.
 
 \begin{figure}[h]
 	\begin{center}
@@ -542,7 +574,7 @@ A szerzők által meghatároztak egy felső korlátot az átlag súlyozott útho
 
 \section{Megjegyzések}
 
-A teszt eredményekből látszik, hogy a $12\Delta$ fokszám egy nagyon magas korlát, mivel bőven túlmutat a rendelkezésre álló csúcsok számán. Feltételezhető, hogy ettől lehet jobb felső becslést is adni. 
+A teszt eredményekből látszik, hogy a $\Delta=12\rho$ fokszám egy nagyon magas korlát, mivel bőven túlmutat a rendelkezésre álló csúcsok számán. Feltételezhető, hogy ettől lehet jobb felső becslést is adni. 
 Egy érdekes megfigyelés az algoritmus esetén, ha egy olyan fokszámot adunk meg, ami nem mutat túl a létező csúcspontok számán, hanem ellenkezőleg, elég szigorúra van véve.
 Ilyenkor csak a magas fokszámú pontokra van garantálva, hogy a megadott fokszámú ponthoz csatlakoznak és ez nem fog teljesülni az alacsony fokszámúakra.
 Egy ilyen eset legegyszerűbben akkor fordul elő, ha már telített a fokszáma a segítő pontnak magas fokú pontokkal. 
