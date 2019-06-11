@@ -112,67 +112,77 @@ Az ilyen hálózat megtervezéséhez először szükségünk van arra, hogy tudj
 
 \subsection{Hálózat tervezési stratégiák}
 
-\begin{itemize}
-	\item A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újra konfiguráljunk, attól függően milyen terhelés éri
-	\begin{itemize}
-		\item pl, korábbi kommunikációs minták alapján
-	\end{itemize}
-	\item Két fő optimalizációs lehetőség van, legyen rövid az út (a) vagy legyen minimális a torlódás (b)
-	\item A cikk bemutat egy módszert arra, hogy lehet mindkettőre majdnem optimális megoldást adni egyszerre (c)
-\end{itemize}
+A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újrakonfiguráljunk, attól függően milyen terhelés éri.
+Egy hálózat korábbi kommunikációs mintái tudnak adni egy jó közelítést arra, hogyan történik a kommunikáció a szerverek között.
+Az előző példában láthattuk, hogy a Microsoft adattárházban milyen a forgalomeloszlást rögzítettek, 
+és ez alapján lehet majd újratervezni a hálózatot, figyelve a terheléseloszlásra.
+Lehetőség szerint, periodikus újrakonfigurálással akár még nagyobb hatékonyságot is elérhetünk az adattárházban.
+
+Két fő optimalizációs megközelítést fogunk megnézni a munka során, ezek a rövid úthossz és a minimális torlódás.
+Rövid úthossz alatt azt értjük, hogy minél kevesebb pontok kelljen áthaladnia az adatnak mielőtt az eljut a céljába, \ref{network_strategies} ábrán az (a) eset.
+A minimális torlódás alatt pedig azt értjük, ha több adatfolyam halad át egy élen, akkor az élek egyenletesen legyenek kihasználva, ezzel csökkentve a várakozási időt, \ref{network_strategies} ábra (b) pontja.
+A cikk célja, egy olyan módszer bemutatása, ahol mindkét esetet figyelembe veszik és az alapján adnak egy olyan algoritmust, ami közel optimális mint úthosszra, mint torlódásra nézve, ez a \ref{network_strategies} ábra (c) esete.
+
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=8cm]{pictures/optimalshemes.png}
 	\caption{Hálózat tervezési stratégiák, (a) rövid utakra való optimalizálás, (b) minimális torlódásra való optimalizálás, (c) mindkét esetre való optimalizálás}
-	\label{network-strategies}
+	\label{network_strategies}
 \end{figure}
 
 \subsection{Adattárházak hálózati felépítése}
 
-\begin{center}
+\begin{figure}[h]
+	\centering
 	\includegraphics[width=0.7\linewidth]{pictures/Traditional+Data+Center+Topology.jpg}
-\end{center}
+	\caption{Adattárház hálózati topológiája}
+	\label{datacenter_topology}
+\end{figure}
 
-\begin{itemize}
-	\item Core switch
-	\item Aggregation Swtiches
-	\item Top of Rack Switches
-	\item In-Rack Switches
-\end{itemize}
+Mielőtt még bármi nemű átalakítást végeznénk az adattárház hálózatán, először még meg kell nézni azt, hogy hogyan is épül fel az.
+Az \ref{datacenter_topology} ábrán látható a felépítés, ahol három szintre tudjuk felosztani a hálózat architektúráját\cite{noauthor_you_nodate}\cite{noauthor_cisco_nodate}.
+Legfelső szinten van a Core réteg, ami adja a gerincét a hálózatnak, ezen a ponton érkeznek és távoznak a csomagok az adattárházból.
+A core réteg további szerepe még, hogy adatot szolgáltasson az alatta lévő Aggregációs rétegnek.
+Ez a réteg nagyobb csoportokra osztja az adattárházat és ezzel minimalizálják a routing táblák számát.
+Az aggregációs réteg továbbá szolgáltatásokat is tud nyújtani, az alatta lévő rétegnek, mint például fűzfal, load balancing és biztonságos csatlakozás.
+A harmadik réteg pedig a Access réteg, ami Top of Rack switchek formájában nyilvánul meg.
+Ezen a ponton kapcsolódnak a szerverek fizikailag a hálózathoz.
+A Core rétegtől a ToR switchekig általában optikai kábellel van kivitelezve a hálózat. 
+ToR switchtől már hagyományos módszerekkel csatlakoznak a szerverek.
+Egy rackben nagyon sok szerver van elhelyezve, ezért azok általában egy köztes, úgy nevezett In-Rack switchre kapcsolódnak, amik végül csatlakoznak a hozzájuk legközelebbi ToR switchhez.
+
+
 
 \subsection{Újrakonfigurálás megvalósítása}
 
-\begin{itemize}
-	\item Átlag hálózatok statikusan vannak konfigurálva, nem  sok lehetőséget adva annak, hogy változtassunk 
-	\begin{itemize}
-		\item pl. Ethernet switchek
-	\end{itemize}
-	\item Optikai switchek már újra tudják konfigurálni magukat, de ezek "lassúak"
-	\item Microsoft Research - ProjecToR\cite{ghobadi_projector:_2016}, lézer segítségével kiváltani az optikai swticheket, \ref{projector-fig} ábrán látható a maga az eszköz
-	\begin{itemize}
-		\item 12 $\mu s$ váltás idő ( 2500x gyorsabb mint egy optikai hálózati switch)
-	\end{itemize}
+Az átlag hálózatok statikusan vannak konfigurálva, ezért nem sok lehetőség van arra annak megváltoztatására, ide tartoznak a hagyományos Ethernet switchek.
+Egy kevésbé statikus megoldás az optikai swtich, ami képes megvalósítani az újrakonfigurálást, és ezt relatív gyorsan is csinálja.
+Az optikai switchektől egy még gyorsabb megoldás a Microsoft Research ProjecToR. 
+A \ref{projector-fig} ábrán látható eszköz szem számára láthatatlan lézer nyalábbal küld és fogad adatokat.
+Az adattárház belső kommunikációjának a gyorsítására szolgál, ezért a ToR switchek vannak lecserélve, ilyen ProjecToR eszközökre.
+A rack tetejéről az eszköz a lézert mikrotükrökre irányítja, aminek a pontos beállíthatósága révén pontosan a megfelelő irányba tudja tükrözi tovább a nyalábot.
+Ennek az folyamatnak köszönhetően jelentősen gyorsabb átkonfigurálási időt érhetünk el mint az optikai switch.
+Váltásidő itt $12\mu s$ ami kétszázötvenezerszer gyorsabb mint az optikai switch.
 	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=0.9\linewidth]{pictures/laserswitch.png}
-		\caption{ProjecToR}\label{projector-fig}
-	\end{figure}
-	
-	
-\end{itemize}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{pictures/laserswitch.png}
+	\caption{ProjecToR}
+	\label{projector-fig}
+\end{figure}
 
 \section{Labor célja}
 
 A labor célja a cikkben\cite{avin_demand-aware_nodate} bemutatott algoritmus implementálása, és annak alkalmazása különböző véletlenszerűen generált gráfokra. 
-A kapott eredményeket össze lehet hasonlítani a megadott elméleti korlátokkal.
+A kapott eredményeket összehasonlítása a megadott elméleti korlátokkal.
 
 \section{Laborban megvalósított munka}
 
 A labor ideje alatt elkészült egy keretrendszer, ami segítségével tesztelhető a szerzők által felvázolt algoritmus. 
 A keretrendszer Python \cite{noauthor_python_nodate} nyelven íródott.
-Egy véletlen gráfok generálására egy külső csomag lett használva \cite{noauthor_networkx_nodate}
+Egy véletlen gráfok generálására a NetworkX külső csomag volt használva\cite{noauthor_networkx_nodate}.
+Az adatok elemzése pedig RapidMiner-ben történt\cite{noauthor_lightning_nodate}.
 
 \chapter{Modell}
 
@@ -188,7 +198,7 @@ Egy véletlen gráfok generálására egy külső csomag lett használva \cite{n
 	\centering
 	\includegraphics[width=14cm]{pictures/example.png}
 	\caption{Forgalom igény tudatos hálózat tervezés probléma, (a) demand mátrix, (b) hálózat optimális úthosszra és (c) hálózat optimális torlódásra}
-	\label{network-strategies}
+	\label{network_types}
 \end{figure}
 
 \section{Formális felírás}
@@ -355,7 +365,7 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 \section{Keretrendszer}
 
 A keretrendszer Python 3 nyelven íródott, és a Networkx külső csomag volt használva a véletlen gráfok generálására.
-A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban.  
+A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban \cite{noauthor_jupyter_nodate}].  
 Networkx csomag továbbá biztosít számunkra egy megjelenítési lehetőséget, amit a Jupyter notebookban tudunk legjobban kihasználni.
 
 
@@ -502,7 +512,7 @@ A skálázhatóság tesztelésére különböző számú csúcspont volt haszná
 A skálázhatósághoz még hozzátartozik a maximum fokszám, hogy mennyi gráf csúcs tud egyszerre kommunikálni, ezért az is meg van adva.
 A valóságban van egy fizikai határ, hogy mennyi kliens tud csatlakozni egyszerre, ezért az értékek így lettek megválasztva, 3, 10, 16, 24 és 48.
 A fenti paraméterek összes kombinációjára öt teszt lett futtat, majd azok átlagolva lettek.
-Az adatok egy CSV fájlban lettek összegyűjtve, majd RapidMiner segítségével lett kiértékelve.
+Az adatok egy CSV fájlban lettek összegyűjtve, majd RapidMiner\cite{noauthor_lightning_nodate} segítségével lett kiértékelve.
 
 \section{Átlag súlyozott úthossz}
 
