@@ -482,7 +482,7 @@ class Network:
     def get_summary(self):
         return self.summary
 
-def map_probabilities(p: List[Node]) -> Dict:
+def map_probabilities(p: List[Node]) -> Dict[Node, float]:
     return {n: n.probability for n in p}
 
 
