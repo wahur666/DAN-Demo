@@ -43,6 +43,18 @@ class HuffmanDanTree(AbstractHuffman):
         return a + b
 
 
+def get_nodes(tree: HuffmanDanTree) -> List[HuffmanDanNode]:
+    nodes = []
+    for index, leaf in enumerate(tree.leaves):
+        if isinstance(leaf, HuffmanDanNode):
+            nodes.append(leaf)
+        elif isinstance(leaf, HuffmanDanTree):
+            nodes.extend(get_nodes(leaf))
+    return nodes
+
+# Naive Solution
+
+
 def detach_leaf(tree: HuffmanDanTree, path: List[int]):
     temp_tree = tree
     for i in path[:-1]:
@@ -58,28 +70,6 @@ def calculate_node_paths(tree: HuffmanDanTree):
         if isinstance(leaf, HuffmanDanTree):
             calculate_node_paths(leaf)
 
-def get_nodes(tree: HuffmanDanTree) -> List[HuffmanDanNode]:
-    nodes = []
-    for index, leaf in enumerate(tree.leaves):
-        if isinstance(leaf, HuffmanDanNode):
-            nodes.append(leaf)
-        elif isinstance(leaf, HuffmanDanTree):
-            nodes.extend(get_nodes(leaf))
-    return nodes
-
-
-def create_push_up_tree(delta, nodes: List[AbstractHuffman]):
-    while len(nodes) != delta:
-        node1 = min(nodes, key=lambda x: x.weight())
-        nodes.pop(nodes.index(node1))
-        node2 = min(nodes, key=lambda x: x.weight())
-        nodes.pop(nodes.index(node2))
-        tree = HuffmanDanTree(2, [node1, node2])
-        nodes.append(tree)
-    root = naive_push_up(delta, nodes)
-
-    return root
-
 
 def remove_dead_branches(root: HuffmanDanTree):
     leaves = []
@@ -92,7 +82,6 @@ def remove_dead_branches(root: HuffmanDanTree):
             continue
         leaf.leaves = [x for x in leaf.leaves if x is not None]
         leaves.extend(leaf.leaves)
-
 
 
 def naive_push_up(delta, nodes):
@@ -109,6 +98,61 @@ def naive_push_up(delta, nodes):
             detach_leaf(root, max_weight_leaf.path)
             leaves.extend(leaf.leaves)
     remove_dead_branches(root)
+    return root
+
+# Breadth-first solution
+
+
+def find_next_free_position(tree: HuffmanDanTree, node: HuffmanDanNode):
+    if len(tree.leaves) < tree.delta:
+        new_leaf = HuffmanDanTree(2, [])
+        new_leaf.base = node
+        tree.leaves.append(new_leaf)
+    else:
+        leaves = tree.leaves.copy()
+        while leaves:
+            leaf = leaves.pop(0)
+            if len(leaf.leaves) < leaf.delta:
+                new_leaf = HuffmanDanTree(2, [])
+                new_leaf.base = node
+                leaf.leaves.append(new_leaf)
+                break
+            else:
+                leaves.extend(leaf.leaves)
+
+
+def bfs_push_up(delta, nodes):
+    root = HuffmanDanTree(delta, nodes)
+    new_root = HuffmanDanTree(delta, [])
+    leaves = root.leaves.copy()
+    while leaves:
+        leaf = leaves.pop(0)
+        if leaf is not None and isinstance(leaf, HuffmanDanTree):
+            nodes = get_nodes(leaf)
+            nodes.sort(key=lambda x: x.weight(), reverse=True)
+            print(nodes)
+            if len(nodes) > 1:
+                n = nodes.pop(0)
+                new_tree = HuffmanDanTree(2, [])
+                new_tree.base = n
+                for node in nodes:
+                    find_next_free_position(new_tree, node)
+                new_root.leaves.append(new_tree)
+
+    return new_root
+
+
+def create_push_up_tree(delta, nodes: List[AbstractHuffman]):
+    while len(nodes) != delta:
+        node1 = min(nodes, key=lambda x: x.weight())
+        nodes.pop(nodes.index(node1))
+        node2 = min(nodes, key=lambda x: x.weight())
+        nodes.pop(nodes.index(node2))
+        tree = HuffmanDanTree(2, [node1, node2])
+        nodes.append(tree)
+    # root = naive_push_up(delta, nodes)
+    root = bfs_push_up(delta, nodes)
+
     return root
 
 
