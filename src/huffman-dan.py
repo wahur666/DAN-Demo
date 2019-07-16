@@ -156,6 +156,13 @@ def create_push_up_tree(delta, nodes: List[AbstractHuffman]):
     return root
 
 
+def create_bfs_tree(delta, nodes: List[HuffmanDanNode]):
+    nodes.sort(key=lambda x: x.weight(), reverse=True)
+    root = HuffmanDanTree(delta, [])
+    for node in nodes:
+        find_next_free_position(root, node)
+    return root
+
 if __name__ == '__main__':
     codes = [
         HuffmanDanNode('t0', 1),
@@ -176,6 +183,10 @@ if __name__ == '__main__':
         HuffmanDanNode('t15', 7),
     ]
 
-    a = create_push_up_tree(4, codes)
+    a = create_push_up_tree(4, codes.copy())
     print(a)
+
+    b = create_bfs_tree(4, codes.copy())
+    print(b)
+
 
