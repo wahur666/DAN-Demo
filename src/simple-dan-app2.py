@@ -2,13 +2,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-import csv
-from math import ceil
-import multiprocessing as mp
+import sys
 
 from typing import Dict, List
 
-from network import Network
+from network2 import Network
 
 FIG_NUM = 0
 
@@ -126,45 +124,18 @@ def main(show=False):
     configurations = load_configurations()
     active_config = configurations[0]
 
-    res = []
+    active_config = configurations[2]
 
-    vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
-    delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
-    ratios = [0.25, 0.33]
+    demand_matrix = create_demand_matrix_for_configuration(active_config)
 
-    with open(f"res/results.csv", "w") as csvFile:
-        fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-                  'max_delta', 'dan', 'most_congested_route', 'ratio']
-        writer = csv.DictWriter(csvFile, fieldnames=fields)
-        writer.writeheader()
-    csvFile.close()
+    network = Network(demand_matrix)
 
-    for vertex_num in vertex_nums:
-        for delta_num in delta_nums:
-            configs = []
-            for ratio in ratios:
-                for i in range(5):
-                    active_cfg = active_config.copy()
-                    active_cfg['vertex_num'] = vertex_num
-                    active_cfg['constant'] = int(ceil(vertex_num * ratio))
-                    active_cfg['dan'] = delta_num
-                    active_cfg['ratio'] = ratio
-                    configs.append(active_cfg)
+    network.create_dan(active_config['dan'])
 
-            with mp.Pool() as p:
-                res = p.map(run_dan, configs)
+    if show:
+        render_everyting(network)
+        plt.show()
 
-                with open(f"res/results.csv", "a+") as csvFile:
-                    fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio']
-                    writer = csv.DictWriter(csvFile, fieldnames=fields)
-                    #writer.writeheader()
-                    writer.writerows(res)
-
-                csvFile.close()
-
-    # if show:
-    #     render_everyting(network)
-    #     plt.show()
 
 
 def run_dan(active_config):
@@ -178,4 +149,5 @@ def run_dan(active_config):
 
 
 if __name__ == '__main__':
-    main()
+    render = True if len(sys.argv) == 2 and sys.argv[1] == "-r" else False
+    main(render)

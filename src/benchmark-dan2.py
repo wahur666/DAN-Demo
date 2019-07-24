@@ -8,7 +8,7 @@ import multiprocessing as mp
 
 from typing import Dict, List
 
-from network import Network
+from network2 import Network
 
 FIG_NUM = 0
 
