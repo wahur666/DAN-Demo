@@ -4,9 +4,9 @@ import numpy as np
 import json
 import sys
 
-from typing import Dict, List
+from typing import Dict
 
-from network import Network
+from egobalance.network2 import Network
 
 FIG_NUM = 0
 

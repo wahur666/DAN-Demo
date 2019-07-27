@@ -3,12 +3,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import csv
-from math import ceil
 import multiprocessing as mp
+import os
+import time
 
-from typing import Dict, List
+from math import ceil
+from typing import Dict
+from huffmandan import HuffmanDanNetwork
 
-from network import Network
 
 FIG_NUM = 0
 
@@ -43,7 +45,7 @@ def create_demand_matrix_for_configuration(config: Dict):
     return generate_demand_matrix(G).tolist()
 
 
-def render_egotrees(network: Network):
+def render_egotrees(network: HuffmanDanNetwork):
     global FIG_NUM
     for tree in network.egotrees:
         FIG_NUM += 1
@@ -73,7 +75,7 @@ def render_egotrees(network: Network):
         nx.draw_networkx_edge_labels(G, pos, weights)
 
 
-def render_original_network(network: Network):
+def render_original_network(network: HuffmanDanNetwork):
     global FIG_NUM
     G = nx.Graph()
     for i in range(len(network.demand_matrix)):
@@ -93,7 +95,7 @@ def render_original_network(network: Network):
     weights = nx.get_edge_attributes(G, 'w')
     nx.draw_networkx_edge_labels(G, pos, weights)
 
-def render_new_network(network: Network):
+def render_new_network(network: HuffmanDanNetwork):
     Gn = nx.Graph()
     for i in range(len(network.demand_matrix)):
         Gn.add_node(i, label=str(i))
@@ -117,11 +119,23 @@ def render_new_network(network: Network):
     weights = nx.get_edge_attributes(Gn, 'w')
     nx.draw_networkx_edge_labels(Gn, pos, weights)
 
-def render_everyting(network: Network):
+def render_everyting(network: HuffmanDanNetwork):
     render_original_network(network)
     render_egotrees(network)
     render_new_network(network)
 
+
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print("--- Runtime ---")
+        print(f'{method.__name__} function run for  {te - ts} s')
+        return result
+    return timed
+
+@timeit
 def main(show=False):
     configurations = load_configurations()
     active_config = configurations[0]
@@ -131,6 +145,9 @@ def main(show=False):
     vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
     delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
     ratios = [0.25, 0.33]
+
+    if not os.path.exists("res"):
+        os.mkdir("res")
 
     with open(f"res/results.csv", "w") as csvFile:
         fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
@@ -169,12 +186,14 @@ def main(show=False):
 
 def run_dan(active_config):
     demand_matrix = create_demand_matrix_for_configuration(active_config)
-    network = Network(demand_matrix)
+    network = HuffmanDanNetwork(demand_matrix)
     network.create_dan(active_config['dan'])
     summary = network.get_summary()
     print(active_config)
     print(summary)
     return {**summary, **active_config, "ratio": active_config["ratio"]}
+
+
 
 
 if __name__ == '__main__':

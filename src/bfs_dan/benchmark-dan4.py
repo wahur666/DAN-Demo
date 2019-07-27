@@ -2,11 +2,15 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-import sys
+import csv
+import multiprocessing as mp
+import os
+import time
 
-from typing import Dict, List
+from math import ceil
+from typing import Dict
+from bfsdan import HuffmanDanNetwork
 
-from network2 import Network
 
 FIG_NUM = 0
 
@@ -41,7 +45,7 @@ def create_demand_matrix_for_configuration(config: Dict):
     return generate_demand_matrix(G).tolist()
 
 
-def render_egotrees(network: Network):
+def render_egotrees(network: HuffmanDanNetwork):
     global FIG_NUM
     for tree in network.egotrees:
         FIG_NUM += 1
@@ -71,7 +75,7 @@ def render_egotrees(network: Network):
         nx.draw_networkx_edge_labels(G, pos, weights)
 
 
-def render_original_network(network: Network):
+def render_original_network(network: HuffmanDanNetwork):
     global FIG_NUM
     G = nx.Graph()
     for i in range(len(network.demand_matrix)):
@@ -91,7 +95,7 @@ def render_original_network(network: Network):
     weights = nx.get_edge_attributes(G, 'w')
     nx.draw_networkx_edge_labels(G, pos, weights)
 
-def render_new_network(network: Network):
+def render_new_network(network: HuffmanDanNetwork):
     Gn = nx.Graph()
     for i in range(len(network.demand_matrix)):
         Gn.add_node(i, label=str(i))
@@ -115,32 +119,74 @@ def render_new_network(network: Network):
     weights = nx.get_edge_attributes(Gn, 'w')
     nx.draw_networkx_edge_labels(Gn, pos, weights)
 
-def render_everyting(network: Network):
+def render_everyting(network: HuffmanDanNetwork):
     render_original_network(network)
     render_egotrees(network)
     render_new_network(network)
 
+
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print("--- Runtime ---")
+        print(f'{method.__name__} function run for  {te - ts} s')
+        return result
+    return timed
+
+@timeit
 def main(show=False):
     configurations = load_configurations()
     active_config = configurations[0]
 
-    active_config = configurations[2]
+    res = []
 
-    demand_matrix = create_demand_matrix_for_configuration(active_config)
+    vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
+    delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
+    ratios = [0.25, 0.33]
 
-    network = Network(demand_matrix)
+    if not os.path.exists("res"):
+        os.mkdir("res")
 
-    network.create_dan(active_config['dan'])
+    with open(f"res/results.csv", "w") as csvFile:
+        fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
+                  'max_delta', 'dan', 'most_congested_route', 'ratio']
+        writer = csv.DictWriter(csvFile, fieldnames=fields)
+        writer.writeheader()
+    csvFile.close()
 
-    if show:
-        render_everyting(network)
-        plt.show()
+    for vertex_num in vertex_nums:
+        for delta_num in delta_nums:
+            configs = []
+            for ratio in ratios:
+                for i in range(5):
+                    active_cfg = active_config.copy()
+                    active_cfg['vertex_num'] = vertex_num
+                    active_cfg['constant'] = int(ceil(vertex_num * ratio))
+                    active_cfg['dan'] = delta_num
+                    active_cfg['ratio'] = ratio
+                    configs.append(active_cfg)
 
+            with mp.Pool() as p:
+                res = p.map(run_dan, configs)
+
+                with open(f"res/results.csv", "a+") as csvFile:
+                    fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio']
+                    writer = csv.DictWriter(csvFile, fieldnames=fields)
+                    #writer.writeheader()
+                    writer.writerows(res)
+
+                csvFile.close()
+
+    # if show:
+    #     render_everyting(network)
+    #     plt.show()
 
 
 def run_dan(active_config):
     demand_matrix = create_demand_matrix_for_configuration(active_config)
-    network = Network(demand_matrix)
+    network = HuffmanDanNetwork(demand_matrix)
     network.create_dan(active_config['dan'])
     summary = network.get_summary()
     print(active_config)
@@ -148,6 +194,7 @@ def run_dan(active_config):
     return {**summary, **active_config, "ratio": active_config["ratio"]}
 
 
+
+
 if __name__ == '__main__':
-    render = True if len(sys.argv) == 2 and sys.argv[1] == "-r" else False
-    main(render)
+    main()
