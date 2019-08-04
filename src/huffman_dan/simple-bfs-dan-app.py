@@ -1,16 +1,14 @@
+import json
+import sys
+
+import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
-import json
-import csv
-import multiprocessing as mp
-import os
-import time
 
-from math import ceil
 from typing import Dict
-from bfsdan import HuffmanDanNetwork
 
+from huffman_tree import calculate_all_bfs_trees
+from huffmandan import Network
 
 FIG_NUM = 0
 
@@ -27,6 +25,7 @@ def generate_demand_matrix(graph: nx.Graph) -> np.array:
     for edge in graph.edges:
         demand_matrix[edge[0], edge[1]] = np.random.randint(1, 10)
         demand_matrix[edge[1], edge[0]] = demand_matrix[edge[0], edge[1]]
+    demand_matrix = np.vectorize(lambda x: int(x))(demand_matrix)
     return demand_matrix
 
 
@@ -44,10 +43,9 @@ def create_demand_matrix_for_configuration(config: Dict):
 
     return generate_demand_matrix(G).tolist()
 
-
-def render_egotrees(network: HuffmanDanNetwork):
+def render_egotrees(network: Network):
     global FIG_NUM
-    for tree in network.egotrees:
+    for tree in network.trees:
         FIG_NUM += 1
         G = nx.Graph()
         queue = [tree]
@@ -75,7 +73,7 @@ def render_egotrees(network: HuffmanDanNetwork):
         nx.draw_networkx_edge_labels(G, pos, weights)
 
 
-def render_original_network(network: HuffmanDanNetwork):
+def render_original_network(network: Network):
     global FIG_NUM
     G = nx.Graph()
     for i in range(len(network.demand_matrix)):
@@ -95,7 +93,7 @@ def render_original_network(network: HuffmanDanNetwork):
     weights = nx.get_edge_attributes(G, 'w')
     nx.draw_networkx_edge_labels(G, pos, weights)
 
-def render_new_network(network: HuffmanDanNetwork):
+def render_new_network(network: Network):
     Gn = nx.Graph()
     for i in range(len(network.demand_matrix)):
         Gn.add_node(i, label=str(i))
@@ -119,82 +117,25 @@ def render_new_network(network: HuffmanDanNetwork):
     weights = nx.get_edge_attributes(Gn, 'w')
     nx.draw_networkx_edge_labels(Gn, pos, weights)
 
-def render_everyting(network: HuffmanDanNetwork):
+def render_everyting(network: Network):
     render_original_network(network)
     render_egotrees(network)
     render_new_network(network)
 
 
-def timeit(method):
-    def timed(*args, **kw):
-        ts = time.time()
-        result = method(*args, **kw)
-        te = time.time()
-        print("--- Runtime ---")
-        print(f'{method.__name__} function run for  {te - ts} s')
-        return result
-    return timed
-
-@timeit
 def main(show=False):
     configurations = load_configurations()
     active_config = configurations[0]
-
-    res = []
-
-    vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
-    delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
-    ratios = [0.25, 0.33]
-
-    if not os.path.exists("res"):
-        os.mkdir("res")
-
-    with open(f"res/results.csv", "w") as csvFile:
-        fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-                  'max_delta', 'dan', 'most_congested_route', 'ratio']
-        writer = csv.DictWriter(csvFile, fieldnames=fields)
-        writer.writeheader()
-    csvFile.close()
-
-    for vertex_num in vertex_nums:
-        for delta_num in delta_nums:
-            configs = []
-            for ratio in ratios:
-                for i in range(5):
-                    active_cfg = active_config.copy()
-                    active_cfg['vertex_num'] = vertex_num
-                    active_cfg['constant'] = int(ceil(vertex_num * ratio))
-                    active_cfg['dan'] = delta_num
-                    active_cfg['ratio'] = ratio
-                    configs.append(active_cfg)
-
-            with mp.Pool() as p:
-                res = p.map(run_dan, configs)
-
-                with open(f"res/results.csv", "a+") as csvFile:
-                    fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio']
-                    writer = csv.DictWriter(csvFile, fieldnames=fields)
-                    #writer.writeheader()
-                    writer.writerows(res)
-
-                csvFile.close()
-
-    # if show:
-    #     render_everyting(network)
-    #     plt.show()
-
-
-def run_dan(active_config):
+    # active_config = configurations[2]
     demand_matrix = create_demand_matrix_for_configuration(active_config)
-    network = HuffmanDanNetwork(demand_matrix)
-    network.create_dan(active_config['dan'])
-    summary = network.get_summary()
-    print(active_config)
-    print(summary)
-    return {**summary, **active_config, "ratio": active_config["ratio"]}
-
-
+    demand_matrix: np.array
+    network = Network(demand_matrix)
+    network.create_dan(active_config['dan'], calculate_all_bfs_trees)
+    if show:
+        render_everyting(network)
+        plt.show()
 
 
 if __name__ == '__main__':
-    main()
+    render = True if len(sys.argv) == 2 and sys.argv[1] == "-r" else False
+    main(render)

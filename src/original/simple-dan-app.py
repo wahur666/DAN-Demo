@@ -129,7 +129,7 @@ def main(show=False):
 
     network = Network(demand_matrix)
 
-    network.create_dan(active_config['dan'])
+    network.select_points(active_config['dan'])
 
     if show:
         render_everyting(network)
@@ -140,7 +140,7 @@ def main(show=False):
 def run_dan(active_config):
     demand_matrix = create_demand_matrix_for_configuration(active_config)
     network = Network(demand_matrix)
-    network.create_dan(active_config['dan'])
+    network.select_points(active_config['dan'])
     summary = network.get_summary()
     print(active_config)
     print(summary)

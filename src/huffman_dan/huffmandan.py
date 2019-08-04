@@ -1,6 +1,9 @@
 import re
 from copy import deepcopy
 from itertools import cycle, combinations
+from types import FunctionType
+from typing import Callable
+
 import numpy as np
 
 from adt import *
@@ -8,9 +11,9 @@ from adt import *
 PREFIX = "T"
 
 
-class HuffmanDanNetwork:
+class Network:
 
-    def __init__(self, demand_matrix: List):
+    def __init__(self, demand_matrix: List[List[float]]):
         self.vertices = []
         self.edges = []
         self.avg_deg = 0
@@ -48,7 +51,15 @@ class HuffmanDanNetwork:
     def get_vertex(self, index: int):
         return list(filter(lambda x: x.index == index, self.vertices))
 
-    def create_dan(self, delta=None):
+    def create_dan(self, delta, tree_function: Callable[[List[List[float]], int, List[Node], str], List[Tree]]):
+        self.select_points(delta)
+        self.add_helpers()
+        self.calculate_trees(tree_function)
+        self.union_trees()
+        self.calculate_congestion_and_avglen()
+        self.print_summary()
+
+    def select_points(self, delta=None):
         self.delta = delta
         # Classifying points
         degs = []
@@ -72,8 +83,6 @@ class HuffmanDanNetwork:
 
         self.H = H
         self.L = L
-
-        self.add_helpers()
 
     def add_helpers(self):
         c_L = cycle(self.L)
@@ -118,9 +127,8 @@ class HuffmanDanNetwork:
                 else:
                     already_assinged[edge.v2].append(l[0])
                 self.helper_struct.append((edge.v1, edge.v2, l[0]))
-        self.calculate_trees()
 
-    def calculate_trees(self):
+    def calculate_trees(self, tree_function: Callable[[List[List[float]], int, List[Node], str], List[Tree]]):
         for i in self.demand_matrix:
             print(i)
 
@@ -135,18 +143,18 @@ class HuffmanDanNetwork:
             self.delta = int(self.delta[:-1]) * int(round(self.avg_deg))
         else:
             raise Exception("Invalid delta format, accepted format \d+$ or \d+d$")
-        self.egotrees = calculate_all_push_up_trees(self.new_demand_matrix, self.delta, self.H_i)
-        for i in self.egotrees:
+        self.trees = tree_function(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
+        # self.egotrees = calculate_all_bfs_trees(self.new_demand_matrix, self.delta, self.H_i)
+        for i in self.trees:
             print(i)
-        self.union_egotrees()
 
-    def union_egotrees(self):
+    def union_trees(self):
         for item in self.new_demand_matrix:
             print(item)
         print("------")
 
         queue = []
-        for tree in self.egotrees:
+        for tree in self.trees:
             print(tree)
             queue.append(tree)
             while queue:
@@ -183,11 +191,10 @@ class HuffmanDanNetwork:
 
         print(str(self.routing_scheme))
 
-        self.calculate_congestion_and_avglen()
 
     def calculate_congestion_and_avglen(self):
         all_path = {}
-        for tree in self.egotrees:
+        for tree in self.trees:
             tree.build_routes()
             tree_paths = []
             for struct in self.helper_struct:
@@ -302,7 +309,6 @@ class HuffmanDanNetwork:
         self.summary['max_delta'] = max_delta
 
 
-        self.print_summary()
         #print(all_path)
 
     def print_summary(self):
@@ -343,155 +349,6 @@ class HuffmanDanNetwork:
 
     def get_summary(self):
         return self.summary
-
-# --------------------------------------------------------------------------------------------------------------------
-def calculate_all_push_up_trees(demand_distribution, delta, indices: List = None):
-    pushup_trees = []
-
-    dd = demand_distribution
-
-    for i in range(len(dd)):
-
-        if indices and i not in indices:
-            continue
-
-        nodes = []
-        source: HuffmanDanNode = None
-
-        for j in range(len(dd)):
-            if i == j:
-                source = HuffmanDanNode(PREFIX, i, 0)
-            elif dd[i][j] + dd[j][i] > 0:
-                nodes.append(HuffmanDanNode(PREFIX, j, dd[i][j] + dd[j][i]))
-
-        tree = create_push_up_tree(delta, nodes)
-        tree.root = source
-
-        pushup_trees.append(tree)
-    return pushup_trees
-
-
-def get_nodes(tree: HuffmanDanTree) -> List[HuffmanDanNode]:
-    nodes = []
-    for index, leaf in enumerate(tree.leaves):
-        if isinstance(leaf, HuffmanDanNode):
-            nodes.append(leaf)
-        elif isinstance(leaf, HuffmanDanTree):
-            nodes.extend(get_nodes(leaf))
-    return nodes
-
-
-# Naive Solution
-
-
-def detach_leaf(tree: HuffmanDanTree, path: List[int]):
-    temp_tree = tree
-    for i in path[:-1]:
-        temp_tree = temp_tree.leaves[i]
-    temp_tree.leaves[path[-1]] = None
-
-
-def calculate_node_paths(tree: HuffmanDanTree):
-    for index, leaf in enumerate(tree.leaves):
-        for i in tree.path:
-            leaf.path.append(i)
-        leaf.path.append(index)
-        if isinstance(leaf, HuffmanDanTree):
-            calculate_node_paths(leaf)
-
-
-def remove_dead_branches(root: HuffmanDanTree):
-    leaves = []
-    for leaf in root.leaves:
-        leaves.append(leaf)
-
-    while leaves:
-        leaf = leaves.pop(0)
-        if isinstance(leaf, HuffmanDanNode):
-            continue
-        leaf.leaves = [x for x in leaf.leaves if x is not None]
-        leaves.extend(leaf.leaves)
-
-
-def naive_push_up(delta, nodes):
-    root = HuffmanDanTree(None, delta, nodes)
-    calculate_node_paths(root)
-    leaves = root.leaves.copy()
-    while leaves:
-        leaf = leaves.pop(0)
-        if leaf is not None and isinstance(leaf, HuffmanDanTree):
-            nodes = get_nodes(leaf)
-            print(nodes)
-            max_weight_leaf = max(nodes, key=lambda x: x.weight())
-            leaf.root = max_weight_leaf
-            detach_leaf(root, max_weight_leaf.path)
-            leaves.extend(leaf.leaves)
-    remove_dead_branches(root)
-    return root
-
-
-# Breadth-first solution
-
-
-def find_next_free_position(tree: HuffmanDanTree, node: HuffmanDanNode):
-    if len(tree.leaves) < tree.delta:
-        new_leaf = HuffmanDanTree(node, 2, [])
-        tree.leaves.append(new_leaf)
-    else:
-        leaves = tree.leaves.copy()
-        while leaves:
-            leaf = leaves.pop(0)
-            if len(leaf.leaves) < leaf.delta:
-                new_leaf = HuffmanDanTree(node, 2, [])
-                leaf.leaves.append(new_leaf)
-                break
-            else:
-                leaves.extend(leaf.leaves)
-
-
-def bfs_push_up(delta, nodes):
-    root = HuffmanDanTree(None, delta, nodes)
-    new_root = HuffmanDanTree(None, delta, [])
-    leaves = root.leaves.copy()
-    while leaves:
-        leaf = leaves.pop(0)
-        if leaf is not None:
-            if isinstance(leaf, HuffmanDanTree):
-                nodes = get_nodes(leaf)
-                nodes.sort(key=lambda x: x.weight(), reverse=True)
-                print(nodes)
-                if len(nodes) > 1:
-                    n = nodes.pop(0)
-                    new_tree = HuffmanDanTree(n, 2, [])
-                    for node in nodes:
-                        find_next_free_position(new_tree, node)
-                    new_root.leaves.append(new_tree)
-            else:
-                tree = HuffmanDanTree(leaf, 2, [])
-                new_root.leaves.append(tree)
-    return new_root
-
-
-def create_push_up_tree(delta, nodes: List[AbstractHuffman]):
-    while len(nodes) > delta:
-        node1 = min(nodes, key=lambda x: x.weight())
-        nodes.pop(nodes.index(node1))
-        node2 = min(nodes, key=lambda x: x.weight())
-        nodes.pop(nodes.index(node2))
-        tree = HuffmanDanTree(None, 2, [node1, node2])
-        nodes.append(tree)
-    # root = naive_push_up(delta, nodes)
-    root = bfs_push_up(delta, nodes)
-
-    return root
-
-
-def create_bfs_tree(delta, nodes: List[HuffmanDanNode]):
-    nodes.sort(key=lambda x: x.weight(), reverse=True)
-    root = HuffmanDanTree(None, delta, [])
-    for node in nodes:
-        find_next_free_position(root, node)
-    return root
 
 def sum_aa(aa):
     return sum([sum(x) for x in aa])

@@ -145,9 +145,9 @@ def main(show=False):
     delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
     ratios = [0.25, 0.33]
 
-    if not os.path.exists("res"):
-        os.mkdir("res")
-    with open(os.path.join('res', 'results.csv'), 'w') as csvFile:
+    if not os.path.exists("bfs_res"):
+        os.mkdir("bfs_res")
+    with open(os.path.join('bfs_res', 'results.csv'), 'w') as csvFile:
         fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
                   'max_delta', 'dan', 'most_congested_route', 'ratio']
         writer = csv.DictWriter(csvFile, fieldnames=fields)
@@ -169,7 +169,7 @@ def main(show=False):
             with mp.Pool() as p:
                 res = p.map(run_dan, configs)
 
-                with open(f"res/results.csv", "a+") as csvFile:
+                with open(f"bfs_res/results.csv", "a+") as csvFile:
                     fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio']
                     writer = csv.DictWriter(csvFile, fieldnames=fields)
                     #writer.writeheader()
@@ -185,7 +185,7 @@ def main(show=False):
 def run_dan(active_config):
     demand_matrix = create_demand_matrix_for_configuration(active_config)
     network = Network(demand_matrix)
-    network.create_dan(active_config['dan'])
+    network.select_points(active_config['dan'])
     summary = network.get_summary()
     print(active_config)
     print(summary)

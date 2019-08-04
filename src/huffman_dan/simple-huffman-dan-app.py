@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 
 from typing import Dict
 
-from huffmandan import HuffmanDanNode, HuffmanDanNetwork
+from huffmandan import Network
+from huffman_tree import calculate_all_push_up_trees
 
 FIG_NUM = 0
 
@@ -42,9 +43,9 @@ def create_demand_matrix_for_configuration(config: Dict):
 
     return generate_demand_matrix(G).tolist()
 
-def render_egotrees(network: HuffmanDanNetwork):
+def render_egotrees(network: Network):
     global FIG_NUM
-    for tree in network.egotrees:
+    for tree in network.trees:
         FIG_NUM += 1
         G = nx.Graph()
         queue = [tree]
@@ -72,7 +73,7 @@ def render_egotrees(network: HuffmanDanNetwork):
         nx.draw_networkx_edge_labels(G, pos, weights)
 
 
-def render_original_network(network: HuffmanDanNetwork):
+def render_original_network(network: Network):
     global FIG_NUM
     G = nx.Graph()
     for i in range(len(network.demand_matrix)):
@@ -92,7 +93,7 @@ def render_original_network(network: HuffmanDanNetwork):
     weights = nx.get_edge_attributes(G, 'w')
     nx.draw_networkx_edge_labels(G, pos, weights)
 
-def render_new_network(network: HuffmanDanNetwork):
+def render_new_network(network: Network):
     Gn = nx.Graph()
     for i in range(len(network.demand_matrix)):
         Gn.add_node(i, label=str(i))
@@ -116,7 +117,7 @@ def render_new_network(network: HuffmanDanNetwork):
     weights = nx.get_edge_attributes(Gn, 'w')
     nx.draw_networkx_edge_labels(Gn, pos, weights)
 
-def render_everyting(network: HuffmanDanNetwork):
+def render_everyting(network: Network):
     render_original_network(network)
     render_egotrees(network)
     render_new_network(network)
@@ -128,8 +129,8 @@ def main(show=False):
     # active_config = configurations[2]
     demand_matrix = create_demand_matrix_for_configuration(active_config)
     demand_matrix: np.array
-    network = HuffmanDanNetwork(demand_matrix)
-    network.create_dan(active_config['dan'])
+    network = Network(demand_matrix)
+    network.create_dan(active_config['dan'], calculate_all_push_up_trees)
     if show:
         render_everyting(network)
         plt.show()

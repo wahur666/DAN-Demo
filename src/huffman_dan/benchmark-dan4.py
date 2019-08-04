@@ -1,13 +1,16 @@
-import json
-import sys
-
-import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
+import json
+import csv
+import multiprocessing as mp
+import os
+import time
 
+from math import ceil
 from typing import Dict
-
 from bfsdan import HuffmanDanNetwork
+
 
 FIG_NUM = 0
 
@@ -24,7 +27,6 @@ def generate_demand_matrix(graph: nx.Graph) -> np.array:
     for edge in graph.edges:
         demand_matrix[edge[0], edge[1]] = np.random.randint(1, 10)
         demand_matrix[edge[1], edge[0]] = demand_matrix[edge[0], edge[1]]
-    demand_matrix = np.vectorize(lambda x: int(x))(demand_matrix)
     return demand_matrix
 
 
@@ -41,6 +43,7 @@ def create_demand_matrix_for_configuration(config: Dict):
         raise NameError("Unknown graph type", config['graph'])
 
     return generate_demand_matrix(G).tolist()
+
 
 def render_egotrees(network: HuffmanDanNetwork):
     global FIG_NUM
@@ -122,19 +125,76 @@ def render_everyting(network: HuffmanDanNetwork):
     render_new_network(network)
 
 
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print("--- Runtime ---")
+        print(f'{method.__name__} function run for  {te - ts} s')
+        return result
+    return timed
+
+@timeit
 def main(show=False):
     configurations = load_configurations()
     active_config = configurations[0]
-    # active_config = configurations[2]
+
+    res = []
+
+    vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
+    delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
+    ratios = [0.25, 0.33]
+
+    if not os.path.exists("bfs_res"):
+        os.mkdir("bfs_res")
+
+    with open(f"bfs_res/results.csv", "w") as csvFile:
+        fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
+                  'max_delta', 'dan', 'most_congested_route', 'ratio']
+        writer = csv.DictWriter(csvFile, fieldnames=fields)
+        writer.writeheader()
+    csvFile.close()
+
+    for vertex_num in vertex_nums:
+        for delta_num in delta_nums:
+            configs = []
+            for ratio in ratios:
+                for i in range(5):
+                    active_cfg = active_config.copy()
+                    active_cfg['vertex_num'] = vertex_num
+                    active_cfg['constant'] = int(ceil(vertex_num * ratio))
+                    active_cfg['dan'] = delta_num
+                    active_cfg['ratio'] = ratio
+                    configs.append(active_cfg)
+
+            with mp.Pool() as p:
+                res = p.map(run_dan, configs)
+
+                with open(f"bfs_res/results.csv", "a+") as csvFile:
+                    fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio']
+                    writer = csv.DictWriter(csvFile, fieldnames=fields)
+                    #writer.writeheader()
+                    writer.writerows(res)
+
+                csvFile.close()
+
+    # if show:
+    #     render_everyting(network)
+    #     plt.show()
+
+
+def run_dan(active_config):
     demand_matrix = create_demand_matrix_for_configuration(active_config)
-    demand_matrix: np.array
     network = HuffmanDanNetwork(demand_matrix)
-    network.create_dan(active_config['dan'])
-    if show:
-        render_everyting(network)
-        plt.show()
+    network.select_points(active_config['dan'])
+    summary = network.get_summary()
+    print(active_config)
+    print(summary)
+    return {**summary, **active_config, "ratio": active_config["ratio"]}
+
+
 
 
 if __name__ == '__main__':
-    render = True if len(sys.argv) == 2 and sys.argv[1] == "-r" else False
-    main(render)
+    main()
