@@ -10,7 +10,7 @@ import time
 from math import ceil
 from typing import Dict
 
-from network import Network
+from src.network import Network
 
 FIG_NUM = 0
 
@@ -47,7 +47,7 @@ def create_demand_matrix_for_configuration(config: Dict):
 
 def render_egotrees(network: Network):
     global FIG_NUM
-    for tree in network.egotrees:
+    for tree in network.trees:
         FIG_NUM += 1
         G = nx.Graph()
         queue = [tree]

@@ -1,6 +1,6 @@
 from typing import List
 
-from adt import HuffmanDanNode, AbstractHuffman, HuffmanDanTree, Node, Tree
+from src.adt import HuffmanDanNode, AbstractHuffman, HuffmanDanTree, Node, Tree
 
 
 def get_nodes(tree: HuffmanDanTree) -> List[HuffmanDanNode]:
@@ -15,7 +15,7 @@ def get_nodes(tree: HuffmanDanTree) -> List[HuffmanDanNode]:
 # Simple push up on each branch
 
 
-def calculate_all_push_up_trees(demand_distribution: List[List[float]], delta: int, indices: List[Node] = None, prefix: str = "T") -> List[Tree]:
+def calculate_all_push_up_trees(demand_distribution: List[List[float]], delta: int, indices: List[Node], prefix: str) -> List[Tree]:
     pushup_trees = []
 
     dd = demand_distribution
@@ -94,7 +94,7 @@ def find_next_free_position(tree: HuffmanDanTree, node: HuffmanDanNode):
 
 # Breadth-first solution
 
-def calculate_all_bfs_trees(demand_distribution: List[List[float]], delta: int, indices: List[Node] = None, prefix: str = "T") -> List[Tree]:
+def calculate_all_bfs_trees(demand_distribution: List[List[float]], delta: int, indices: List[Node], prefix: str) -> List[Tree]:
     bfs_trees = []
 
     dd = demand_distribution

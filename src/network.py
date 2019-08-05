@@ -1,12 +1,13 @@
-import re
-from copy import deepcopy
 from itertools import cycle, combinations
-from types import FunctionType
-from typing import Callable
+from copy import deepcopy
+from typing import Tuple
+
+from huffman_tree import calculate_all_push_up_trees, calculate_all_bfs_trees
+from src.ego_trees import calculate_all_egotrees
 
 import numpy as np
-
-from adt import *
+from src.adt import *
+import re
 
 PREFIX = "T"
 
@@ -18,9 +19,9 @@ class Network:
         self.edges = []
         self.avg_deg = 0
         self.demand_matrix = demand_matrix
+        self.trees: List[Tree] = []
 
         self.new_demand_matrix = deepcopy(demand_matrix)
-        self.new_new_demand_matrix = deepcopy(demand_matrix)
         self.routing_scheme = []  # a.k.a new edges
 
         self.build_graph()
@@ -51,10 +52,10 @@ class Network:
     def get_vertex(self, index: int):
         return list(filter(lambda x: x.index == index, self.vertices))
 
-    def create_dan(self, delta, tree_function: Callable[[List[List[float]], int, List[Node], str], List[Tree]]):
+    def create_dan(self, delta):
         self.select_points(delta)
         self.add_helpers()
-        self.calculate_trees(tree_function)
+        self.calculate_trees()
         self.union_trees()
         self.calculate_congestion_and_avglen()
         self.print_summary()
@@ -86,7 +87,7 @@ class Network:
 
     def add_helpers(self):
         c_L = cycle(self.L)
-        self.helper_struct = []
+        self.helper_struct: List[Tuple[Vertex, Vertex, float]] = []
         already_assinged = {}
         for edge in self.edges:
             H_v = [x[0] for x in self.H]
@@ -128,7 +129,7 @@ class Network:
                     already_assinged[edge.v2].append(l[0])
                 self.helper_struct.append((edge.v1, edge.v2, l[0]))
 
-    def calculate_trees(self, tree_function: Callable[[List[List[float]], int, List[Node], str], List[Tree]]):
+    def calculate_trees(self):
         for i in self.demand_matrix:
             print(i)
 
@@ -143,10 +144,13 @@ class Network:
             self.delta = int(self.delta[:-1]) * int(round(self.avg_deg))
         else:
             raise Exception("Invalid delta format, accepted format \d+$ or \d+d$")
-        self.trees = tree_function(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
-        # self.egotrees = calculate_all_bfs_trees(self.new_demand_matrix, self.delta, self.H_i)
+        self.calculate()
         for i in self.trees:
             print(i)
+
+    @abstractmethod
+    def calculate(self):
+        raise Exception("Calculate function has to be implemented!")
 
     def union_trees(self):
         for item in self.new_demand_matrix:
@@ -163,9 +167,6 @@ class Network:
                     queue.append(subtree)
                     edge = Edge(tree_to_process.root, subtree.root, subtree.weight())
                     if edge not in self.routing_scheme:
-                        # u_index = edge.v1.index
-                        # v_index = edge.v2.index
-                        # edge.probability = self.new_new_demand_matrix[u_index][v_index]
                         if edge.probability > 0:
                             self.routing_scheme.append(edge)
                     else:
@@ -204,9 +205,6 @@ class Network:
                     tree_paths.append(r)
             if tree_paths:
                 all_path[tree_paths[0][0].index] = tree_paths
-
-        self.H_i = [x[0].index for x in self.H]
-        self.L_i = [x[0].index for x in self.L]
 
         # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
         congestion = 0
@@ -288,13 +286,6 @@ class Network:
             control_demand_matrix[edge.v1.index][edge.v2.index] += edge.probability
             control_demand_matrix[edge.v2.index][edge.v1.index] += edge.probability
 
-        mismatch_counter = 0
-        for i in range(len(self.demand_matrix)):
-            for j in range(len(self.demand_matrix)):
-                if control_demand_matrix[i][j] != self.new_new_demand_matrix[i][j]:
-                    mismatch_counter += 1
-        print("Mismatching items count:",mismatch_counter)
-
         max_delta = 0
         for row in control_demand_matrix:
             delta = sum(1 if x > 0 else 0 for x in row)
@@ -339,16 +330,46 @@ class Network:
                     break
         return con
 
-    def find_route(self, all_path, i, j) -> List[HuffmanDanNode]:
+    def find_route(self, all_path, i, j) -> List[Node]:
         if not i in all_path:
             return None
         for route in all_path[i]:
-            assert route, List[HuffmanDanNode]
+            assert route, List[Node]
             if route[0].index == i and route[-1].index == j:
                 return route.copy()
 
     def get_summary(self):
         return self.summary
 
+
+class OriginalDanNetwork(Network):
+
+    def calculate(self):
+        self.trees, self.new_demand_matrix = calculate_all_egotrees(self.demand_matrix, self.delta, self.H_i, PREFIX,
+                                                              self.helper_struct)
+
+
+class HuffmanDanNetwork(Network):
+
+    def calculate(self):
+        self.trees = calculate_all_push_up_trees(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
+
+
+class BfsDanNetwork(Network):
+
+    def calculate(self):
+        self.trees = calculate_all_bfs_trees(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
+
+
 def sum_aa(aa):
     return sum([sum(x) for x in aa])
+
+
+
+def normalize100(demand_distribution):
+    sum_of_items = sum_aa(demand_distribution)
+    multiplier = 100 / sum_of_items
+    normalized = [list(map(lambda z: z * multiplier, x)) for x in demand_distribution]
+    return normalized
+
+

@@ -5,10 +5,10 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from typing import Dict
+from typing import Dict, Type
 
-from huffmandan import Network
-from huffman_tree import calculate_all_push_up_trees
+from network import BfsDanNetwork
+from src.huffmandan import Network
 
 FIG_NUM = 0
 
@@ -117,7 +117,8 @@ def render_new_network(network: Network):
     weights = nx.get_edge_attributes(Gn, 'w')
     nx.draw_networkx_edge_labels(Gn, pos, weights)
 
-def render_everyting(network: Network):
+
+def render_everyting(network: Type[Network]):
     render_original_network(network)
     render_egotrees(network)
     render_new_network(network)
@@ -125,17 +126,17 @@ def render_everyting(network: Network):
 
 def main(show=False):
     configurations = load_configurations()
-    active_config = configurations[0]
-    # active_config = configurations[2]
+    # active_config = configurations[0]
+    active_config = configurations[2]
     demand_matrix = create_demand_matrix_for_configuration(active_config)
     demand_matrix: np.array
-    network = Network(demand_matrix)
-    network.create_dan(active_config['dan'], calculate_all_push_up_trees)
+    network = BfsDanNetwork(demand_matrix)
+    network.create_dan(active_config['dan'])
     if show:
         render_everyting(network)
         plt.show()
 
 
 if __name__ == '__main__':
-    render = True if len(sys.argv) == 2 and sys.argv[1] == "-r" else False
+    render = len(sys.argv) == 2 and sys.argv[1] == "-r"
     main(render)

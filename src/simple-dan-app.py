@@ -1,14 +1,11 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+import numpy as np
 import json
 import sys
 
-import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
-
 from typing import Dict
-
-from huffman_tree import calculate_all_bfs_trees
-from huffmandan import Network
+from src.network import Network, OriginalDanNetwork
 
 FIG_NUM = 0
 
@@ -25,7 +22,6 @@ def generate_demand_matrix(graph: nx.Graph) -> np.array:
     for edge in graph.edges:
         demand_matrix[edge[0], edge[1]] = np.random.randint(1, 10)
         demand_matrix[edge[1], edge[0]] = demand_matrix[edge[0], edge[1]]
-    demand_matrix = np.vectorize(lambda x: int(x))(demand_matrix)
     return demand_matrix
 
 
@@ -42,6 +38,7 @@ def create_demand_matrix_for_configuration(config: Dict):
         raise NameError("Unknown graph type", config['graph'])
 
     return generate_demand_matrix(G).tolist()
+
 
 def render_egotrees(network: Network):
     global FIG_NUM
@@ -122,18 +119,32 @@ def render_everyting(network: Network):
     render_egotrees(network)
     render_new_network(network)
 
-
 def main(show=False):
     configurations = load_configurations()
     active_config = configurations[0]
-    # active_config = configurations[2]
+
+    active_config = configurations[2]
+
     demand_matrix = create_demand_matrix_for_configuration(active_config)
-    demand_matrix: np.array
-    network = Network(demand_matrix)
-    network.create_dan(active_config['dan'], calculate_all_bfs_trees)
+
+    network = OriginalDanNetwork(demand_matrix)
+
+    network.create_dan(active_config['dan'])
+
     if show:
         render_everyting(network)
         plt.show()
+
+
+
+def run_dan(active_config):
+    demand_matrix = create_demand_matrix_for_configuration(active_config)
+    network = Network(demand_matrix)
+    network.select_points(active_config['dan'])
+    summary = network.get_summary()
+    print(active_config)
+    print(summary)
+    return {**summary, **active_config, "ratio": active_config["ratio"]}
 
 
 if __name__ == '__main__':

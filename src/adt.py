@@ -14,6 +14,7 @@ class Vertex:
     def __str__(self):
         return "Vertex: " + self.label
 
+
 class Node(Vertex):
 
     def __init__(self, prefix: str, index: int, probability: float):
@@ -33,7 +34,7 @@ class Node(Vertex):
 
 class Edge:
 
-    def __init__(self, v1: Vertex, v2: Vertex, probability):
+    def __init__(self, v1: Vertex, v2: Vertex, probability: float):
         self.v1 = v1
         self.v2 = v2
         self.probability = probability
@@ -46,6 +47,7 @@ class Edge:
 
     def __eq__(self, other):
         return {self.v1.index, self.v2.index} == {other.v1.index, other.v2.index}
+
 
 class Tree:
 
@@ -115,6 +117,34 @@ class Tree:
         return route
 
 
+class BinTree(Tree):
+
+    def __init__(self, root: Node):
+        super().__init__(root)
+        self.leaves: List[BinTree] = []
+
+    def push(self, bintree):
+        if len(self.leaves) != 2:
+            self.leaves.append(bintree)
+        else:
+            lightest_leave = min(self.leaves, key=lambda x: x.weight())
+            lightest_leave.push(bintree)
+
+
+class EgoTree(Tree):
+
+    def __init__(self, root: Node, delta: int):
+        super().__init__(root)
+        self.delta = delta
+        self.leaves: List[BinTree] = []
+
+    def push(self, bintree: BinTree):
+        if len(self.leaves) == self.delta:
+            lightest_leave = min(self.leaves, key=lambda x: x.weight())
+            lightest_leave.push(bintree)
+        else:
+            self.leaves.append(bintree)
+
 class AbstractHuffman:
 
     def __init__(self):
@@ -155,3 +185,4 @@ class HuffmanDanTree(AbstractHuffman, Tree):
         a = sum(x.weight() for x in self.leaves)
         b = self.root.weight() if self.root else 0
         return a + b
+

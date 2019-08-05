@@ -1,7 +1,9 @@
 from itertools import cycle, combinations
 from copy import deepcopy
+from typing import Callable, Tuple
+
 import numpy as np
-from adt import *
+from src.adt import *
 import re
 
 PREFIX = "T"
@@ -9,14 +11,13 @@ PREFIX = "T"
 
 class Network:
 
-    def __init__(self, demand_matix : List):
+    def __init__(self, demand_matrix: List[List[float]]):
         self.vertices = []
         self.edges = []
         self.avg_deg = 0
-        self.demand_matrix = demand_matix
+        self.demand_matrix = demand_matrix
 
-        self.new_demand_matrix = deepcopy(demand_matix)
-        self.new_new_demand_matrix = deepcopy(demand_matix)
+        self.new_demand_matrix = deepcopy(demand_matrix)
         self.routing_scheme = []  # a.k.a new edges
 
         self.build_graph()
@@ -45,9 +46,17 @@ class Network:
                     self.add_edge(e)
 
     def get_vertex(self, index: int):
-        return list(filter(lambda x : x.index == index, self.vertices))
+        return list(filter(lambda x: x.index == index, self.vertices))
 
-    def create_dan(self, delta = None):
+    def create_dan(self, delta, tree_function: Callable[[List[List[float]], int, List[Node], str], List[Tree]]):
+        self.select_points(delta)
+        self.add_helpers()
+        self.calculate_trees(tree_function)
+        self.union_trees()
+        self.calculate_congestion_and_avglen()
+        self.print_summary()
+
+    def select_points(self, delta=None):
         self.delta = delta
         # Classifying points
         degs = []
@@ -72,11 +81,9 @@ class Network:
         self.H = H
         self.L = L
 
-        self.add_helpers()
-
     def add_helpers(self):
         c_L = cycle(self.L)
-        self.helper_struct = []
+        self.helper_struct: List[Tuple[Vertex, Vertex, float]] = []
         already_assinged = {}
         for edge in self.edges:
             H_v = [x[0] for x in self.H]
@@ -117,13 +124,13 @@ class Network:
                 else:
                     already_assinged[edge.v2].append(l[0])
                 self.helper_struct.append((edge.v1, edge.v2, l[0]))
-        self.calculate_egotrees()
 
-    def calculate_egotrees(self):
+    def calculate_trees(self, tree_function: Callable[[List[List[float]], int, List[Node], str], List[Tree]]):
         for i in self.demand_matrix:
             print(i)
 
-        H_i = [x[0].index for x in self.H]
+        self.H_i = [x[0].index for x in self.H]
+        self.L_i = [x[0].index for x in self.L]
 
         if self.delta is None:
             self.delta = 12 * int(round(self.avg_deg))
@@ -133,158 +140,19 @@ class Network:
             self.delta = int(self.delta[:-1]) * int(round(self.avg_deg))
         else:
             raise Exception("Invalid delta format, accepted format \d+$ or \d+d$")
-        self.egotrees = calculate_all_egotrees(self.demand_matrix, self.delta, H_i)
-        for i in self.egotrees:
+        self.trees = tree_function(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
+        # self.egotrees = calculate_all_bfs_trees(self.new_demand_matrix, self.delta, self.H_i)
+        for i in self.trees:
             print(i)
 
-        self.change_nodes_in_egotrees()
 
-    def change_nodes_in_egotrees(self):
-
-        print("---- EGO TREES BEFORE ----")
-        for tree in self.egotrees:
-            print(tree)
-        print("--------------------------")
-        for tree in self.egotrees:
-            print("Tree before", tree)
-            for struct in self.helper_struct:
-                leave_indices = [x.index for x in tree.get_dependent_nodes()]
-                if tree.root.index == struct[0].index and struct[1].index in leave_indices:
-                    v_tree = [x for x in tree.get_trees() if x.root.index == struct[1].index][0]
-                elif tree.root.index == struct[1].index and struct[0].index in leave_indices:
-                    v_tree = [x for x in tree.get_trees() if x.root.index == struct[0].index][0]
-                else:
-                    continue
-
-                if v_tree in tree.leaves:
-                    v_parent = tree
-                else:
-                    v_parent = [x for x in tree.get_trees() if v_tree in x.leaves][0]
-
-                if not struct[2].index in leave_indices:
-                    # Mikor L nincs benne a faban
-                    print("L atveszi V helyet, L=0")
-                    # print(tree)
-                    # print("V", v_tree)
-                    l_tree = BinTree(Node(PREFIX, struct[2].index, 0))
-                    l_tree.leaves = v_tree.leaves
-
-                    ind = v_parent.leaves.index(v_tree)
-                    v_parent.leaves[ind] = l_tree
-                    # print("L", l_tree)
-                    # print(tree)
-                    u_index = tree.root.index
-                    v_index = v_tree.root.index
-                    l_index = l_tree.root.index
-
-                    weight = self.new_new_demand_matrix[u_index][v_index]
-
-                    self.new_new_demand_matrix[u_index][v_index] = 0
-                    self.new_new_demand_matrix[v_index][u_index] = 0
-
-                    self.new_new_demand_matrix[u_index][l_index] += weight
-                    self.new_new_demand_matrix[l_index][u_index] += weight
-
-                    self.new_new_demand_matrix[v_index][l_index] += weight
-                    self.new_new_demand_matrix[l_index][v_index] += weight
-
-                    l_tree.root.probability = self.new_new_demand_matrix[u_index][l_index]
-                else:
-                    # Mikor L benne van a faban
-                    l_tree = [x for x in tree.get_trees() if x.root.index == struct[2].index][0]
-                    if l_tree in tree.leaves:
-                        l_parent = tree
-                    else:
-                        l_parent = [x for x in tree.get_trees() if l_tree in x.leaves][0]
-
-                    u_index = tree.root.index
-                    v_index = v_tree.root.index
-                    l_index = l_tree.root.index
-
-                    if self.new_new_demand_matrix[u_index][l_index] > self.new_new_demand_matrix[u_index][v_index]\
-                            or tree.get_node_dept(v_tree.root) > tree.get_node_dept(l_tree.root):
-                        # Toroljuk V-t a fabol
-
-                        leaves: List[BinTree] = v_tree.leaves
-                        ind = v_parent.leaves.index(v_tree)
-                        v_parent.leaves.pop(ind)
-
-                        self.rebalance_tree(v_parent, leaves)
-
-                        print("V-t toroljuk a fabol")
-                    else:
-                        # L atveszi V helyet
-                        leaves: List[BinTree] = l_tree.leaves
-                        if v_tree in leaves:
-                            leaves.remove(v_tree)
-
-                        ind = l_parent.leaves.index(l_tree)
-                        l_parent.leaves.pop(ind)
-                        l_tree.leaves = v_tree.leaves
-                        if len(v_parent.leaves) > 0:
-                            ind = v_parent.leaves.index(v_tree)
-                            v_parent.leaves[ind] = l_tree
-                        else:
-                            if v_parent != l_tree:
-                                v_parent.push(l_tree)
-
-                        self.rebalance_tree(l_parent, leaves)
-
-                        print("L atveszi V helyet, L>0")
-
-                    weight = self.new_new_demand_matrix[u_index][v_index]
-
-                    self.new_new_demand_matrix[u_index][v_index] = 0
-                    self.new_new_demand_matrix[v_index][u_index] = 0
-
-                    self.new_new_demand_matrix[u_index][l_index] += weight
-                    self.new_new_demand_matrix[l_index][u_index] += weight
-
-                    self.new_new_demand_matrix[v_index][l_index] += weight
-                    self.new_new_demand_matrix[l_index][v_index] += weight
-                    l_tree.root.probability = self.new_new_demand_matrix[u_index][l_index]
-
-
-            if len(tree.leaves) < self.delta:
-                for leave in tree.leaves:
-                    if len(leave.leaves) > 0:
-                        tree_to_move = leave.leaves.pop(0)
-                        tree.leaves.append(tree_to_move)
-                        break
-
-            print("Tree after", tree)
-
-
-        self.union_egotrees()
-
-    def rebalance_tree(self, l_parent, leaves):
-        while leaves:
-            if len(leaves) == 2:
-                if leaves[0].weight() > leaves[1].weight():
-                    new_leaves = leaves[0].leaves
-                    leaves[0].leaves = [leaves[1]]
-                    l_parent.leaves.append(leaves[0])
-                    l_parent = leaves[0]
-                    leaves = new_leaves
-                else:
-                    new_leaves = leaves[1].leaves
-                    leaves[1].leaves = [leaves[0]]
-                    l_parent.leaves.append(leaves[1])
-                    l_parent = leaves[1]
-                    leaves = new_leaves
-            elif len(leaves) == 1:
-                l_parent.leaves.extend(leaves)
-                break
-
-    def union_egotrees(self):
+    def union_trees(self):
         for item in self.new_demand_matrix:
             print(item)
         print("------")
-        for item in self.new_new_demand_matrix:
-            print(item)
 
         queue = []
-        for tree in self.egotrees:
+        for tree in self.trees:
             print(tree)
             queue.append(tree)
             while queue:
@@ -293,9 +161,6 @@ class Network:
                     queue.append(subtree)
                     edge = Edge(tree_to_process.root, subtree.root, subtree.weight())
                     if edge not in self.routing_scheme:
-                        # u_index = edge.v1.index
-                        # v_index = edge.v2.index
-                        # edge.probability = self.new_new_demand_matrix[u_index][v_index]
                         if edge.probability > 0:
                             self.routing_scheme.append(edge)
                     else:
@@ -311,7 +176,7 @@ class Network:
         for u, v in L_perms:
             u_index = u.index
             v_index = v.index
-            edge = Edge(u, v, self.new_new_demand_matrix[u_index][v_index])
+            edge = Edge(u, v, self.new_demand_matrix[u_index][v_index])
             if edge.probability > 0:
                 if edge not in self.routing_scheme:
                     self.routing_scheme.append(edge)
@@ -321,11 +186,10 @@ class Network:
 
         print(str(self.routing_scheme))
 
-        self.calculate_congestion_and_avglen()
 
     def calculate_congestion_and_avglen(self):
         all_path = {}
-        for tree in self.egotrees:
+        for tree in self.trees:
             tree.build_routes()
             tree_paths = []
             for struct in self.helper_struct:
@@ -335,9 +199,6 @@ class Network:
                     tree_paths.append(r)
             if tree_paths:
                 all_path[tree_paths[0][0].index] = tree_paths
-
-        self.H_i = [x[0].index for x in self.H]
-        self.L_i = [x[0].index for x in self.L]
 
         # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
         congestion = 0
@@ -419,13 +280,6 @@ class Network:
             control_demand_matrix[edge.v1.index][edge.v2.index] += edge.probability
             control_demand_matrix[edge.v2.index][edge.v1.index] += edge.probability
 
-        mismatch_counter = 0
-        for i in range(len(self.demand_matrix)):
-            for j in range(len(self.demand_matrix)):
-                if control_demand_matrix[i][j] != self.new_new_demand_matrix[i][j]:
-                    mismatch_counter += 1
-        print("Mismatching items count:",mismatch_counter)
-
         max_delta = 0
         for row in control_demand_matrix:
             delta = sum(1 if x > 0 else 0 for x in row)
@@ -440,7 +294,6 @@ class Network:
         self.summary['max_delta'] = max_delta
 
 
-        self.print_summary()
         #print(all_path)
 
     def print_summary(self):
@@ -482,49 +335,5 @@ class Network:
     def get_summary(self):
         return self.summary
 
-def map_probabilities(p: List[Node]) -> Dict[Node, float]:
-    return {n: n.probability for n in p}
-
-
-def create_egotree(source: Node, p: List[Node], delta: int) -> EgoTree:
-    p1 = map_probabilities(p)
-    p1 = sorted(p1.items(), key=lambda kv: kv[1], reverse=True)
-    egotree = EgoTree(source, delta)
-    for key, value in p1:
-        egotree.push(BinTree(key))
-    return egotree
-
-
 def sum_aa(aa):
     return sum([sum(x) for x in aa])
-
-
-def normalize100(demand_distribution):
-    sum_of_items = sum_aa(demand_distribution)
-    multiplier = 100 / sum_of_items
-    normalized = [list(map(lambda z: z * multiplier, x)) for x in demand_distribution]
-    return normalized
-
-
-def calculate_all_egotrees(demand_distribution, delta, indexes : List = None):
-    egotrees = []
-
-    dd = demand_distribution
-
-    for i in range(len(demand_distribution)):
-
-        if indexes and i not in indexes:
-            continue
-        nodes = []
-        source: Node
-
-        for j in range(len(demand_distribution)):
-            if i == j:
-                source = Node(PREFIX, i, 0)
-            elif dd[i][j] + dd[j][i] > 0:
-                nodes.append(Node(PREFIX, j, dd[i][j] + dd[j][i]))
-
-        egotrees.append(create_egotree(source, nodes, delta))
-
-    return egotrees
-
