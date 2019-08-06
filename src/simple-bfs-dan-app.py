@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 
 from typing import Dict, Type
 
-from network import BfsDanNetwork
-from src.huffmandan import Network
+from network import BfsDanNetwork, Network
 
 FIG_NUM = 0
 

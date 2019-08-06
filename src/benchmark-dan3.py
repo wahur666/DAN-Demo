@@ -9,7 +9,6 @@ import time
 
 from math import ceil
 from typing import Dict
-from src.huffmandan import Network
 
 
 FIG_NUM = 0

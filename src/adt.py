@@ -145,6 +145,7 @@ class EgoTree(Tree):
         else:
             self.leaves.append(bintree)
 
+
 class AbstractHuffman:
 
     def __init__(self):
@@ -157,19 +158,18 @@ class AbstractHuffman:
 
 class HuffmanDanNode(AbstractHuffman, Node):
 
-    def __init__(self, prefix, index, value):
+    def __init__(self, prefix, index, probability):
         AbstractHuffman.__init__(self)
-        Node.__init__(self, prefix, index, value)
-        self.value = value
+        Node.__init__(self, prefix, index, probability)
 
     def weight(self):
-        return self.value
+        return self.probability
 
     def __str__(self):
-        return f"N:{self.label},{self.value},{self.path}"
+        return f"N:{self.label},{self.probability},{self.path}"
 
     def __repr__(self):
-        return f"N:{self.label},{self.value},{self.path}"
+        return f"N:{self.label},{self.probability},{self.path}"
 
 
 class HuffmanDanTree(AbstractHuffman, Tree):

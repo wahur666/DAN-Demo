@@ -3,7 +3,7 @@ from copy import deepcopy
 from typing import Tuple
 
 from huffman_tree import calculate_all_push_up_trees, calculate_all_bfs_trees
-from src.ego_trees import calculate_all_egotrees
+from ego_trees import calculate_all_locally_balanced_egotrees, calculate_all_ego_balanced_egotrees
 
 import numpy as np
 from src.adt import *
@@ -345,8 +345,14 @@ class Network:
 class OriginalDanNetwork(Network):
 
     def calculate(self):
-        self.trees, self.new_demand_matrix = calculate_all_egotrees(self.demand_matrix, self.delta, self.H_i, PREFIX,
-                                                              self.helper_struct)
+        self.trees, self.new_demand_matrix = calculate_all_locally_balanced_egotrees(self.demand_matrix, self.delta, self.H_i, PREFIX,
+                                                                                     self.helper_struct)
+
+class EgoBalanceDanNetwork(Network):
+
+    def calculate(self):
+        self.trees, self.new_demand_matrix = calculate_all_ego_balanced_egotrees(self.demand_matrix, self.delta, self.H_i, PREFIX,
+                                                                                     self.helper_struct)
 
 
 class HuffmanDanNetwork(Network):

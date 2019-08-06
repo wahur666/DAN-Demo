@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 
 from typing import Dict
 
-from network import HuffmanDanNetwork
-from src.huffmandan import Network
-from src.huffman_tree import calculate_all_push_up_trees
+from network import HuffmanDanNetwork, Network
 
 FIG_NUM = 0
 

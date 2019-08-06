@@ -6,7 +6,7 @@ import sys
 
 from typing import Dict
 
-from egobalance.network2 import Network
+from network import EgoBalanceDanNetwork, Network
 
 FIG_NUM = 0
 
@@ -122,15 +122,15 @@ def render_everyting(network: Network):
 
 def main(show=False):
     configurations = load_configurations()
-    active_config = configurations[0]
+    # active_config = configurations[0]
 
     active_config = configurations[2]
 
     demand_matrix = create_demand_matrix_for_configuration(active_config)
 
-    network = Network(demand_matrix)
+    network = EgoBalanceDanNetwork(demand_matrix)
 
-    network.select_points(active_config['dan'])
+    network.create_dan(active_config['dan'])
 
     if show:
         render_everyting(network)
