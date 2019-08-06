@@ -2,9 +2,9 @@
   "config": [
     {
       "graph": "erdos-renyi",
-      "vertex_num": 15,
-      "dan": 3,
-      "constant": 4
+      "vertex_num": 25,
+      "dan": 16,
+      "constant": 7
     },
     {
       "graph": "barabasi-albert",

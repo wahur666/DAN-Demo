@@ -2,12 +2,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-import sys
+import time
 
 from typing import Dict
-from src.network import Network, OriginalDanNetwork
+from network import Network
 
-FIG_NUM = 0
 
 
 def load_configurations(file_name = "config.json"):
@@ -119,34 +118,13 @@ def render_everyting(network: Network):
     render_egotrees(network)
     render_new_network(network)
 
-def main(show=False):
-    configurations = load_configurations()
-    active_config = configurations[0]
+def timeit(method):
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        print("--- Runtime ---")
+        print(f'{method.__name__} function run for  {te - ts} s')
+        return result
+    return timed
 
-    #active_config = configurations[3]
-
-    demand_matrix = create_demand_matrix_for_configuration(active_config)
-
-    network = OriginalDanNetwork(demand_matrix)
-
-    network.create_dan(active_config['dan'])
-
-    if show:
-        render_everyting(network)
-        plt.show()
-
-
-
-def run_dan(active_config):
-    demand_matrix = create_demand_matrix_for_configuration(active_config)
-    network = Network(demand_matrix)
-    network.select_points(active_config['dan'])
-    summary = network.get_summary()
-    print(active_config)
-    print(summary)
-    return {**summary, **active_config, "ratio": active_config["ratio"]}
-
-
-if __name__ == '__main__':
-    render = True if len(sys.argv) == 2 and sys.argv[1] == "-r" else False
-    main(render)

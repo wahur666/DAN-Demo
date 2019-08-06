@@ -87,7 +87,7 @@ class Network:
 
     def add_helpers(self):
         c_L = cycle(self.L)
-        self.helper_struct: List[Tuple[Vertex, Vertex, float]] = []
+        self.helper_struct: List[Tuple[Vertex, Vertex, Vertex]] = []
         already_assinged = {}
         for edge in self.edges:
             H_v = [x[0] for x in self.H]
@@ -198,13 +198,21 @@ class Network:
         for tree in self.trees:
             tree.build_routes()
             tree_paths = []
+            helpers_added = []
             for struct in self.helper_struct:
                 if struct[0].index == tree.root.index or struct[1].index == tree.root.index:
                     r = tree.get_path(struct[2])
                     r.reverse()
                     tree_paths.append(r)
-            if tree_paths:
-                all_path[tree_paths[0][0].index] = tree_paths
+                    helpers_added.append(struct[2])
+            leaves = [x.root for x in tree.leaves]
+            leaves_indices = [x.index for x in leaves]
+            helper_indices = [x.index for x in helpers_added]
+            for index, leaf in enumerate(leaves_indices):
+                if leaf not in helper_indices:
+                    tree_paths.append([tree.root, leaves[index]])
+
+            all_path[tree_paths[0][0].index] = tree_paths
 
         # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
         congestion = 0
@@ -213,9 +221,11 @@ class Network:
         # sum az ut hossza megszorozva ut valoszinusege
         avg_route_len = 0
 
-        for i in range(len(self.demand_matrix)-1):
-            for j in range(i + 1, len(self.demand_matrix)):
-                if self.demand_matrix[i][j]:
+        full_weight = sum_aa(self.demand_matrix)
+
+        for i in range(len(self.new_demand_matrix) - 1):
+            for j in range(i + 1, len(self.new_demand_matrix)):
+                if self.new_demand_matrix[i][j]:
                     print(i, j)
                     if i in self.H_i and j in self.H_i:
                         #Mikor H x H van
@@ -228,57 +238,31 @@ class Network:
                                 route2.reverse()
                                 route.extend(route2)
                                 break
-
-                        if route:
-                            con = self.calculate_congestion(route)
-                            congestion, most_congested_route = self.update_congestion(con, congestion,
-                                                                                      most_congested_route,
-                                                                                      route)
-                            avg_route_len += self.demand_matrix[i][j] * len(route)
-                            print("Congestion:", con, route)
-                            print("Route Length:", self.demand_matrix[i][j] * len(route))
-
-
-                        #print("Full combined:", route1)
                     elif i in self.H_i and j in self.L_i:
                         #Megkeresessük az utat
                         route = self.find_route(all_path, i, j)
-                        if route:
-                            con = self.calculate_congestion(route)
-                            congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
-                                                                                      route)
-                            avg_route_len += self.demand_matrix[i][j] * len(route)
-                            print("Congestion:", con, route)
-                            print("Route Length:", self.demand_matrix[i][j] * len(route))
-                            #print(route)
-
                     elif i in self.L_i and j in self.H_i:
+                        #Megkeresessük az utat
                         route = self.find_route(all_path, j, i)
-                        if route:
-                            con = self.calculate_congestion(route)
-                            congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
-                                                                                      route)
-                            avg_route_len += self.demand_matrix[i][j] * len(route)
-                            print("Congestion:", con, route)
-                            print("Route Length:", self.demand_matrix[i][j] * len(route))
-
-                        #print(route)
                     else:
                         # Mikor mindketto L
                         # Direkt kapcsolat, hossz 1
-                        con, route = 0, []
                         for edge in self.routing_scheme:
                             if edge.v1.index == i and edge.v2.index == j or edge.v1.index == j and edge.v2.index == i:
                                 con = edge.probability
                                 route = [edge.v1, edge.v2]
                                 break
+                    if route:
+                        con = self.calculate_congestion(route)
                         congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
                                                                                   route)
-                        avg_route_len += self.demand_matrix[i][j] * len(route)
+                        route_len = (len(route) - 1) * self.new_demand_matrix[i][j] * 2
+                        avg_route_len += route_len
                         print("Congestion:", con, route)
-                        print("Route Length:", self.demand_matrix[i][j] * len(route))
+                        print("Route Length:", route_len)
+                        print("Route LEN:", len(route) - 1)
 
-        full_weight = sum_aa(self.demand_matrix)
+        #full_weight = sum_aa(self.demand_matrix)
 
         control_demand_matrix = np.zeros((len(self.demand_matrix), len(self.demand_matrix)))
 
@@ -290,12 +274,15 @@ class Network:
         for row in control_demand_matrix:
             delta = sum(1 if x > 0 else 0 for x in row)
             max_delta = max(max_delta, delta)
+            
+        # if avg_route_len / full_weight < 1:
+        #     breakpoint()
 
         self.summary = {}
         self.summary['congestion'] = congestion
         self.summary['real_congestion'] = congestion / full_weight
         self.summary['most_congested_route'] = most_congested_route
-        self.summary['avg_route_len'] = avg_route_len/full_weight
+        self.summary['avg_route_len'] = avg_route_len / full_weight
         self.summary['delta'] = self.delta
         self.summary['max_delta'] = max_delta
 

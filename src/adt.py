@@ -53,7 +53,7 @@ class Tree:
 
     def __init__(self, root: Node):
         self.root = root
-        self.leaves: List = []
+        self.leaves: List[Tree] = []
         self.routes_built = False
 
 
