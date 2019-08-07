@@ -21,6 +21,9 @@ class Network:
         self.demand_matrix = demand_matrix
         self.trees: List[Tree] = []
 
+        if sum_aa(self.demand_matrix) <= 0:
+            raise Exception("Invalid demand matrix!")
+
         self.new_demand_matrix = deepcopy(demand_matrix)
         self.routing_scheme = []  # a.k.a new edges
 
@@ -144,6 +147,8 @@ class Network:
             self.delta = int(self.delta[:-1]) * int(round(self.avg_deg))
         else:
             raise Exception("Invalid delta format, accepted format \d+$ or \d+d$")
+        # Potenciális 0 delta miatt, minimum meg van határozva
+        self.delta = max(3, self.delta)
         self.calculate()
         for i in self.trees:
             print(i)
@@ -196,6 +201,8 @@ class Network:
     def calculate_congestion_and_avglen(self):
         all_path = {}
         for tree in self.trees:
+            if len(tree.leaves) == 0:
+                continue
             tree.build_routes()
             tree_paths = []
             helpers_added = []

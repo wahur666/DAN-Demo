@@ -28,7 +28,7 @@ def create_demand_matrix_for_configuration(config: Dict):
     G = None
     vertex_num = config['vertex_num']
     if config['graph'] == "erdos-renyi":
-        G = nx.erdos_renyi_graph(vertex_num, 1/vertex_num * config['constant'])
+        G = nx.erdos_renyi_graph(vertex_num, config['constant'] / vertex_num)
     elif config['graph'] == "barabasi-albert":
         G = nx.barabasi_albert_graph(vertex_num, config['m'])
     elif config['graph'] == "manual":

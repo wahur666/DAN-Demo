@@ -2,8 +2,6 @@ import csv
 import multiprocessing as mp
 import os
 
-from math import ceil
-
 from common import timeit, load_configurations, create_demand_matrix_for_configuration
 from network import OriginalDanNetwork
 
@@ -19,36 +17,36 @@ def main(show=False):
 
     vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
     delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
-    ratios = [0.25, 0.33]
+    constants = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     if not os.path.exists("original_res"):
         os.mkdir("original_res")
     res_file = os.path.join('original_res', 'results.csv')
+
+    fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
+              'max_delta', 'dan', 'most_congested_route', 'type']
+
     with open(res_file, 'w') as csvFile:
-        fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-                  'max_delta', 'dan', 'most_congested_route', 'ratio', 'type']
-        writer = csv.DictWriter(csvFile, fieldnames=fields, dialect='excel', delimiter=';')
+        writer = csv.DictWriter(csvFile, fieldnames=fields)
         writer.writeheader()
     csvFile.close()
 
     for vertex_num in vertex_nums:
         for delta_num in delta_nums:
             configs = []
-            for ratio in ratios:
+            for constant in constants:
                 for i in range(5):
                     active_cfg = active_config.copy()
                     active_cfg['vertex_num'] = vertex_num
-                    active_cfg['constant'] = int(ceil(vertex_num * ratio))
+                    active_cfg['constant'] = constant
                     active_cfg['dan'] = delta_num
-                    active_cfg['ratio'] = ratio
                     configs.append(active_cfg)
 
             with mp.Pool() as p:
                 res = p.map(run_dan, configs)
 
                 with open(res_file, "a+") as csvFile:
-                    fields = ['graph', 'vertex_num', 'constant', 'congestion','real_congestion', 'avg_route_len', 'delta', 'max_delta', 'dan', 'most_congested_route', 'ratio', 'type']
-                    writer = csv.DictWriter(csvFile, fieldnames=fields, dialect='excel', delimiter=';')
+                    writer = csv.DictWriter(csvFile, fieldnames=fields)
                     #writer.writeheader()
                     writer.writerows(res)
 
@@ -66,7 +64,7 @@ def run_dan(active_config):
     summary = network.get_summary()
     print(active_config)
     print(summary)
-    return {**summary, **active_config, "ratio": active_config["ratio"], "type": "original"}
+    return {**summary, **active_config, "type": "original"}
 
 
 
