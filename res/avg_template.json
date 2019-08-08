@@ -1,0 +1,252 @@
+{
+  "type" : "CHART",
+  "name" : null,
+  "generalConfiguration" : {
+    "inverted" : false,
+    "polar" : false,
+    "optimizedForPrinting" : false,
+    "width" : null,
+    "height" : null,
+    "zoomType" : "XY",
+    "style" : {
+      "backgroundColor" : null,
+      "plotBackgroundColor" : null
+    }
+  },
+  "titleConfiguration" : {
+    "enabled" : true,
+    "title" : "ExampleSet",
+    "subTitle" : null,
+    "titleStyle" : {
+      "color" : null,
+      "fontSize" : 14,
+      "bold" : false,
+      "italic" : false
+    },
+    "subTitleStyle" : {
+      "color" : null,
+      "fontSize" : null,
+      "bold" : false,
+      "italic" : false
+    },
+    "horizontalAlignment" : "CENTER"
+  },
+  "tooltipConfiguration" : {
+    "enabled" : true,
+    "shared" : false,
+    "valuePrefix" : null,
+    "valueSuffix" : null,
+    "valueDecimals" : null
+  },
+  "legendConfiguration" : {
+    "enabled" : true,
+    "title" : null,
+    "layout" : "HORIZONTAL",
+    "horizontalAlignment" : "CENTER",
+    "verticalAlignment" : "BOTTOM",
+    "style" : {
+      "color" : null,
+      "fontSize" : null,
+      "bold" : true,
+      "italic" : false
+    }
+  },
+  "colorAxisConfiguration" : {
+    "id" : "color1",
+    "minValue" : null,
+    "maxValue" : null,
+    "logarithmic" : false,
+    "coloringType" : "GRADIENT",
+    "colorBins" : [ {
+      "from" : null,
+      "to" : 0.0,
+      "color" : "rgba(103,143,248,1.0)",
+      "name" : null
+    }, {
+      "from" : 0.0,
+      "to" : null,
+      "color" : "rgba(239,64,64,1.0)",
+      "name" : null
+    } ],
+    "colorStops" : [ {
+      "point" : 0.0,
+      "color" : "rgba(103,143,248,1.0)"
+    }, {
+      "point" : 0.5,
+      "color" : "rgba(247,247,164,1.0)"
+    }, {
+      "point" : 1.0,
+      "color" : "rgba(239,64,64,1.0)"
+    } ],
+    "labelConfiguration" : {
+      "enabled" : true,
+      "format" : null,
+      "labelInterval" : 0,
+      "style" : {
+        "color" : null,
+        "fontSize" : null,
+        "bold" : false,
+        "italic" : false
+      }
+    }
+  },
+  "plotConfigurations" : [ {
+    "columns" : [ "average(real_congestion)" ],
+    "plotType" : "scatter",
+    "stackingType" : "NONE",
+    "additionalColumns" : {
+      "color" : "constant"
+    },
+    "aggregationConfiguration" : {
+      "enabled" : false,
+      "groupByColumns" : [ "vertex_num" ],
+      "aggregationFunction" : "COUNT",
+      "aggregationParameter" : null
+    },
+    "typeSpecificConfiguration" : {
+      "configuration" : {
+        "regression_interpolation" : "loess",
+        "jitter_amount" : 0
+      }
+    },
+    "styleConfiguration" : {
+      "visible" : true,
+      "markersEnabled" : false,
+      "showInLegend" : true,
+      "colors" : null,
+      "missingColor" : null,
+      "lineWidth" : 2.0,
+      "areaFillOpacity" : 0.7,
+      "markerSize" : 4.0,
+      "markerFillOpacity" : 0.5,
+      "lineType" : "SOLID",
+      "markerShape" : "CIRCLE",
+      "dataLabelConfiguration" : {
+        "enabled" : false,
+        "format" : null,
+        "style" : {
+          "color" : null,
+          "fontSize" : null,
+          "bold" : false,
+          "italic" : false
+        },
+        "filter" : {
+          "enabled" : false,
+          "filterOperator" : "GREATER_THAN",
+          "filterProperty" : "y",
+          "filterValue" : null
+        }
+      }
+    },
+    "yaxisId" : "y1"
+  } ],
+  "yaxisConfigurations" : [ {
+    "id" : "y1",
+    "minValue" : null,
+    "maxValue" : null,
+    "logarithmic" : false,
+    "plotLines" : [ ],
+    "styleConfiguration" : {
+      "title" : null,
+      "titleStyle" : {
+        "color" : null,
+        "fontSize" : null,
+        "bold" : false,
+        "italic" : false
+      },
+      "opposite" : false,
+      "reversed" : false,
+      "decimalsAllowed" : true,
+      "visible" : true,
+      "tickInterval" : null,
+      "axisColor" : null,
+      "gridLineType" : "SOLID",
+      "gridLineColor" : null,
+      "gridLineWidth" : null,
+      "labelConfiguration" : {
+        "enabled" : true,
+        "format" : null,
+        "labelInterval" : 0,
+        "style" : {
+          "color" : null,
+          "fontSize" : null,
+          "bold" : false,
+          "italic" : false
+        }
+      }
+    }
+  } ],
+  "xaxisConfiguration" : {
+    "id" : "x1",
+    "minValue" : null,
+    "maxValue" : null,
+    "logarithmic" : false,
+    "plotLines" : [ ],
+    "column" : "vertex_num",
+    "styleConfiguration" : {
+      "title" : null,
+      "titleStyle" : {
+        "color" : null,
+        "fontSize" : null,
+        "bold" : false,
+        "italic" : false
+      },
+      "opposite" : false,
+      "reversed" : false,
+      "decimalsAllowed" : true,
+      "visible" : true,
+      "tickInterval" : null,
+      "axisColor" : null,
+      "gridLineType" : "SOLID",
+      "gridLineColor" : null,
+      "gridLineWidth" : null,
+      "labelConfiguration" : {
+        "enabled" : true,
+        "format" : null,
+        "labelInterval" : 0,
+        "style" : {
+          "color" : null,
+          "fontSize" : null,
+          "bold" : false,
+          "italic" : false
+        }
+      }
+    }
+  },
+  "zaxisConfiguration" : {
+    "id" : "z1",
+    "minValue" : null,
+    "maxValue" : null,
+    "logarithmic" : false,
+    "plotLines" : [ ],
+    "styleConfiguration" : {
+      "title" : null,
+      "titleStyle" : {
+        "color" : null,
+        "fontSize" : null,
+        "bold" : false,
+        "italic" : false
+      },
+      "opposite" : false,
+      "reversed" : false,
+      "decimalsAllowed" : true,
+      "visible" : true,
+      "tickInterval" : null,
+      "axisColor" : null,
+      "gridLineType" : "SOLID",
+      "gridLineColor" : null,
+      "gridLineWidth" : null,
+      "labelConfiguration" : {
+        "enabled" : true,
+        "format" : null,
+        "labelInterval" : 0,
+        "style" : {
+          "color" : null,
+          "fontSize" : null,
+          "bold" : false,
+          "italic" : false
+        }
+      }
+    }
+  }
+}
