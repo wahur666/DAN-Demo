@@ -1,6 +1,6 @@
 from typing import List
 
-from src.adt import HuffmanDanNode, AbstractHuffman, HuffmanDanTree, Node, Tree
+from adt import HuffmanDanNode, AbstractHuffman, HuffmanDanTree, Node, Tree
 
 
 def get_nodes(tree: HuffmanDanTree) -> List[HuffmanDanNode]:

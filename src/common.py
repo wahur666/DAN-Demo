@@ -7,7 +7,7 @@ import time
 from typing import Dict
 from network import Network
 
-
+FIG_NUM = 0
 
 def load_configurations(file_name = "config.json"):
     with open(file_name, encoding="utf-8", mode="r") as file:

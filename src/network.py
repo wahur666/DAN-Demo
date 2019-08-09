@@ -6,7 +6,7 @@ from huffman_tree import calculate_all_push_up_trees, calculate_all_bfs_trees
 from ego_trees import calculate_all_locally_balanced_egotrees, calculate_all_ego_balanced_egotrees
 
 import numpy as np
-from src.adt import *
+from adt import *
 import re
 
 PREFIX = "T"
