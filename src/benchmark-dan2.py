@@ -21,7 +21,7 @@ def main(show=False):
 
     if not os.path.exists("egobalance_res"):
         os.mkdir("egobalance_res")
-    res_file = os.path.join('egobalance_res', 'results.csv')
+    res_file = os.path.join('egobalance_res', 'results_egobalance.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
               'max_delta', 'dan', 'most_congested_route', 'type']

@@ -20,7 +20,7 @@ def main(show=False):
 
     if not os.path.exists("huffman_res"):
         os.mkdir("huffman_res")
-    res_file = os.path.join('huffman_res', 'results.csv')
+    res_file = os.path.join('huffman_res', 'results_huffman.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
               'max_delta', 'dan', 'most_congested_route', 'type']

@@ -20,7 +20,7 @@ def main(show=False):
 
     if not os.path.exists("bfs_res"):
         os.mkdir("bfs_res")
-    res_file = os.path.join('bfs_res', 'results.csv')
+    res_file = os.path.join('bfs_res', 'results_bfs.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
               'max_delta', 'dan', 'most_congested_route', 'type']
