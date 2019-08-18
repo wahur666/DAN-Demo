@@ -24,13 +24,31 @@ def generate_demand_matrix(graph: nx.Graph) -> np.array:
     return demand_matrix
 
 
+def generate_star_demand_matrix(vertex_num: int, num_of_stars: int):
+    demand_matrix = np.zeros((vertex_num, vertex_num))
+    nums = set()
+    while len(nums) != num_of_stars:
+        nums.add(np.random.randint(0, vertex_num))
+
+    for num in nums:
+        numbers = np.random.randint(1, 10, vertex_num)
+        for i in range(vertex_num):
+            demand_matrix[num][i] = numbers[i]
+            demand_matrix[i][num] = numbers[i]
+        demand_matrix[num][num] = 0
+
+    return demand_matrix
+
+
 def create_demand_matrix_for_configuration(config: Dict):
     G = None
     vertex_num = config['vertex_num']
     if config['graph'] == "erdos-renyi":
         G = nx.erdos_renyi_graph(vertex_num, config['constant'] / vertex_num)
     elif config['graph'] == "barabasi-albert":
-        G = nx.barabasi_albert_graph(vertex_num, config['m'])
+        G = nx.barabasi_albert_graph(vertex_num, config['constant'])
+    elif config['graph'] == "star":
+        return generate_star_demand_matrix(vertex_num, config['constant'])
     elif config['graph'] == "manual":
         return config['demand']
     else:

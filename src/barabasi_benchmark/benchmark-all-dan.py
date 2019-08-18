@@ -10,7 +10,7 @@ FIG_NUM = 0
 
 @timeit
 def main(show=False):
-    configurations = load_configurations()
+    configurations = load_configurations("../config.json")
     active_config = configurations[0]
 
     res = []
@@ -36,7 +36,7 @@ def main(show=False):
     res_file_bfs = os.path.join('bfs_res', 'results_s_bfs.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-              'max_delta', 'dan', 'most_congested_route', 'type']
+              'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'type']
 
     with open(res_file_original, 'w') as csvFile:
         writer = csv.DictWriter(csvFile, fieldnames=fields)

@@ -2,15 +2,15 @@
   "config": [
     {
       "graph": "erdos-renyi",
-      "vertex_num": 25,
-      "dan": 16,
-      "constant": 7
+      "vertex_num": 50,
+      "dan": 4,
+      "constant": 1
     },
     {
       "graph": "barabasi-albert",
       "vertex_num": 11,
       "dan": 3,
-      "m": 4
+      "constant": 4
     },
     {
       "graph": "manual",
@@ -55,6 +55,12 @@
                  [0, 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, 0, 0, 0, 0]]
+    },
+    {
+      "graph": "star",
+      "vertex_num": 15,
+      "constant": 5,
+      "dan": 3
     }
   ]
 }

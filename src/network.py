@@ -230,6 +230,7 @@ class Network:
 
         full_weight = sum_aa(self.demand_matrix)
 
+        max_route_len = 0
         for i in range(len(self.new_demand_matrix) - 1):
             for j in range(i + 1, len(self.new_demand_matrix)):
                 if self.new_demand_matrix[i][j]:
@@ -265,6 +266,7 @@ class Network:
                                                                                   route)
                         route_len = (len(route) - 1) * self.new_demand_matrix[i][j] * 2
                         avg_route_len += route_len
+                        max_route_len = max(max_route_len, len(route) - 1)
                         print("Congestion:", con, route)
                         print("Route Length:", route_len)
                         print("Route LEN:", len(route) - 1)
@@ -292,6 +294,7 @@ class Network:
         self.summary['avg_route_len'] = avg_route_len / full_weight
         self.summary['delta'] = self.delta
         self.summary['max_delta'] = max_delta
+        self.summary['max_route_len'] = max_route_len
 
 
         #print(all_path)
@@ -302,7 +305,8 @@ class Network:
               self.summary['most_congested_route'])
         print("Average weighted route length:", self.summary['avg_route_len'])
         print("Delta:", self.delta)
-        print("max delta:", self.summary['max_delta'])
+        print("Max delta:", self.summary['max_delta'])
+        print("Max route length", self.summary['max_route_len'])
         print("-----------------------")
 
     def update_congestion(self, con, congestion, most_congested_route, route):
