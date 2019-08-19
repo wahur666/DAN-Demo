@@ -11,7 +11,7 @@ FIG_NUM = 0
 @timeit
 def main(show=False):
     configurations = load_configurations("../config.json")
-    active_config = configurations[0]
+    active_config = configurations[5]
 
     res = []
 
