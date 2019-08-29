@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import List, Dict, Callable
 
-from adt import Node, EgoTree, BinTree
+from adt import Node, EgoTree
 
 
 def calculate_all_locally_balanced_egotrees(demand_distribution, delta, indexes: List, prefix, helper_struct):
@@ -63,7 +63,7 @@ def change_nodes_in_egotrees(demand_matrix, delta, egotrees, prefix, helper_stru
                 print("L atveszi V helyet, L=0")
                 # print(tree)
                 # print("V", v_tree)
-                l_tree = BinTree(Node(prefix, struct[2].index, 0))
+                l_tree = EgoTree(Node(prefix, struct[2].index, 0), 2)
                 l_tree.leaves = v_tree.leaves
 
                 ind = v_parent.leaves.index(v_tree)
@@ -119,7 +119,7 @@ def local_balance(l_index, l_parent, l_tree, new_demand_matrix, tree, u_index, v
             or tree.get_node_dept(v_tree.root) > tree.get_node_dept(l_tree.root):
         # Toroljuk V-t a fabol
 
-        leaves: List[BinTree] = v_tree.leaves
+        leaves: List[EgoTree] = v_tree.leaves
         ind = v_parent.leaves.index(v_tree)
         v_parent.leaves.pop(ind)
 
@@ -128,7 +128,7 @@ def local_balance(l_index, l_parent, l_tree, new_demand_matrix, tree, u_index, v
         print("V-t toroljuk a fabol")
     else:
         # L atveszi V helyet
-        leaves: List[BinTree] = l_tree.leaves
+        leaves: List[EgoTree] = l_tree.leaves
         if v_tree in leaves:
             leaves.remove(v_tree)
 
@@ -171,7 +171,7 @@ def create_egotree(source: Node, p: List[Node], delta: int) -> EgoTree:
     p1 = sorted(p1.items(), key=lambda kv: kv[1], reverse=True)
     egotree = EgoTree(source, delta)
     for key, value in p1:
-        egotree.push(BinTree(key))
+        egotree.push(EgoTree(key, 2))
     return egotree
 
 def map_probabilities(p: List[Node]) -> Dict[Node, float]:
@@ -203,4 +203,4 @@ def ego_balance(l_index, l_parent, l_tree, new_demand_matrix, tree, u_index, v_i
         print("L atveszi V helyet, L>0")
     for item in nodes_to_redistribute:
         print("REEEEEEEEEE")
-        tree.push(BinTree(item))
+        tree.push(EgoTree(item, 2))

@@ -117,28 +117,15 @@ class Tree:
         return route
 
 
-class BinTree(Tree):
-
-    def __init__(self, root: Node):
-        super().__init__(root)
-        self.leaves: List[BinTree] = []
-
-    def push(self, bintree):
-        if len(self.leaves) != 2:
-            self.leaves.append(bintree)
-        else:
-            lightest_leave = min(self.leaves, key=lambda x: x.weight())
-            lightest_leave.push(bintree)
-
 
 class EgoTree(Tree):
 
     def __init__(self, root: Node, delta: int):
         super().__init__(root)
         self.delta = delta
-        self.leaves: List[BinTree] = []
+        self.leaves: List[EgoTree] = []
 
-    def push(self, bintree: BinTree):
+    def push(self, bintree):
         if len(self.leaves) == self.delta:
             lightest_leave = min(self.leaves, key=lambda x: x.weight())
             lightest_leave.push(bintree)
