@@ -73,11 +73,11 @@
 
 \section{Labor célja}
 
-A labor célja a korábban már bemutatott cikkben\cite{avin_demand-aware_nodate} szereplő hálózat építése.
-Az eredeti cikkben a fák építésére az Egofa algoritmus volt használva. 
-A labor keretén belül azt a felvetést vizsgáltam meg, hogy lehet-e jobb algoritmust találni fa építésre, mint az Egofa.  
-Az új módszerek hasonlóan az eredetihez véletlenszerűen generált gráfokra voltak tesztelve.
-Az így kapott eredmények a különböző algoritmusokból az eredeti eredménnyel voltak összehasonlítva.
+A labor célja a korábban már bemutatott cikkben\cite{avin_demand-aware_nodate} szereplő hálózat megépítése és annak kiegészítése.
+Az eredeti cikk az Egofa algoritmus használta a fák építésére. 
+A labor keretén belül azt a felvetést vizsgáltam meg, hogy lehet-e jobb algoritmust találni fák építésre.  
+Az új módszerek hasonlóan az eredetihez véletlenszerű gráfokra voltak tesztelve.
+Az új algoritmusok eredményei az eredetivel voltak összehasonlítva.
 
 \section{Laborban megvalósított munka}
 
@@ -94,12 +94,13 @@ Az adatok elemzése RapidMiner-ben történt\cite{noauthor_lightning_nodate}.
 
 Az első algoritmus majdnem teljes mértékben megegyezik az eredetivel.
 A cikk szerzői az Egofa algoritmus vázlatos összefoglalásában használtak egy csere lépést.
-A csere lépés lényege, hogy mikor megépítettük a fát egy magas csúcsra akkor a fában minden szomszédja megjelenik.
+A csere lépés lényege, hogy mikor megépítettük a fát egy magas csúcsra, akkor a fában minden szomszédja megjelenik.
 A szomszédok között megtalálhatók a magas-magas fokszámú kapcsolatok, amiket ki kell cserélni a segítő csúcsokra.
 Három esetet különböztetünk meg itt, attól függően hol helyezkedik el a segítő csúcs a fában.
 Első eset, mikor a segítő csúcs nem szerepel a fában, ilyenkor a magas csúcsot ki kell cserélni a segítőre. Ebben az esetben nem kell semmi kiegészítő lépést csinálni, mivel a gyerekeket átveszi a segítő.
-A következő két eset, mikor a segítő pont is része a fának, attól függően mennyire közel vannak az érintett csúcsok a fa gyökeréhez más-más gyerek csúcsokat kell újra elhelyezni.
-Mikor a segítő csomópont közelebb van a gyökérhez akkor töröljük a magas pontot a fából, ha voltak gyerekei a törölt pontnak, akkor azoknak új szülő csúcsot kell találni.
+A következő két eset, mikor a segítő is része a fának. 
+Attól függően mennyire közel vannak az érintett csúcsok a fa gyökeréhez más-más gyerek csúcsokat kell újra elhelyezni.
+Mikor a segítő csúcs közelebb van a gyökérhez, akkor töröljük a magas pontot a fából, ha voltak gyerekei a törölt pontnak, akkor azoknak új szülő csúcsot kell találni.
 Ellenkező esetben, mikor magas pont helyezkedik el közelebb a forráshoz, akkor a segítő csúcs átveszi a helyét és gyerekeit, majd a segítő leveleinek kell új szülő csúcsot találni. 
 Ezt úgy oldja meg az eredeti algoritmus, hogy a nehezebb levél csúcs lesz az új szülő és a könnyebb csomópontnak ő lesz a szülője.
 
@@ -115,24 +116,24 @@ A eddigi két algoritmus az Egofát\cite{avin_demand-aware_nodate} használta, a
 A Huffman kódolásnál\cite{huf52} használt fa tulajdonsága, hogy átlagosan rövidek legyenek az utak attól függően milyen gyakori egy elem.
 A cl-Dan probléma is ezt a tényezőt használja, ezért kitűnően lehet használni ezt a fát a hálózat alapjának.
 Egyetlen probléma a Huffman fával az, hogy a belső csomópontok nem tartalmaznak számunkra hasznos információt.
-Ezért szükséges egy kiegészítő lépés, ami segítségével belső pontok is ki lesznek töltve, azaz esetünkben csomópontokat fognak reprezentálni, amik maguk is végpontok mint a levelek.
+Ezért szükséges egy kiegészítő lépés, ami segítségével belső pontok is ki lesznek töltve, azaz esetünkben csomópontokat fognak reprezentálni mint a levelek.
 
 Az algoritmus első része teljesen megegyezik a Huffman kódolással.
 Rendezzük sorba növekedően a pontokat, és kettesével vonjuk össze őket, még nem kapunk egy teljes fát.
 Mint az Egofáknál, úgy a Huffman fánál is a legfelső szinten \(n\) darab csúcsot tudunk a forrás pontra kapcsolni.
 Az összes többi alacsonyabb pont pedig marad bináris.
 
-A belső pontok kitöltésére a következő algoritmust végezzük el az összes gyökérre kapcsolódó ágon:
+A belső csúcsok kitöltésére a gyökér ágain a következő algoritmust végezzük el:
 \begin{enumerate}
-	\item Gyűjtsük össze a levelet az ágon, mivel a levelek tartalmaznak hasznos pontokat számunkra
-	\item Az csúcsokból kezdjünk el egy sorfolytonos fát építeni, ahol a valószínűségek csökkenő sorrendben vannak elhelyezve
+	\item Gyűjtsük össze a levelet az ágon, a levelek tartalmazzák a számunkra hasznos pontokat 
+	\item Az ág gyökerétől indulva sorfolytonosan helyezzük el a leveleket, ahol a valószínűségek csökkenő sorrendben vannak rendezve
 \end{enumerate}
  
 Felmerülhet a kérdés, hogy miért nem a legnehezebb levél jön fel mindig?
-Ez azért van, mert a Huffman kódolásnál megtörténik az az eset, hogy két csomópont összesített értéke megegyezik egy harmadikkal.
-Ez olyan fát eredményez, ahol bal oldalon egy nehéz csúcs és jobb oldalon egy fában két könnyű csomópont szerepel.
-A naiv megoldás esetén ez azt eredményezi, hogy az egy nehéz pont lesz a belső csúcs és az ág ahonnan jött megüresedik.
-A pont levelei nem fognak ágat változtatni, annak ellenére, hogy megüresedett az egyik feljebb, ezért hosszú egyenes utak jöhetnek létre.
+Ez azért van, mert a Huffman kódolásnál megtörténik az eset, hogy két csomópont összesített értéke megegyezik egy harmadikkal.
+Ez egy olyan fát eredményez, ahol az egyik oldalon egy nehéz csúcs, a másik oldalon pedig két könnyű csúcs szerepel.
+A naiv megoldás azt eredményezi, hogy az a nehéz pont lesz a belső csúcs és az ág ahonnan jött megüresedik.
+A könnyebb fa levelei nem fognak ágat változtatni, annak ellenére, hogy megüresedett az ág feljebb, ezért hosszú egyenes utak jöhetnek létre.
 Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet, hogy fa egyik belső pontja sem marad kitöltetlen.
 
 \subsection{Sorfolytonos fa}
@@ -151,7 +152,7 @@ A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
 	\item \textbf{Vertex} - az általános gráf csúcs
 	\item \textbf{Node} - az \textit{Egófák} készítésekor használt csúcs, ami tartalmazza a valószínűségét annak, hogy a forrás csomópont mekkora valószínűséggel fog kommunikálni a másik \textit{Node} csúccsal
 	\item \textbf{HuffmanDanNode} - a Huffman fa csomópontjait reprezentáló osztály, minden tulajdonsága megvan mint a Node-nak, csak még kiegészül egy útvonallal, amit a Huffman fa építése után lesz meghatározva
-	\item \textbf{Edge} - az gráf pontjait összekötő él reprezentációja, ami \textit{Vertexet} vár paraméterként, és tartalmazza a kommunikációs valószínűséget, hasonlóan mint a \textit{Node}
+	\item \textbf{Edge} - a gráf pontjait összekötő él reprezentációja, ami \textit{Vertexet} vár paraméterként, és tartalmazza a kommunikációs valószínűséget, hasonlóan mint a \textit{Node}
 	\item \textbf{Tree} - ami adja az alapját majd a útvonal tervezési sémának. A fának két fajtája van megvalósítva:
 	\begin{itemize}
 		\item \textbf{EgoTree} - a $\Delta$ fokú Egofa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet
@@ -163,8 +164,7 @@ A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
 	
 \section{Modell}
 
-A \textbf{Network} osztály megváltozott az előző megvalósításhoz képest.
-Absztrakt osztályra lett átalakítva, a belőle leszármazó osztályok valósítják meg a különböző algoritmusokat.
+A \textbf{Network} osztály megváltozott az előző megvalósításhoz képest, absztrakt osztályra lett átalakítva és a belőle leszármazó osztályok valósítják meg a különböző algoritmusokat.
 A leszármaztatott osztályoknak egyetlen függvényt kell csak megvalósítani, ami a fa építései stratégiát tartalmazza.
 Ennek segítségével nagyon egyszerűen lehet új algoritmust illeszteni a már meglévő rendszerhez.
 
@@ -186,7 +186,7 @@ A konfiguráció további egységesítésen esett át, minden véletlen gráf sz
 	
 	\begin{itemize}
 		\item Barabási-Albert gráf esetén azt határozza meg, hogy az új csúcs mennyi már a gráfban szereplő csúcshoz kapcsolódjon
-		\item Erdős-Rényi gráf esetén az él valószínűségének meghatározásra használjuk a következő képlet segítségével  \[p = constant \cdot \frac{1}{vertex\_num}\]
+		\item Erdős-Rényi gráf esetén az él valószínűségének meghatározásra használjuk a következő képlet segítségével  \[p = \frac{constant}{vertex\_num}\]
 		\item Csillag gráf esetén pedig a csillagok számát adjuk meg
 	\end{itemize}
 \end{itemize}
@@ -195,12 +195,13 @@ A konfiguráció további egységesítésen esett át, minden véletlen gráf sz
 
 \section{Tesztelés menete}
 
-A tesztelés során mindegyik véletlen gráfok volt használva, és minden algoritmus ugyanazon a bemeneti mátrixon dolgozott a egyértelmű összehasonlítás érdekében. 
+A tesztelés során mindegyik véletlen gráf volt használva, és minden algoritmus ugyanazon a bemeneti mátrixon dolgozott a egyértelmű összehasonlítás érdekében. 
 A mérések a konstans alapján lettek kiértékelve, mivel az a fő érték, ami alapján változik a gráf ritkasága.
 A skálázhatóság tesztelésére különböző számú csúcs volt használva, ezek rendre: 11, 15, 35, 50, 75, 100, 125, 150, 175 és 200.
 A skálázhatósághoz még hozzátartozik a maximum fokszám, hogy mennyi gráf csúcs tud egyszerre kommunikálni, ezért az is meg van adva.
 A valóságban van egy fizikai határ, hogy mennyi kliens tud csatlakozni egyszerre, ezért az értékek így lettek megválasztva, 10, 16, 24 és 48.
-A konkrét számú pont mellett meg volt vizsgálva az is, hogy valóságban mekkora szorzóra van szükségünk, mivel a cikk ad egy felső becslést ami $\Delta=12\rho$, ezért a teszt során figyelve volt az ajánlott és szükséges fokszám.
+A konkrét számú pont mellett meg volt vizsgálva az is, hogy valóságban mekkora szorzóra van szükségünk. 
+A cikk ad egy felső becslést ami $\Delta=12\rho$, ezért a teszt során figyelve volt az ajánlott és szükséges fokszám.
 Az ajánlott fokszám értékei a következők voltak $\Delta\in[1\rho, 2\rho, 4\rho, 6\rho, 8\rho, 10\rho, 12\rho]$.
 Az így megadott paraméterek alapján 52800 teszt lett lefuttatva.
 
@@ -299,13 +300,13 @@ A Huffman és sorfolyonos algoritmus nem veszi számításba ezt a tényezőt, e
 
 A tesztek kiértékelésének eredménye azt mutatja, hogy mind a négy algoritmus helytálló, mert hasonló eredményeket kapunk.
 Az úthosszra nézve az algoritmusok teljesítménye szintén nagyon hasonló és benne van mérési hiba tartományában.
-A torlódásra nézve van jelentős különbség, a Huffman fa alapú algoritmusok nem veszik figyelembe egyáltalán a torlódást, ezért határozottan rosszabbul teljesítenek.
+A torlódásra szempontjából van jelentős különbség, a Huffman fa alapú algoritmusok nem veszik figyelembe egyáltalán a torlódást, ezért határozottan rosszabbul teljesítenek.
  
 Két algoritmus ami hasonló módon építi fel a fát az a sorfolytonos (Bfs) és az EgoBalance algoritmus. 
 A kettő közötti lényeges különbség, amíg az Egofa legnehezebbtől legkönnyebbig próbálja a legjobban elosztani a súlyokat, addig a sorfolytonos folyamatosan rakja fel őket.
 Egy ilyen kis eltérés határozottan jobb eredményhez vezet az Egofák esetén.
 
-A végső összesítésből az látszik, hogy a szerzők által felvázolt Egofa egy megfelelő adatszerkezet arra a célra, hogy hálózatot építünk vele, ami mindkét szempontól jó eredményt eredményez.
+Az eredmények összesítésből látszik, hogy a szerzők által felvázolt Egofa egy megfelelő adatszerkezet arra a célra, hogy hálózatot építünk vele, mivel mindkét szempontól jó teljesít.
 
 
 \bibliographystyle{abbrv}
