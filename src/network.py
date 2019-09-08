@@ -2,7 +2,7 @@ from itertools import cycle, combinations
 from copy import deepcopy
 from typing import Tuple
 
-from huffman_tree import calculate_all_push_up_trees, calculate_all_bfs_trees
+from huffman_tree import calculate_all_push_up_trees, calculate_all_bfs_trees, calculate_all_random_trees
 from ego_trees import calculate_all_locally_balanced_egotrees, calculate_all_ego_balanced_egotrees
 
 import numpy as np
@@ -69,7 +69,7 @@ class Network:
         degs = []
         for vert in self.vertices:
             deg = sum(e.v1 is vert or e.v2 is vert for e in self.edges)
-            degs.append((vert, deg))
+            degs.append([vert, deg])
         # print(degs)
         self.avg_deg = sum(x[1] for x in degs) / len(degs)
 
@@ -131,6 +131,10 @@ class Network:
                 else:
                     already_assinged[edge.v2].append(l[0])
                 self.helper_struct.append((edge.v1, edge.v2, l[0]))
+                l[1] += 2 if len(s) != len(self.L) else 1
+                self.L.sort(key=lambda x: x[1])
+                c_L = cycle(self.L)
+
 
     def calculate_trees(self):
         for i in self.demand_matrix:
@@ -200,9 +204,17 @@ class Network:
 
     def calculate_congestion_and_avglen(self):
         all_path = {}
+        avg_tree_weight = 0
+        most_weight_ratio = 0
+        tree_count = 0
         for tree in self.trees:
             if len(tree.leaves) == 0:
                 continue
+            tree_count += 1
+            avg_tree_weight += sum([x.weight() for x in tree.leaves])
+            avg_tree_branch_weight = sum([x.weight() for x in tree.leaves]) / len(tree.leaves)
+            max_weight = max([x.weight() for x in tree.leaves])
+            most_weight_ratio = max(most_weight_ratio, max_weight/avg_tree_branch_weight)
             tree.build_routes()
             tree_paths = []
             helpers_added = []
@@ -221,6 +233,7 @@ class Network:
 
             all_path[tree_paths[0][0].index] = tree_paths
 
+        avg_tree_weight /= tree_count
         # max az utak trolodasa, tordoldas sum az u-v ut osszes elet
         congestion = 0
         most_congested_route = None
@@ -295,7 +308,9 @@ class Network:
         self.summary['delta'] = self.delta
         self.summary['max_delta'] = max_delta
         self.summary['max_route_len'] = max_route_len
-
+        self.summary['avg_tree_weight'] = avg_tree_weight / full_weight
+        self.summary['most_tree_ratio'] = most_weight_ratio
+        self.summary['tree_count'] = tree_count
 
         #print(all_path)
 
@@ -307,6 +322,9 @@ class Network:
         print("Delta:", self.delta)
         print("Max delta:", self.summary['max_delta'])
         print("Max route length", self.summary['max_route_len'])
+        print("Average tree weight", self.summary['avg_tree_weight'])
+        print("Tree count", self.summary['tree_count'])
+        print("Greatest radio between max branch weight", self.summary['most_tree_ratio'])
         print("-----------------------")
 
     def update_congestion(self, con, congestion, most_congested_route, route):
@@ -363,6 +381,11 @@ class BfsDanNetwork(Network):
 
     def calculate(self):
         self.trees = calculate_all_bfs_trees(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
+
+class RandomDanNetwork(Network):
+
+    def calculate(self):
+        self.trees = calculate_all_random_trees(self.new_demand_matrix, self.delta, self.H_i, PREFIX)
 
 
 def sum_aa(aa):

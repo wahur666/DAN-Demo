@@ -3,7 +3,7 @@ import multiprocessing as mp
 import os
 
 from common import timeit, load_configurations, create_demand_matrix_for_configuration
-from network import OriginalDanNetwork, EgoBalanceDanNetwork, BfsDanNetwork, HuffmanDanNetwork
+from network import OriginalDanNetwork, EgoBalanceDanNetwork, BfsDanNetwork, HuffmanDanNetwork, RandomDanNetwork
 
 FIG_NUM = 0
 
@@ -35,8 +35,13 @@ def main(show=False):
         os.mkdir("bfs_res")
     res_file_bfs = os.path.join('bfs_res', 'results_s_bfs.csv')
 
+    if not os.path.exists("random_res"):
+        os.mkdir("random_res")
+    res_file_random = os.path.join('random_res', 'results_s_random.csv')
+
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-              'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'type']
+              'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',
+              'tree_count', 'type']
 
     with open(res_file_original, 'w') as csvFile:
         writer = csv.DictWriter(csvFile, fieldnames=fields)
@@ -58,6 +63,11 @@ def main(show=False):
         writer.writeheader()
     csvFile.close()
 
+    with open(res_file_random, 'w') as csvFile:
+        writer = csv.DictWriter(csvFile, fieldnames=fields)
+        writer.writeheader()
+    csvFile.close()
+
     for vertex_num in vertex_nums:
         for delta_num in delta_nums:
             configs = []
@@ -74,6 +84,8 @@ def main(show=False):
                 res2 = p.map(run_dan_egobalance, configs)
                 res3 = p.map(run_dan_huffman, configs)
                 res4 = p.map(run_dan_bfs, configs)
+                res5 = p.map(run_dan_random, configs)
+
 
                 with open(res_file_original, "a+") as csvFile:
                     writer = csv.DictWriter(csvFile, fieldnames=fields)
@@ -93,6 +105,11 @@ def main(show=False):
                 with open(res_file_bfs, "a+") as csvFile:
                     writer = csv.DictWriter(csvFile, fieldnames=fields)
                     writer.writerows(res4)
+                csvFile.close()
+
+                with open(res_file_random, "a+") as csvFile:
+                    writer = csv.DictWriter(csvFile, fieldnames=fields)
+                    writer.writerows(res5)
                 csvFile.close()
 
     # if show:
@@ -138,6 +155,16 @@ def run_dan_huffman(active_config):
     print(active_config)
     print(summary)
     return {**summary, **active_config, "type": "huffman"}
+
+
+def run_dan_random(active_config):
+    demand_matrix = create_demand_matrix_for_configuration(active_config)
+    network = RandomDanNetwork(demand_matrix)
+    network.create_dan(active_config['dan'])
+    summary = network.get_summary()
+    print(active_config)
+    print(summary)
+    return {**summary, **active_config, "type": "random"}
 
 
 if __name__ == '__main__':

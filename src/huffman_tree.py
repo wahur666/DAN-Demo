@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 from adt import HuffmanDanNode, AbstractHuffman, HuffmanDanTree, Node, Tree
@@ -126,6 +127,33 @@ def create_bfs_tree(delta, nodes: List[HuffmanDanNode]):
         find_next_free_position(root, node)
     return root
 
+
+def calculate_all_random_trees(demand_distribution: List[List[float]], delta: int, indices: List[Node], prefix: str) -> List[Tree]:
+    bfs_trees = []
+
+    dd = demand_distribution
+
+    for i in range(len(dd)):
+
+        if indices and i not in indices:
+            continue
+
+        nodes = []
+        source: HuffmanDanNode = None
+
+        for j in range(len(dd)):
+            if i == j:
+                source = HuffmanDanNode(prefix, i, 0)
+            elif dd[i][j] + dd[j][i] > 0:
+                nodes.append(HuffmanDanNode(prefix, j, dd[i][j] + dd[j][i]))
+
+        for i in range(5):
+            random.shuffle(nodes)
+        tree = create_bfs_tree(delta, nodes)
+        tree.root = source
+
+        bfs_trees.append(tree)
+    return bfs_trees
 
 # Naive Solution
 

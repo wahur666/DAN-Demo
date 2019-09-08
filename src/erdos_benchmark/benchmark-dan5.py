@@ -3,14 +3,14 @@ import multiprocessing as mp
 import os
 
 from common import timeit, load_configurations, create_demand_matrix_for_configuration
-from network import BfsDanNetwork
+from network import RandomDanNetwork
 
 FIG_NUM = 0
 
 @timeit
 def main(show=False):
     configurations = load_configurations('../config.json')
-    active_config = configurations[5]
+    active_config = configurations[0]
 
     res = []
 
@@ -18,9 +18,9 @@ def main(show=False):
     delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
     constants = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    if not os.path.exists("bfs_res"):
-        os.mkdir("bfs_res")
-    res_file = os.path.join('bfs_res', 'results_bfs.csv')
+    if not os.path.exists("huffman_res"):
+        os.mkdir("huffman_res")
+    res_file = os.path.join('huffman_res', 'results_huffman.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
                   'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',
@@ -59,14 +59,14 @@ def main(show=False):
 
 def run_dan(active_config):
     demand_matrix = create_demand_matrix_for_configuration(active_config)
-    network = BfsDanNetwork(demand_matrix)
+    network = RandomDanNetwork(demand_matrix)
     network.create_dan(active_config['dan'])
     summary = network.get_summary()
     print(active_config)
     print(summary)
-    return {**summary, **active_config, "type": "bfs"}
-
+    return {**summary, **active_config, "type": "huffman"}
 
 
 if __name__ == '__main__':
     main()
+

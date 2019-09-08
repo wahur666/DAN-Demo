@@ -23,7 +23,8 @@ def main(show=False):
     res_file = os.path.join('huffman_res', 'results_huffman.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-              'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'type']
+                  'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',
+                  'tree_count', 'type']
 
     with open(res_file, 'w') as csvFile:
         writer = csv.DictWriter(csvFile, fieldnames=fields)
