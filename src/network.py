@@ -66,7 +66,7 @@ class Network:
     def select_points(self, delta=None):
         self.delta = delta
         # Classifying points
-        degs = []
+        degs: List[List[Vertex, int]] = []
         for vert in self.vertices:
             deg = sum(e.v1 is vert or e.v2 is vert for e in self.edges)
             degs.append([vert, deg])
@@ -75,12 +75,19 @@ class Network:
 
         degs.sort(key=lambda x: x[1], reverse=True)
 
-        H = degs[0:round(len(degs) / 2)]
-        L = degs[round(len(degs) / 2):]
+        H = [x for x in degs if x[1] >= self.avg_deg]
+        L = [x for x in degs if x[1] < self.avg_deg]
 
-        while len(L) > 0 and L[0][1] > self.avg_deg:
-            H.append(L.pop(0))
+        H.sort(key=lambda x: x[1], reverse=True)
         L.sort(key=lambda x: x[1])
+
+
+        # H = degs[0:round(len(degs) / 2)]
+        # L = degs[round(len(degs) / 2):]
+        #
+        # while len(L) > 0 and L[0][1] > self.avg_deg:
+        #     H.append(L.pop(0))
+        # L.sort(key=lambda x: x[1])
 
         print(H)
         print(L)
