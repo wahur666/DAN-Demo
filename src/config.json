@@ -60,8 +60,8 @@
     {
       "graph": "star",
       "vertex_num": 15,
-      "constant": 5,
-      "dan": null
+      "constant": 2,
+      "dan": 8
     }
   ]
 }

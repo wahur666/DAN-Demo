@@ -25,7 +25,7 @@ class Network:
             raise Exception("Invalid demand matrix!")
 
         self.new_demand_matrix = deepcopy(demand_matrix)
-        self.routing_scheme = []  # a.k.a new edges
+        self.routing_scheme: List[Edge] = []  # a.k.a new edges
 
         self.build_graph()
 
@@ -253,8 +253,9 @@ class Network:
         max_route_len = 0
         for i in range(len(self.new_demand_matrix) - 1):
             for j in range(i + 1, len(self.new_demand_matrix)):
-                if self.new_demand_matrix[i][j]:
+                if self.demand_matrix[i][j]:
                     print(i, j)
+                    route = False
                     if i in self.H_i and j in self.H_i:
                         #Mikor H x H van
                         #Ket kulonbozo pont osszeforgatasa
@@ -277,14 +278,23 @@ class Network:
                         # Direkt kapcsolat, hossz 1
                         for edge in self.routing_scheme:
                             if edge.v1.index == i and edge.v2.index == j or edge.v1.index == j and edge.v2.index == i:
-                                con = edge.probability
                                 route = [edge.v1, edge.v2]
                                 break
                     if route:
                         con = self.calculate_congestion(route)
                         congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
                                                                                   route)
-                        route_len = (len(route) - 1) * self.new_demand_matrix[i][j] * 2
+                        if self.new_demand_matrix[i][j] == 0:
+                            prob = 0
+                            for i in range(len(route)-1):
+                                for edge in self.routing_scheme:
+                                    if edge.v1.index == route[i].index and edge.v2.index == route[i+1].index or \
+                                            edge.v1.index == route[i+1].index and edge.v2.index == route[i].index:
+                                        prob += edge.probability
+                                        break
+                        else:
+                            prob = self.new_demand_matrix[i][j]
+                        route_len = (len(route) - 1) * prob * 2
                         avg_route_len += route_len
                         max_route_len = max(max_route_len, len(route) - 1)
                         print("Congestion:", con, route)

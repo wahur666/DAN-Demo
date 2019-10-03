@@ -7,7 +7,7 @@ from network import BfsDanNetwork
 def main(show=False):
     configurations = load_configurations()
     # active_config = configurations[0]
-    active_config = configurations[2]
+    active_config = configurations[5]
     demand_matrix = create_demand_matrix_for_configuration(active_config)
     network = BfsDanNetwork(demand_matrix)
     network.create_dan(active_config['dan'])
