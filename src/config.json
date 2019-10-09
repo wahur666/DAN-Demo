@@ -59,9 +59,9 @@
     },
     {
       "graph": "star",
-      "vertex_num": 15,
-      "constant": 2,
-      "dan": 8
+      "vertex_num": 25,
+      "constant": 1,
+      "dan": 10
     }
   ]
 }

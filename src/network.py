@@ -224,19 +224,11 @@ class Network:
             most_weight_ratio = max(most_weight_ratio, max_weight/avg_tree_branch_weight)
             tree.build_routes()
             tree_paths = []
-            helpers_added = []
-            for struct in self.helper_struct:
-                if struct[0].index == tree.root.index or struct[1].index == tree.root.index:
-                    r = tree.get_path(struct[2])
-                    r.reverse()
-                    tree_paths.append(r)
-                    helpers_added.append(struct[2])
-            leaves = [x.root for x in tree.leaves]
-            leaves_indices = [x.index for x in leaves]
-            helper_indices = [x.index for x in helpers_added]
-            for index, leaf in enumerate(leaves_indices):
-                if leaf not in helper_indices:
-                    tree_paths.append([tree.root, leaves[index]])
+
+            for node in tree.get_dependent_nodes():
+                r = tree.get_path(node)
+                r.reverse()
+                tree_paths.append(r)
 
             all_path[tree_paths[0][0].index] = tree_paths
 
@@ -284,17 +276,8 @@ class Network:
                         con = self.calculate_congestion(route)
                         congestion, most_congested_route = self.update_congestion(con, congestion, most_congested_route,
                                                                                   route)
-                        if self.new_demand_matrix[i][j] == 0:
-                            prob = 0
-                            for i in range(len(route)-1):
-                                for edge in self.routing_scheme:
-                                    if edge.v1.index == route[i].index and edge.v2.index == route[i+1].index or \
-                                            edge.v1.index == route[i+1].index and edge.v2.index == route[i].index:
-                                        prob += edge.probability
-                                        break
-                        else:
-                            prob = self.new_demand_matrix[i][j]
-                        route_len = (len(route) - 1) * prob * 2
+
+                        route_len = (len(route) - 1) * self.demand_matrix[i][j] * 2
                         avg_route_len += route_len
                         max_route_len = max(max_route_len, len(route) - 1)
                         print("Congestion:", con, route)
