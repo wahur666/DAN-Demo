@@ -63,7 +63,7 @@ class Network:
         self.calculate_congestion_and_avglen()
         self.print_summary()
 
-    def select_points(self, delta=None):
+    def select_points(self, delta=None, mod=False):
         self.delta = delta
         # Classifying points
         degs: List[List[Vertex, int]] = []
@@ -78,16 +78,18 @@ class Network:
         H = [x for x in degs if x[1] >= self.avg_deg]
         L = [x for x in degs if x[1] < self.avg_deg]
 
-        H.sort(key=lambda x: x[1], reverse=True)
-        L.sort(key=lambda x: x[1])
 
+        if mod:
+            H.sort(key=lambda x: x[1], reverse=True)
+            L.sort(key=lambda x: x[1])
 
-        # H = degs[0:round(len(degs) / 2)]
-        # L = degs[round(len(degs) / 2):]
-        #
-        # while len(L) > 0 and L[0][1] > self.avg_deg:
-        #     H.append(L.pop(0))
-        # L.sort(key=lambda x: x[1])
+        else:
+            H = degs[0:round(len(degs) / 2)]
+            L = degs[round(len(degs) / 2):]
+
+            while len(L) > 0 and L[0][1] > self.avg_deg:
+                H.append(L.pop(0))
+            L.sort(key=lambda x: x[1])
 
         print(H)
         print(L)
@@ -344,7 +346,7 @@ class Network:
                         edge.v1.index == end.index and edge.v2.index == start.index:
                     con += edge.probability
                     break
-        return con
+        return con * 2
 
     def find_route(self, all_path, i, j) -> List[Node]:
         if not i in all_path:

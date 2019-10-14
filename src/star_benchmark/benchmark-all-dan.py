@@ -21,7 +21,7 @@ def main(show=False):
 
     if not os.path.exists("unified_res"):
         os.mkdir("unified_res")
-    res_file_original = os.path.join('unified_res', 'star_unified.csv')
+    res_file_original = os.path.join('unified_res', 'e_star_unified.csv')
 
     # if not os.path.exists("egobalance_res"):
     #     os.mkdir("egobalance_res")
@@ -72,7 +72,7 @@ def main(show=False):
         for delta_num in delta_nums:
             configs = []
             for constant in constants:
-                for i in range(5):
+                for i in range(20):
                     active_cfg = active_config.copy()
                     active_cfg['vertex_num'] = vertex_num
                     active_cfg['constant'] = constant
