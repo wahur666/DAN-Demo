@@ -63,7 +63,7 @@ class Network:
         self.calculate_congestion_and_avglen()
         self.print_summary()
 
-    def select_points(self, delta=None, mod=False):
+    def select_points(self, delta=None, mod=True):
         self.delta = delta
         # Classifying points
         degs: List[List[Vertex, int]] = []

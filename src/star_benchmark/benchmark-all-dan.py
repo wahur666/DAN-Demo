@@ -21,7 +21,7 @@ def main(show=False):
 
     if not os.path.exists("unified_res"):
         os.mkdir("unified_res")
-    res_file_original = os.path.join('unified_res', 'e_star_unified.csv')
+    res_file_original = os.path.join('unified_res', 'star_unified_1.csv')
 
     # if not os.path.exists("egobalance_res"):
     #     os.mkdir("egobalance_res")

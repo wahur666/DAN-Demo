@@ -19,7 +19,7 @@ def generate_demand_matrix(graph: nx.Graph) -> np.array:
     nodes_num = len(graph.nodes)
     demand_matrix = np.zeros((nodes_num, nodes_num))
     for edge in graph.edges:
-        demand_matrix[edge[0], edge[1]] = np.random.randint(1, 10)
+        demand_matrix[edge[0], edge[1]] = 1
         demand_matrix[edge[1], edge[0]] = demand_matrix[edge[0], edge[1]]
     return demand_matrix
 
