@@ -23,50 +23,16 @@ def main(show=False):
         os.mkdir("unified_res")
     res_file_original = os.path.join('unified_res', 'erdos_unified_1.csv')
 
-    # if not os.path.exists("egobalance_res"):
-    #     os.mkdir("egobalance_res")
-    # res_file_egobalance = os.path.join('egobalance_res', 'results_s_egobalance.csv')
-    #
-    # if not os.path.exists("huffman_res"):
-    #     os.mkdir("huffman_res")
-    # res_file_huffman = os.path.join('huffman_res', 'results_s_huffman.csv')
-    #
-    # if not os.path.exists("bfs_res"):
-    #     os.mkdir("bfs_res")
-    # res_file_bfs = os.path.join('bfs_res', 'results_s_bfs.csv')
-    #
-    # if not os.path.exists("random_res"):
-    #     os.mkdir("random_res")
-    # res_file_random = os.path.join('random_res', 'results_s_random.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
-                  'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',
-                  'tree_count', 'type']
+              'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',
+              'tree_count', 'type', 'start_entropy']
 
     with open(res_file_original, 'w') as csvFile:
         writer = csv.DictWriter(csvFile, fieldnames=fields)
         writer.writeheader()
     csvFile.close()
 
-    # with open(res_file_huffman, 'w') as csvFile:
-    #     writer = csv.DictWriter(csvFile, fieldnames=fields)
-    #     writer.writeheader()
-    # csvFile.close()
-    #
-    # with open(res_file_bfs, 'w') as csvFile:
-    #     writer = csv.DictWriter(csvFile, fieldnames=fields)
-    #     writer.writeheader()
-    # csvFile.close()
-    #
-    # with open(res_file_egobalance, 'w') as csvFile:
-    #     writer = csv.DictWriter(csvFile, fieldnames=fields)
-    #     writer.writeheader()
-    # csvFile.close()
-    #
-    # with open(res_file_random, 'w') as csvFile:
-    #     writer = csv.DictWriter(csvFile, fieldnames=fields)
-    #     writer.writeheader()
-    # csvFile.close()
 
     for vertex_num in vertex_nums:
         for delta_num in delta_nums:

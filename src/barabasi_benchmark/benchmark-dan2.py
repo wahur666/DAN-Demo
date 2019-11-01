@@ -25,7 +25,7 @@ def main(show=False):
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
               'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',
-              'tree_count', 'type']
+              'tree_count', 'type', 'start_entropy']
 
     with open(res_file, 'w') as csvFile:
         writer = csv.DictWriter(csvFile, fieldnames=fields)

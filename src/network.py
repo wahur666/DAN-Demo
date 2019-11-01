@@ -298,7 +298,11 @@ class Network:
         for row in control_demand_matrix:
             delta = sum(1 if x > 0 else 0 for x in row)
             max_delta = max(max_delta, delta)
-            
+
+        start_entropy = 0
+        for i in range(0, len(self.demand_matrix)):
+                start_entropy -= (sum(self.demand_matrix[i]) / full_weight) * np.log2(sum(self.demand_matrix[i]) / full_weight) if sum(self.demand_matrix[i]) else 0
+
         # if avg_route_len / full_weight < 1:
         #     breakpoint()
 
@@ -313,7 +317,7 @@ class Network:
         self.summary['avg_tree_weight'] = avg_tree_weight / full_weight
         self.summary['most_tree_ratio'] = most_weight_ratio
         self.summary['tree_count'] = tree_count
-
+        self.summary['start_entropy'] = start_entropy
         #print(all_path)
 
     def print_summary(self):
@@ -327,6 +331,7 @@ class Network:
         print("Average tree weight", self.summary['avg_tree_weight'])
         print("Tree count", self.summary['tree_count'])
         print("Greatest radio between max branch weight", self.summary['most_tree_ratio'])
+        print("Start entropy", self.summary['start_entropy'])
         print("-----------------------")
 
     def update_congestion(self, con, congestion, most_congested_route, route):
