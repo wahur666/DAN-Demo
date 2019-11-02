@@ -21,7 +21,7 @@ def main(show=False):
 
     if not os.path.exists("unified_res"):
         os.mkdir("unified_res")
-    res_file_original = os.path.join('unified_res', 'star_unified_1.csv')
+    res_file_original = os.path.join('unified_res', 'e_star_unified_1.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
               'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',

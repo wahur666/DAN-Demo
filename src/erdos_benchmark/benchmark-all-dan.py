@@ -21,7 +21,7 @@ def main(show=False):
 
     if not os.path.exists("unified_res"):
         os.mkdir("unified_res")
-    res_file_original = os.path.join('unified_res', 'erdos_unified_1.csv')
+    res_file_original = os.path.join('unified_res', 'e_erdos_unified_1.csv')
 
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
