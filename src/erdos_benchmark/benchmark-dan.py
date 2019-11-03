@@ -16,12 +16,12 @@ def main(show=False):
     res = []
 
     vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
-    delta_nums = [10, 16, 24, 48, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
+    delta_nums = [ "2d", "4d", "6d", "8d", "10d", "12d"]
     constants = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     if not os.path.exists("original_res"):
         os.mkdir("original_res")
-    res_file = os.path.join('original_res', 'results_original.csv')
+    res_file = os.path.join('original_res', 'results_original_delta.csv')
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
               'max_delta', 'dan', 'most_congested_route', 'max_route_len', 'avg_tree_weight', 'most_tree_ratio',

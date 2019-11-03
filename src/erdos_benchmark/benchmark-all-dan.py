@@ -17,11 +17,12 @@ def main(show=False):
 
     vertex_nums = [25, 50, 75, 100, 125, 150, 175, 200]
     delta_nums = [10, 16, 24, 48] #, "1d", "2d", "4d", "6d", "8d", "10d", "12d"]
+    delta_nums = ["2d", "4d", "6d", "8d", "10d", "12d"]
     constants = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     if not os.path.exists("unified_res"):
         os.mkdir("unified_res")
-    res_file_original = os.path.join('unified_res', 'e_erdos_unified_1.csv')
+    res_file_original = os.path.join('unified_res', 'e_erdos_unified_1_delta.csv')
 
 
     fields = ['graph', 'vertex_num', 'constant', 'congestion', 'real_congestion', 'avg_route_len', 'delta',
@@ -38,7 +39,7 @@ def main(show=False):
         for delta_num in delta_nums:
             configs = []
             for constant in constants:
-                for i in range(20):
+                for i in range(5):
                     active_cfg = active_config.copy()
                     active_cfg['vertex_num'] = vertex_num
                     active_cfg['constant'] = constant
