@@ -21,7 +21,6 @@
 \usepackage{xcolor}
 
 
-
 % \setcounter{secnumdepth}{3}
 \onehalfspacing
 
@@ -32,7 +31,6 @@
 \BeforeBeginEnvironment{minted}{\begin{mdframed}[backgroundcolor=bg, hidealllines=true]}
 \AfterEndEnvironment{minted}{\end{mdframed}}
 
-\newcommand{\cmd}[1]{\colorbox{gray!10}{\strut #1}}
 
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
 \newminted[mintedJson]{js}{breaklines, breaksymbolleft=\quad}
@@ -198,7 +196,7 @@ A kapott eredményeket összehasonlítása a megadott elméleti korlátokkal.
 A labor ideje alatt elkészült egy keretrendszer, ami segítségével tesztelhető a szerzők által felvázolt algoritmus. 
 A keretrendszer Python \cite{noauthor_python_nodate} nyelven íródott.
 Egy véletlen gráfok generálására a NetworkX külső csomag volt használva\cite{noauthor_networkx_nodate}.
-Az adatok elemzése pedig RapidMiner-ben történt\cite{noauthor_lightning_nodate}.
+
 
 \chapter{Modell}
 
@@ -376,227 +374,68 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 	\end{itemize}
 \end{enumerate}
 
-\chapter{Megvalósítás}
-
-\section{Keretrendszer}
-
-A keretrendszer Python 3 nyelven íródott, és a Networkx külső csomag volt használva a véletlen gráfok generálására.
-A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban \cite{noauthor_jupyter_nodate}.  
-Networkx csomag továbbá biztosít számunkra egy megjelenítési lehetőséget, amit a Jupyter notebookban tudunk legjobban kihasználni.
-Az adatok feldolgozása és kiértékelése is Jupyter notebookban történt. 
+\chapter{Kiterjesztett modell}
 
 \section{Véletlen gráfok}
 
+A hálózat tesztelésnek céljából több különböző típusú véletlen gráfon lett tesztelve az algoritmus hatékonysága.
+A következő alfejezetekben ezek lesznek bemutatva.
+
 \subsection{Barabási-Albert gráf}
 
-A Barabási-Albert gráf\cite{RevModPhys.74.47} a komplex hálózatok egy modellje. 
-A gráf felépítése az úgy nevezett "preferential attachment" mechanizmust használja, ami kimondja, hogy az újonnan becsatlakozó csomópontnak \(m\) már a hálózatban szereplő csomópontra kell kapcsolódnia. A \ref{barabasi} ábrán látható a gráf eredménye, attól függően, hogyan választjuk meg az \(m\) értéket.
+A Barabási-Albert modell\cite{RevModPhys.74.47} a komplex hálózatok egy modellje. 
+A \(G(n, m)\) gráf felépítése az úgy nevezett "preferential attachment" mechanizmust használja, ami kimondja, hogy az újonnan becsatlakozó csomópontnak \(m\) már a hálózatban szereplő csomópontra kell kapcsolódnia. A \ref{barabasi} ábrán látható a gráf eredménye, attól függően, hogyan választjuk meg az \(m\) értéket.
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=1\linewidth]{pictures/800px-Barabasi_albert_graph.png}
+		\includegraphics[width=0.9\linewidth]{pictures/Barabasi_albert_graph.eps}
 		\caption{Barabási-Albert gráf}
 		\label{barabasi}
 	\end{center}
 \end{figure}
 
-% További véletlen gráfok megadása!!!
+\subsection{Erdős-Rényi gráf}
 
-\section{Modell}
-
-A \textbf{Network} osztály valósítja meg az algoritmus legnagyobb részét, de magában nem használható, mivel nem tartalmazza a fa építési stratégiát.
-Ahhoz, hogy a teljes legyen az osztály, le kell származtatni és meg kell valósítani milyen algoritmussal építse meg a fákat.
-Ennek segítségével nagyon egyszerűen lehet új algoritmust illeszteni a már meglévő rendszerhez.
-A Network osztály bemenete a demand mátrix, kimenete egy útválasztási séma.
-Ez mellett sok metaadatot is kiszámol a program amik között szerepel az átlag súlyozott úthossz és a torlódás.
-Az algoritmus futásához még szükség egy paraméterre, ahol megadjuk a maximális fokszámot a rendszernek, ami alapján elkészülnek a fák.
-Itt kettő lehetőségünk van, kötött és dinamikus fokszám attól függően mit szeretnénk elérni.
-A dinamikus fokszám esetén az átlag fokszám függvényében lehet megadni a maximális fokszámot.
-Erre egy példa a "6d", ahol azt fejezzük ki, hogy az átlag fokszám hatszorosát szeretnénk használni az adott gráfban, mint maximális fokszám a megépítendő fák esetén.
-Az útválasztási séma létrehozásakor a csere lépéssorozatot követően megváltozik a demand mátrix, ezért fontos, hogy a \(\Delta\) fokszámot ne haladjuk meg, de ez nem garantált.
-A metaadatok tartalmazzák a kiszámított maximális delta fokszámot és a valós fokszámot, ami a szükséges fokszámot adja meg amire algoritmusnak szüksége volt.  
-Ebből az adatból lehet következtetést levonni, hogy valóban megfelelő-e felső korlátja amit a szerzők adtak és lehet-e jobb felső korlátot adni. 
-
-
-Az algoritmushoz szükséges bemeneti demand mátrix több módos is megadható konfiguráción keresztül.
-A konfigurációk egy  \textit{JSON} fájl tartalmazza, amiben egyszerre több konfiguráció is megadható. 
-A lehetséges konfigurációk pedig a következők
-
-%IDÁIG MEGTÖRTÉNT A MERGE
-
-A bemeneti konfiguráció kiegészült egy új gráf típussal, ami a csillag gráf.
-Csillag gráfnak nevezzük azt a gráfot, ahol az összes pont egy ponthoz kapcsolódik.
-A konfiguráció további egységesítésen esett át, minden véletlen gráf szerkezete megegyezik, ami a következő:
-
+Az Erdős-Rényi modell\cite{erdos59a} a véletlen gráfok előállítására szolgáló modell.
+A modellnek két változata van, amik szorosan összefüggenek.
 \begin{itemize}
-	\item \cmd{graph} - Gráf típusa, lehetséges értékek:
-	\begin{itemize}
-		\item \cmd{barabasei-albert} - Barabási-Albert gráf
-		\item \cmd{erdos-renyi} - Erdős-Rényi gráf
-		\item \cmd{star} - Csillag gráf
-	\end{itemize}
-	
-	\item \cmd{vertex\textunderscore num} - Csomópontok száma
-	\item \cmd{dan} - A maximális fokszám a magas fokú csúcsokra
-	\item \cmd{constant} - Konstans érték ami a gráf paraméterét adja, ezek rendre a következők:
-	
-	\begin{itemize}
-		\item Barabási-Albert gráf esetén azt határozza meg, hogy az új csúcs mennyi már a gráfban szereplő csúcshoz kapcsolódjon
-		\item Erdős-Rényi gráf esetén az él valószínűségének meghatározásra használjuk a következő képlet segítségével  \[p = \frac{constant}{vertex\_num}\]
-		\item Csillag gráf esetén pedig a csillagok számát adjuk meg
-	\end{itemize}
+	\item A \(G(n, M)\) modellben egyenletes eloszlás szerint választunk egyet az összes lehetséges \(n\) csúcsú gráf közül, ahol az élek száma \(M\).
+	\item A \(G(n, p)\) modellben az \(n\) csúcsú gráf éleit \(p\) valószínűséggel húzunk be bármely két csúcs között, egymástól függetlenül.
 \end{itemize}
 
+A \ref{erdos} ábrán látható egy lehetséges véletlen gráf \(p=0.01\) valószínűséggel.
 
-% ITT TARTOK A MERGEL
-
-
-
-Többféle módon lehet megadni konfigurációt attól függően milyen gráfot akarunk használni. 
-Lehetőség van kézileg megadni a demand mátrixot vagy generálhatunk kétféle gráfot.
-Véletlen gráfok amit tud generálni a program:
-\begin{itemize}
-	\item Erdős-Rényi gráf
-	\item Barabási-Albert gráf
-\end{itemize}
-
-Egy minta konfiguráció, ami tartalmaz példát mind három esetre:
-
-\begin{mintedJson}
-	{
-		"config": [ {
-			"graph": "erdos-renyi",
-			"vertex_num": 11,
-			"dan": null,
-			"constant": 3
-		}, {
-			"graph": "barabasi-albert",
-			"vertex_num": 11,
-			"dan": 3,
-			"m": 4
-		}, {
-			"graph": "manual",
-			"vertex_num": null,
-			"dan": 3,
-			"demand": [
-			[0, 3, 4, 1, 1, 1, 1],
-			[3, 0, 2, 0, 1, 0, 4],
-			[4, 2, 0, 2, 0, 0, 4],
-			[1, 0, 2, 0, 3, 0, 0],
-			[1, 1, 0, 3, 0, 0, 0],
-			[1, 0, 0, 0, 0, 0, 3],
-			[1, 4, 4, 0, 0, 3, 0]]	
-		} ]
-	}
-\end{mintedJson}
-
-A konfigurációnak van három kötelező mezője, és a egy kiegészítő mező, attól függően, hogy melyik típusú gráfot választottuk. 
-
-Kötelező mezők: 
-\begin{enumerate}
-	\item \textbf{graph} - a gráf típusa, három érték közül lehet választani:
-	\begin{itemize}
-		\item \textit{"erdos-renyi"} - Erdős-Rényi gráf 
-		\item \textit{"barabasi-albert"} - Barabási-Albert gráf
-		\item \textit{"manual"} - Kézzel megadott gráf
-	\end{itemize}
-	\item \textbf{vertex\_num} - A gráf csúcsainak száma. Ez nincs figyelembe véve kézzel adott gráf esetén, mivel meg van adva a demand mátrix és nem kell azt kigenerálni.
-	\item \textbf{dan} - A Demand-Aware Network fokszámára ad megkötést. Értékek amit felvehet:
-	\begin{itemize}
-		\item \textit{null} - Alap beállítás szerint a cikkben ajánlott $12\rho$ fokszámot fogja használni
-		\item \textit{12} - A megadott szám lesz a fokszám, példában most 12.
-		\item \textit{"6d"} - A szám és egy "d" betűvel a végén hasonlóan működik mint az első eset, annyi különbséggel, hogy itt meg lehet adni, hogy mi legyen a $\rho$ szorzója, példa most $6\rho$
-	\end{itemize}
-\end{enumerate}
-
-Konfiguráció függő mezők:
-\begin{itemize}
-	\item \textbf{constant} - \textit{Erdő-Rényi} gráf esetén a modell vár egy \(p\) valószínűséget ami annak a valószínűsége, hogy egy él be legyen húzva az új pontba, és ez független minden a korábban behúzott élektől. 
-	A ritka mátrix eléréséhez a következő formulát használja a generáló algoritmus:  \[p = constant \cdot \frac{1}{vertex\_num}\]
-	\item \textbf{m} - \textit{Barabási-Albert} gráf esetén a modell vár egy \(m\) számot, ami azt adja meg, hány olyan gráf ponthoz kell csatlakozzon az új, ami már eddig benne van a gráfban. 
-	\item \textbf{demand} -  \textit{kézzel megadott} gráf esetén direkt módon megadható a mátrix, aminek a formája listák listája. 
-	Figyeljünk arra, hogy négyzetes lehet csak a demand mátrix!
-\end{itemize}
-
-\section{Kimenet}
-
-Az program kimenete, az algoritmus által kiszámolt metrikák, átlag súlyozott úthossz és torlódás. 
-Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egófák és az új hálózat választási séma ki lesz rajzolva.
-
-\begin{figure}[h]
+\begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=0.49\linewidth]{pictures/starting_network.png}
-		\caption{Kiindulási hálózat}
-		\label{starting-network}
+		\includegraphics[width=0.9\linewidth]{pictures/Erdos_generated_network-p001.jpg}
+		\caption{Erdős-Rényi gráf \(p=0.01\) valószínűséggel}
+		\label{erdos}
 	\end{center}
 \end{figure}
 
-A \ref{starting-network} ábrán látható a bemeneti hálózat, aminek a demand mátrixa már a korábban fel lett írva. Az algoritmus ezek után a cl-DAN algoritmust használva, először elkészíti az egófákat \ref{ego-trees} ábra, majd végül az új hálózat választási sémát ami a \ref{routing-scheme} ábrán látható.
+A munka során a második megközelítést volt használva a véletlen gráfok generálására.
 
-\begin{figure}[h]
+\subsection{Csillaggráf}
+
+A csillaggráf vagy röviden csillag, egy olyan gráf, ahol \(n\) csúcs esetén, van egy központi csúcs a gráfban amivel a maradék \(n-1\) csúcs kapcsolatban áll.
+Bármely két csúcs, amelyek közül egyik sem a csillag közepe, nem áll kapcsolatban.
+A \ref{star} ábrán látható egy példa a nyolc csúcs gráfra ahol egy csillag van.
+A munka során használt véletlen csillaggráfokban a csillagok számát lehet megadni.
+
+\begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=0.40\linewidth]{pictures/egotree1.png}
-		\includegraphics[width=0.40\linewidth]{pictures/egotree2.png}
-		%\includegraphics[width=0.40\linewidth]{pictures/egotree3.png}
-		%\includegraphics[width=0.40\linewidth]{pictures/egotree4.png}
-		\caption{Egófák}
-		\label{ego-trees}
+		\includegraphics[width=0.4\linewidth]{pictures/Star_network_7.eps}
+		\caption{Csillaggráf hét fokszámmal, \(S_7\)}
+		\label{star}
 	\end{center}
 \end{figure}
 
-A \ref{routing-scheme} ábrán látható gráfon pár extra információ megfigyelhető. 
-Pirosra vannak festve a magas fokszámú csúcsok és zöldre az alacsony fokszámúak.
-Az algoritmus fő célja az volt, hogy ne legyen egymással közvetlen kapcsolatban két magas fokszámú csúcs, azaz ne legyen két piros csúcs összekötve, és ez maradéktalanul teljesül is.
-Két magas fokszú csúcs csak egy alacsony fokszámú segítő csúcson keresztül tud kommunikálni.
-Fokszámok szempontjából a csúcsok rendben vannak, mivel nem haladják meg $\Delta$ fokszámot. 
-A gráf esetén a delta \(\Delta = 12\rho = 12 \cdot \lceil\frac{25}{7}\rceil = 43  \).
+\section{Fa építési stratégiák}
 
-\begin{figure}[h]
-	\begin{center}
-		\includegraphics[width=0.49\linewidth]{pictures/new_network.png}
-		\caption{Új hálózat}
-		\label{routing-scheme}
-	\end{center}
-\end{figure}
+A cikkben\cite{avin_demand-aware_nodate} már szereplő Egófa algoritmusából kiindulva több különböző fa építési stratégia is meg lett valósítva.
+A különböző fa építési stratégiák más-más szempontból közelítik meg a problémát.
 
-
-\section{Adatszerkezetek}
-
-A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
-\begin{itemize}
-	\item \textbf{Vertex} - az általános gráf csúcs
-	\item \textbf{Node} - az \textit{Egófák} készítésekor használt csúcs, ami tartalmazza a valószínűségét annak, hogy a forrás csomópont mekkora valószínűséggel fog kommunikálni a másik \textit{Node} csúccsal
-	\item \textbf{HuffmanDanNode} - a Huffman fa csomópontjait reprezentáló osztály, minden tulajdonsága megvan mint a Node-nak, csak még kiegészül egy útvonallal, amit a Huffman fa építése után lesz meghatározva
-	\item \textbf{Edge} - a gráf pontjait összekötő él reprezentációja, ami \textit{Vertexet} vár paraméterként, és tartalmazza a kommunikációs valószínűséget, hasonlóan mint a \textit{Node}
-	\item \textbf{Tree} - ami adja az alapját majd a útvonal tervezési sémának. A fának két fajtája van megvalósítva:
-	\begin{itemize}
-		\item \textbf{EgoTree} - a $\Delta$ fokú Egofa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet
-		\item \textbf{HuffmanDanTree} - a $\Delta$ fokú Huffman fa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet és a belső csúcsok állhatnak üresen
-	\end{itemize}
-	
-	
-\end{itemize}
-	
-\chapter{Bevezetés}
-
-
-\section{Labor célja}
-
-A labor célja a korábban már bemutatott cikkben\cite{avin_demand-aware_nodate} szereplő hálózat megépítése.
-Az elkészült keresztrendszert kiegészíteni még egy fa építési stratégiával, ami a Véletlenszerűen felépített fa (Random fa).
-Továbbá még különböző metrikák bevezetése, ami segítségével pontosabb képet kapunk arról, hogy különböző helyzetekben milyen eredményeket eredményeznek az algoritmusok.
-Egy fontos megközelítésbeli változás is alkalmazva volt az algoritmus első lépésére, mennyi fát építünk és az milyen kihatással van az eredményre.
-
-\section{Laborban megvalósított munka}
-
-A labor ideje alatt a már elkészült keretrendszer segítségével tesztek voltak futtatva, és azok adati kiértékelve.
-A keretrendszer Python \cite{noauthor_python_nodate} nyelven íródott.
-A véletlen gráfok generálására a NetworkX külső csomag volt használva\cite{noauthor_networkx_nodate}.
-Az adatok elemzése Python segítségével történt.
-
-\chapter{Modell}
-
-\section{EgoBalance}
+\subsection{EgoBalance}
 
 Az EgoBalance algoritmus majdnem teljes mértékben megegyezik az eredetivel.
 A cikk szerzői az Egofa algoritmus vázlatos összefoglalásában használtak egy csere lépést.
@@ -616,7 +455,7 @@ Az Egobalance logaritmus a függő pontok újra elhelyezését az Egofára bízz
 Ezzel elméletben mindig arra törekszik az algoritmus, hogy optimális legyen torlódásra nézve az új fa.
 Lényegi különbség úthossznál jelentkezik az eredetivel szemben.
 
-\section{Huffman fa}
+\subsection{Huffman fa}
 
 A eddigi két algoritmus az Egofát\cite{avin_demand-aware_nodate} használta, ami optimális torlódásra nézve, de mivel a hálózat nem csak torlódás szempontjából van vizsgálva, ezért meg kell vizsgálni a másik aspektust is, az optimális úthosszt.
 A Huffman kódolásnál\cite{huf52} használt fa tulajdonsága, hogy átlagosan rövidek legyenek az utak attól függően milyen gyakori egy elem.
@@ -642,13 +481,13 @@ A naiv megoldás azt eredményezi, hogy az a nehéz pont lesz a belső csúcs é
 A könnyebb fa levelei nem fognak ágat változtatni, annak ellenére, hogy megüresedett az ág feljebb, ezért hosszú egyenes utak jöhetnek létre.
 Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet, hogy fa egyik belső pontja sem marad kitöltetlen.
 
-\section{Sorfolytonos fa}
+\subsection{Sorfolytonos fa}
 
 Mint láthattuk korábban a Huffman fánál, a levelek felfelé mozgatását sorfolytonosan valósítottuk meg. A sorfolyonos fa is hasonló elvet követ.
 Lényegi különbség a kettő fa között, hogy a Huffman kódolási algoritmust kihagyjuk, és egyenest sorfolytonosan rakjuk fel csúcsokat a fa építésekor.
 Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem veszi figyelembe.
 
-\section{Random fa}
+\subsection{Random fa}
 
 Az eddigi fa építési stratégiák mindegyike valamilyen szempontból próbált egy jobb útválasztási sémát létrehozni.
 A Random fa olyan megközelítést használ, hogy szimulálja azt ha valaki véletlenszerűen kötögetné össze a csomópontokat.
@@ -660,15 +499,15 @@ Egyetlen változás az algoritmusban, a fához tartozó vektor ami tartalmazza a
 \section{Módosított fa építés}
 
 
-Az cikkben szereplő cl-DAN algoritmus első lépése a csomópontok besorolása magas és alacsony halmazokba a fokszámuk alapján. 
+A cikkben\cite{avin_demand-aware_nodate} szereplő cl-DAN algoritmus első lépése a csomópontok besorolása magas és alacsony halmazokba a fokszámuk alapján. 
 A szerzők itt fele-fele arányban osztják el a pontokat és egy hozzáadott feltételként megnézik, hogy az alacsony fokszámúak között szerepel-e olyan csomópont, aminek a fokszáma meghaladja \(2\rho\)-t, azaz a kétszeres átlag fokszámot.
 
 A általam módosított cl-DAN algoritmus ezt a kiegészítő szabályt veszi alapul.
 Mi lenne ha, nem szabályosan fele-fele arányba lenne elosztva, hanem magán a \(2\rho\) feltételen?
 
 Nézzünk egy példát, ahol ez jelentőséggel bír.
-Tegyük fel, hogy van egy 25 csúcsú csillag gráfunk két csillaggal.
-A csillag gráfban a csillag közepére kapcsolódik rá az összes másik csomópont, így van kettő 24 fokú csomópontunk, és huszonhárom darab 2 fokú csomópont. 
+Tegyük fel, hogy van egy 25 csúcsú csillaggráfunk két csillaggal.
+A csillaggráfban a csillag közepére kapcsolódik rá az összes másik csomópont, így van kettő 24 fokú csomópontunk, és huszonhárom darab 2 fokú csomópont. 
 Az átlag fokszám így \(\rho=23\cdot2+2\cdot23=3.68\), ennek a kétszerese \(2\rho=7.36\).
 
 Az eredeti esetben a nagy fokú csomópontokhoz a csillagok közepei fog tartozni és további tizenegy darab 2 fokú csomópont. 
@@ -680,6 +519,177 @@ Ezen esetben ténylegesen magas csomópontok közé helyezünk egy kisegítőt, 
 %A torlódásra tekintette, meg azt tapasztalhatjuk, hogy kevesebb lesz, mintha az eredeti módszer segítségével csináltuk volna. 
 
 A módosított algoritmus nem lesz rosszabb mint az eredeti algoritmus, mivel ott mit kiegészítő feltétel szerepel a fokszám ellenőrzés, még itt az alapot adja, így legrosszabb esetben is visszatérünk az eredetihez. 
+
+\chapter{Megvalósítás}
+
+
+\section{Keretrendszer}
+
+A keretrendszer Python 3 nyelven íródott, és a Networkx külső csomag volt használva a véletlen gráfok generálására.
+A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban \cite{noauthor_jupyter_nodate}.  
+Networkx csomag továbbá biztosít számunkra egy megjelenítési lehetőséget, amit a Jupyter notebookban tudunk legjobban kihasználni.
+Az adatok feldolgozása és kiértékelése is Jupyter notebookban történt. 
+
+\section{Adatszerkezetek}
+
+A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
+\begin{itemize}
+	\item \textbf{Vertex} - az általános gráf csúcs
+	\item \textbf{Node} - az \textit{Egófák} készítésekor használt csúcs, ami tartalmazza a valószínűségét annak, hogy a forrás csomópont mekkora valószínűséggel fog kommunikálni a másik \textit{Node} csúccsal
+	\item \textbf{HuffmanDanNode} - a Huffman fa csomópontjait reprezentáló osztály, minden tulajdonsága megvan mint a Node-nak, csak még kiegészül egy útvonallal, amit a Huffman fa építése után lesz meghatározva
+	\item \textbf{Edge} - a gráf pontjait összekötő él reprezentációja, ami \textit{Vertexet} vár paraméterként, és tartalmazza a kommunikációs valószínűséget, hasonlóan mint a \textit{Node}
+	\item \textbf{Tree} - ami adja az alapját majd a útvonal tervezési sémának. A fának két fajtája van megvalósítva:
+	\begin{itemize}
+		\item \textbf{EgoTree} - a $\Delta$ fokú Egofa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet
+		\item \textbf{HuffmanDanTree} - a $\Delta$ fokú Huffman fa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet és a belső csúcsok állhatnak üresen
+	\end{itemize}
+	
+	
+\end{itemize}
+
+\section{Hálózat modell}
+
+A \textbf{Network} osztály valósítja meg az algoritmus legnagyobb részét, de magában nem használható, mivel nem tartalmazza a fa építési stratégiát.
+Ahhoz, hogy a teljes legyen az osztály, le kell származtatni és meg kell valósítani milyen algoritmussal építse meg a fákat.
+Ennek segítségével nagyon egyszerűen lehet új algoritmust illeszteni a már meglévő rendszerhez.
+
+A Network osztály bemenete a demand mátrix, kimenete egy útválasztási séma.
+Az algoritmus futásához szükség még egy paraméterre, ahol megadjuk a maximális fokszámot a rendszernek, ami alapján elkészülnek a fák.
+Itt kettő lehetőségünk van, kötött és dinamikus fokszám attól függően mit szeretnénk elérni.
+A dinamikus fokszám esetén az átlag fokszám függvényében lehet megadni a maximális fokszámot.
+Erre egy példa a "6d", ahol azt fejezzük ki, hogy az átlag fokszám hatszorosát szeretnénk használni az adott gráfban, mint maximális fokszám a megépítendő fák esetén.
+Az útválasztási séma létrehozásakor a csere lépéssorozatot követően megváltozik a demand mátrix, ezért fontos, hogy a \(\Delta\) fokszámot ne haladjuk meg, de ez nem garantált.
+Az algoritmus kimenete mellett további metaadatok tartalmazzák a kiszámított maximális $\Delta$ fokszámot és a valós fokszámot.
+A valós fokszám adja azt a fokszámot amire algoritmusnak tényleg szüksége volt.  
+Ezekből az adatból lehet következtetést levonni, hogy valóban megfelelő-e a felső korlátja az algoritmusnak, amit a szerzők adtak és lehetőséget ad egy jobb felső korlát becslésre. 
+
+
+Az algoritmushoz szükséges bemeneti demand mátrix több módos is megadható konfiguráción keresztül.
+A konfigurációk egy  \textit{JSON} fájl tartalmazza, amiben egyszerre több konfiguráció is megadható. 
+A lehetséges konfigurációk pedig a következők módon adhatók meg.
+
+Először is, van lehetőségünk egy konkrét mátrixra elkészíteni az útválasztási sémát.
+Egy így megadott helyes konfiguráció pedig a következő:
+
+\pagebreak
+
+\begin{mintedJson}
+	{
+		"config": [
+		{ 
+			"graph": "manual",
+			"dan": 3,
+			"demand": [
+			[0, 3, 4, 1, 1, 1, 1],
+			[3, 0, 2, 0, 1, 0, 4],
+			[4, 2, 0, 2, 0, 0, 4],
+			[1, 0, 2, 0, 3, 0, 0],
+			[1, 1, 0, 3, 0, 0, 0],
+			[1, 0, 0, 0, 0, 0, 3],
+			[1, 4, 4, 0, 0, 3, 0]]	
+		} ]
+	}
+\end{mintedJson}
+
+Fontos paraméterek az ilyen konfiguráció esetén a következők:
+\begin{itemize}
+	\item $graph$ - itt adjuk meg a bemeneti gráf típusát, esetünkben ez $"manual"$, azaz ezt a megadott mátrixot fogja használni az algoritmus.
+	\item $dan$ - ez a paraméter határozza meg a maximum fokszámot a magas fokú csomópontokra, itt megadható konkrét érték pl. 3, dinamikus érték pl. $"6d"$ vagy $null$ ami ekvivalens a $"12d"$ értékkel, ami a cikkben\cite{avin_demand-aware_nodate} meghatározott felső korlát.
+	\item $demand$ - maga a demand mátrix, listák listájaként egy négyzetes mátrix, ahol a diagonális elemek értéke $0$, mivel önmagával való kommunikáció nem befolyásolja a hálózatot
+\end{itemize}
+
+A konkrét demand mátrix megadás mellett van még lehetőség generálni véletlen gráfot.
+A program három fajta véletlen gráf típust tud generálni, amik rendre: Barabási-Albert gráf, Erdős-Rényi gráf és csillaggráf.
+
+A véletlen gráfok konfigurációit meg lehet adni hasonló módon mint az előző esetben.
+Több konfiguráció megadása a $config$ tömbben vesszővel elválasztva történik.
+A véletlen gráfok konfigurációja megegyezik, és a gráf típusától függően változik a konstans jelentése. 
+Egy példa erre a következő kód részlet:
+
+\pagebreak
+
+\begin{mintedJson}
+{
+	"graph": "star",
+	"vertex_num": 25,
+	"constant": 1,
+	"dan": 10
+}
+\end{mintedJson}
+
+
+A paraméterek rendre a következők:
+
+\begin{itemize}
+	\item $graph$ - véletlen gráf típusa, aminek a lehetséges értékei:
+	\begin{itemize}
+		\item $"barabasei-albert"$ - Barabási-Albert gráf
+		\item $"erdos-renyi"$ - Erdős-Rényi gráf
+		\item $"star"$ - Csillaggráf
+	\end{itemize}
+	
+	\item $vertex\_num$ - Csomópontok száma
+	\item $dan$ - A maximális fokszám a magas fokú csúcsokra, megegyezik az előző esettel
+	\item $constant$ - Konstans érték ami a megadott gráf paraméterét adja, ezek rendre a következők:
+	\begin{itemize}
+		\item Barabási-Albert gráf esetén a "preferential attachment" számát adja meg
+		\item Erdős-Rényi gráf esetén az él valószínűségét határozza meg a következő képlet segítségével  \[p = \frac{constant}{vertex\_num}\]
+		\item Csillaggráf esetén pedig a csillagok számát adjuk meg
+	\end{itemize}
+\end{itemize}
+
+
+%IDÁIG MEGTÖRTÉNT A MERGE
+
+% ITT TARTOK A MERGEL
+
+\section{Kimenet}
+
+Az program kimenete, az algoritmus által kiszámolt metrikák, átlag súlyozott úthossz és torlódás. 
+Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egófák és az új hálózat választási séma ki lesz rajzolva.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/starting_network.png}
+		\caption{Kiindulási hálózat}
+		\label{starting-network}
+	\end{center}
+\end{figure}
+
+A \ref{starting-network} ábrán látható a bemeneti hálózat, aminek a demand mátrixa már a korábban fel lett írva. Az algoritmus ezek után a cl-DAN algoritmust használva, először elkészíti az egófákat \ref{ego-trees} ábra, majd végül az új hálózat választási sémát ami a \ref{routing-scheme} ábrán látható.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.40\linewidth]{pictures/egotree1.png}
+		\includegraphics[width=0.40\linewidth]{pictures/egotree2.png}
+		%\includegraphics[width=0.40\linewidth]{pictures/egotree3.png}
+		%\includegraphics[width=0.40\linewidth]{pictures/egotree4.png}
+		\caption{Egófák}
+		\label{ego-trees}
+	\end{center}
+\end{figure}
+
+A \ref{routing-scheme} ábrán látható gráfon pár extra információ megfigyelhető. 
+Pirosra vannak festve a magas fokszámú csúcsok és zöldre az alacsony fokszámúak.
+Az algoritmus fő célja az volt, hogy ne legyen egymással közvetlen kapcsolatban két magas fokszámú csúcs, azaz ne legyen két piros csúcs összekötve, és ez maradéktalanul teljesül is.
+Két magas fokszú csúcs csak egy alacsony fokszámú segítő csúcson keresztül tud kommunikálni.
+Fokszámok szempontjából a csúcsok rendben vannak, mivel nem haladják meg $\Delta$ fokszámot. 
+A gráf esetén a delta \(\Delta = 12\rho = 12 \cdot \lceil\frac{25}{7}\rceil = 43  \).
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/new_network.png}
+		\caption{Új hálózat}
+		\label{routing-scheme}
+	\end{center}
+\end{figure}
+
+Egy érdekes tény még megfigyelhető a \ref{routing-scheme} gráfon, mint a konfigurációnál is említve volt, azoknak a csomópontoknak adjuk meg a maximális fokszámát, ami a magas fokszámúak halmazába fog kerülni. 
+Mivel a cl-DAN utolsó lépésében meg van említve, hogy nem csak magas-magas és magas-alacsony kapcsolatok között van él, hanem az alacsony-alacsony között is.
+Ez annyiban hat ki a végső útválasztási sémára, hogy ha van két telített segítő pontunk, akkor ellenőrzés nélkül be kell húzni az alacsony-alacsony kapcsolatot, ezzel megszegve azt a feltételt, hogy egy csomópontnak csak meghatározott $\Delta$ fokszáma lehet.
+Ha $\Delta$ nagyon kicsi, akkor ez a probléma hatványozottan érvényesül, de ha választunk egy megfelelően nagy és reális fokszámot, akkor ez a probléma nagy valószínűséggel nem fog fellépni.
+	
+
 
 \chapter{Tesztelés}
 
@@ -718,22 +728,22 @@ Végül pedig, hogy a mérési hiba minimalizálásának érdekében az fent eml
 Tesztek különböző metrikák alapján lettek kiértékelve, amit a következők:
 
 \begin{itemize}
-	\item \cmd{graph} - gráf típusa 
-	\item \cmd{vertex num} - csúcsok száma a gráfban
-	\item \cmd{constant} - a gráfhoz tartozó konstans paraméter 
-	\item \cmd{congestion} - torlódás az eredeti értékekkel
-	\item \cmd{real congestion} - a torlódás normalizálva egyre
-	\item \cmd{avg route len} - átlag úthossz
-	\item \cmd{delta} - fa $\Delta$ fokszáma
-	\item \cmd{max delta} - a maximális $\Delta$ fokszám
-	\item \cmd{dan} - a $\Delta$ megadott fokszám, ami lehet relatív is
-	\item \cmd{most congested route} - a legnagyobb torlódással rendelkező él
-	\item \cmd{max route len} - a maximális úthossz
-	\item \cmd{avg tree weight} - az átlag fa súlya
-	\item \cmd{most tree ratio} - a legnagyobb arány fa átlag ágsúlya és a legnehezebb ág között
-	\item \cmd{tree count} - az épített fák száma
-	\item \cmd{type} - a fa építései algoritmus típusa
-	\item \cmd{start entropy} - a kezdeti költség mátrix entrópiája
+	\item $graph$ - gráf típusa 
+	\item $vertex\_num$ - csúcsok száma a gráfban
+	\item $constant$ - a gráfhoz tartozó konstans paraméter 
+	\item $congestion$ - torlódás az eredeti értékekkel
+	\item $real\_congestion$ - a torlódás normalizálva egyre
+	\item $avg\_route\_len$ - átlag úthossz
+	\item $delta$ - fa $\Delta$ fokszáma
+	\item $max\_delta$ - a maximális $\Delta$ fokszám
+	\item $dan$ - a $\Delta$ megadott fokszám, ami lehet relatív is
+	\item $most\_congested\_route$ - a legnagyobb torlódással rendelkező él
+	\item $max\_route\_len$ - a maximális úthossz
+	\item $avg\_tree\_weight$ - az átlag fa súlya
+	\item $most\_tree\_ratio$ - a legnagyobb arány fa átlag ágsúlya és a legnehezebb ág között
+	\item $tree\_count$ - az épített fák száma
+	\item $type$ - a fa építései algoritmus típusa
+	\item $start\_entropy$ - a kezdeti költség mátrix entrópiája
 \end{itemize}
 	
 
@@ -829,12 +839,12 @@ Eredmény a \ref{erdos-len} ábrán.
 A grafikon itt már kicsit érdekesebb, mivel kicsit nagyobb mozgása van az értékeknek, de ha megnézzük, legfeljebb kettő százalékos eltérés mérhető.
 Az összes algoritmus hasonlóan teljesít.   
 
-Végül pedig nézzük meg a csillag gráfot az eredeti számú fa mennyiséggel a \ref{star-len} ábrán.
+Végül pedig nézzük meg a csillaggráfot az eredeti számú fa mennyiséggel a \ref{star-len} ábrán.
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.9\linewidth]{pictures/star_len_e.png}
-		\caption{Csillag gráf - Úthossz}
+		\caption{Csillaggráf - Úthossz}
 		\label{star-len}
 	\end{center}
 \end{figure}
@@ -875,13 +885,13 @@ Következő gráfunk az Erdős-Rényi gráf a \ref{erdos-tree-difference-len} á
 Amint látható, a grafikonon ismét megjelenik egy szórás, kicsit nagyobb is mint az eredetinél, de még mindig a pár százalékos határon belül. 
 Az eredetihez képest az értékek kisebbek, ezzel elérve célunk a módosítás bevezetésével.
 
-Végül nézzük meg a csillag gráfot a \ref{star-tree-difference-len} ábrán. 
+Végül nézzük meg a csillaggráfot a \ref{star-tree-difference-len} ábrán. 
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.49\linewidth]{pictures/star_len_e.png}
 		\includegraphics[width=0.49\linewidth]{pictures/star_len_m.png}
-		\caption{Csillag gráf - Megépített fa számosságának összehasonlítása}
+		\caption{Csillaggráf - Megépített fa számosságának összehasonlítása}
 		\label{star-tree-difference-len}
 	\end{center}
 \end{figure}
@@ -948,12 +958,12 @@ Eredmény a \ref{erdos-con} ábrán.
 A grafikon szinte megegyezően ugyanazt az eredmény mutatja mint a Barabási-Albert gráf esetén.
 Két csoport, ahol még mindig az Eredeti és az EgoBalance teljesítenek a legjobban.
 
-Végül pedig nézzük meg a csillag gráfot az eredeti fa mennyiséggel a \ref{star-con} ábrán.
+Végül pedig nézzük meg a csillaggráfot az eredeti fa mennyiséggel a \ref{star-con} ábrán.
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.9\linewidth]{pictures/star_con_e.png}
-		\caption{Csillag gráf - Torlódás}
+		\caption{Csillaggráf - Torlódás}
 		\label{star-con}
 	\end{center}
 \end{figure}
@@ -992,13 +1002,13 @@ Következő gráfunk az Erdős-Rényi gráf a \ref{erdos-tree-difference-con} á
 
 Jelentős különbség itt sem figyelhető meg.
 
-Végül nézzük meg a csillag gráfot a \ref{star-tree-difference-con} ábrán. 
+Végül nézzük meg a csillaggráfot a \ref{star-tree-difference-con} ábrán. 
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.49\linewidth]{pictures/star_con_e.png}
 		\includegraphics[width=0.49\linewidth]{pictures/star_con_m.png}
-		\caption{Csillag gráf - Fa számosság összehasonlítás}
+		\caption{Csillaggráf - Fa számosság összehasonlítás}
 		\label{star-tree-difference-con}
 	\end{center}
 \end{figure}
@@ -1009,8 +1019,8 @@ Szóval a torlódás összpontosul egy helyre, erre pedig példa a \ref{inbalanc
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=0.9\linewidth]{pictures/Figure_5.png}
-		\caption{Csillag gráf - Egofa az eredeti algoritmus alapján}
+		\includegraphics[width=0.7\linewidth]{pictures/Figure_5.png}
+		\caption{Csillaggráf - Egofa az eredeti algoritmus alapján}
 		\label{inbalance}
 	\end{center}
 \end{figure}
@@ -1037,7 +1047,7 @@ Az algoritmus alapját a Sorfolytonos fa adta, ezért mindkettő algoritmus szin
 A labor lényegi kérdés az volt, hogy ha csak tényleg a szükséges fákat építjük meg akkor jobb lesz-e a hálózatunk.
 A kapott eredményekből pedig az látszik, igen jobb lesz az úthossz esetében, mivel az algoritmus mindig rövidebb úthosszt eredményez, mint az eredeti.
 Az torlódás már kicsit érdekesebb eredményt mutat, mivel a torlódásra nincs feltétlen kihatással, ha egy kiegyensúlyozott gráfot nézünk.
-Ellenben, ha ez nem teljesül, hanem egy extrém esetet veszünk, a csillag gráfot, ott egyenesen rosszabb lesz az eredmény.
+Ellenben, ha ez nem teljesül, hanem egy extrém esetet veszünk, a csillaggráfot, ott egyenesen rosszabb lesz az eredmény.
 
 \section{A munka eredménye}
 

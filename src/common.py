@@ -42,6 +42,9 @@ def generate_star_demand_matrix(vertex_num: int, num_of_stars: int):
 
 def create_demand_matrix_for_configuration(config: Dict):
     G = None
+    if config['graph'] == "manual":
+        return config['demand']
+
     vertex_num = config['vertex_num']
     if config['graph'] == "erdos-renyi":
         G = nx.erdos_renyi_graph(vertex_num, config['constant'] / vertex_num)
@@ -49,8 +52,6 @@ def create_demand_matrix_for_configuration(config: Dict):
         G = nx.barabasi_albert_graph(vertex_num, config['constant'])
     elif config['graph'] == "star":
         return generate_star_demand_matrix(vertex_num, config['constant'])
-    elif config['graph'] == "manual":
-        return config['demand']
     else:
         raise NameError("Unknown graph type", config['graph'])
 
