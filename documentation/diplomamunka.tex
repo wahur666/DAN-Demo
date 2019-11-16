@@ -67,7 +67,7 @@
 	
 	\vspace*{8cm}
 	\begin{tabular*}{\textwidth}{c  @{\extracolsep{\fill}} c}
-		\textit{Témavezető:} & \textit{Szerző:} \\
+		\textit{Témavezető:} & \textit{Készítette:} \\
 		\textbf{Lukovszki Tamás} &  \textbf{Szecsődi Imre} \\
 		Egyetemi docens, PhD & Programtervező informatikus \\
 		Információs Rendszerek tanszék & MSC\\ 
@@ -96,16 +96,16 @@ Mikor a kommunikációs mintát ábrázoljuk egy gráfban, ahol az élek az egym
 A kommunikációs technológiák fejlődésével lehetőségünk van futás időben a fizikai hálózatok újra konfigurálására. 
 Az ilyen technológiák segítségével lehet növelni az adatközpontok hatékonyságát. 
 A változó adatforgalomhoz lehet alkalmazkodni és a topológiát átalakítani az szerint, hogy mekkora terhelés éri a hálózat egyes részeit. 
-A hálózat fizikai újra konfigurálására egy megoldás a Microsoft Research ProjecToR\cite{ghobadi_projector:_2016}, ami lézer technológia segítségével köti össze a szervereket egy adattárházban. 
+A hálózat fizikai újra konfigurálására egy megoldás a Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}, ami lézer technológia segítségével köti össze a szervereket egy adatközpontban. 
 Az új technológiák új problémákat eredményeztek és új kihívások elé állították a hálózat tervezést.
 Napjainkban intenzív kutatás folyik ezen a területen.
 
 \pagebreak
 
-\subsection{Microsoft adattárház adatok}
+\subsection{Valós forgalmi adatok}
 
-Microsoft Research ProjecToR keretén belül, a szerzők adatokat gyűjtöttek Microsoft adattárházában. 
-Adatokat kétszázötvenezer szerverről rögzítettek, ami öt prductionban használt klaszterben voltak elosztva. 
+A Microsoft Research ProjecToR kutatás keretén belül, a szerzők adatokat gyűjtöttek Microsoft adatközpontokban. 
+Adatokat kétszázötvenezer szerverről rögzítettek, ami öt productionban használt klaszterben voltak elosztva. 
 
 
 \begin{figure}[h]
@@ -115,22 +115,22 @@ Adatokat kétszázötvenezer szerverről rögzítettek, ami öt prductionban has
 	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR3.png}
 	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR4.png}
 	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR5.png}
-	\caption{Microsoft adattárház adatok klaszterenként}
+	\caption{Microsoft adatközpont adatok klaszterenként}
 	\label{microsoft-clasters}
 \end{figure}
 
 Amint a \ref{microsoft-clasters} ábrán látható, a kommunikáció főleg megadott szerverek között történik.
-Korábban már említve volt, az adattárházak jelenleg a legrosszabb esetre vannak tervezve, hogy bármelyik két szerver tudjon kommunikálni.
+Korábban már említve volt, az adatközpontok jelenleg a legrosszabb esetre vannak tervezve, hogy bármelyik két szerver tudjon kommunikálni.
 Az ábrán látszik, hogy melyik szerverek között nem szükséges feltétlen direkt kapcsolatot kiépíteni, hanem elég egy már meglévő közvetett útvonalat használni, ahol kicsi a torlódás.
-Az ilyen hálózat megtervezéséhez először szükségünk van arra, hogy tudjuk milyen tervezési stratégiák vannak és, hogy az adattárházak milyen topológiával rendelkeznek jelenleg.
+Az ilyen hálózat megtervezéséhez először szükségünk van arra, hogy tudjuk milyen tervezési stratégiák vannak és, hogy az adatközpontok milyen topológiával rendelkeznek jelenleg.
 
 \subsection{Hálózat tervezési stratégiák}
 
 A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újrakonfiguráljunk, attól függően milyen terhelés éri.
 Egy hálózat korábbi kommunikációs mintái tudnak adni egy jó közelítést arra, hogyan történik a kommunikáció a szerverek között.
-Az előző példában láthattuk, hogy a Microsoft adattárházban milyen a forgalomeloszlást rögzítettek, 
+Az előző példában láthattuk, hogy a Microsoft adatközpontban milyen a forgalomeloszlást rögzítettek, 
 és ez alapján lehet majd újratervezni a hálózatot, figyelve a terheléseloszlásra.
-Lehetőség szerint, periodikus újrakonfigurálással akár még nagyobb hatékonyságot is elérhetünk az adattárházban.
+Lehetőség szerint, periodikus újrakonfigurálással akár még nagyobb hatékonyságot is elérhetünk az adatközpontokban.
 
 Két fő optimalizációs megközelítést fogunk megnézni a munka során, ezek a rövid úthossz és a minimális torlódás.
 Rövid úthossz alatt azt értjük, hogy minél kevesebb pontok kelljen áthaladnia az adatnak mielőtt az eljut a céljába, \ref{network_strategies} ábrán az (a) eset.
@@ -145,24 +145,24 @@ A cikk célja, egy olyan módszer bemutatása, ahol mindkét esetet figyelembe v
 	\label{network_strategies}
 \end{figure}
 
-\subsection{Adattárházak hálózati felépítése}
+\subsection{Adatközpontok hálózati felépítése}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\linewidth]{pictures/Traditional+Data+Center+Topology.jpg}
-	\caption{Adattárház hálózati topológiája}
+	\caption{Adatközpont hálózati topológiája}
 	\label{datacenter_topology}
 \end{figure}
 
-Mielőtt még bármi nemű átalakítást végeznénk az adattárház hálózatán, először még meg kell nézni azt, hogy hogyan is épül fel az.
-Az \ref{datacenter_topology} ábrán látható a felépítés, ahol három szintre tudjuk felosztani a hálózat architektúráját\cite{noauthor_you_nodate}\cite{noauthor_cisco_nodate}.
-Legfelső szinten van a Core réteg, ami adja a gerincét a hálózatnak, ezen a ponton érkeznek és távoznak a csomagok az adattárházból.
-A core réteg további szerepe még, hogy adatot szolgáltasson az alatta lévő Aggregációs rétegnek.
-Ez a réteg nagyobb csoportokra osztja az adattárházat és ezzel minimalizálják a routing táblák számát.
-Az aggregációs réteg továbbá szolgáltatásokat is tud nyújtani, az alatta lévő rétegnek, mint például fűzfal, load balancing és biztonságos csatlakozás.
+Mielőtt még bármi nemű átalakítást végeznénk az adatközpont hálózatán, először még meg kell nézni azt, hogy hogyan is épül fel az.
+Az \ref{datacenter_topology} ábrán látható a felépítés, ahol három szintre tudjuk felosztani a hálózat architektúráját \cite{noauthor_you_nodate} \cite{noauthor_cisco_nodate}.
+Legfelső szinten van a Core réteg, ami adja a gerincét a hálózatnak, ezen a ponton érkeznek és távoznak a csomagok az adatközpontból.
+A Core réteg további szerepe még, hogy adatot szolgáltasson az alatta lévő Aggregációs rétegnek.
+Ez a réteg nagyobb csoportokra osztja az adatközpontot, ezzel minimalizálva a routing táblák számát.
+Az aggregációs réteg további szolgáltatásokat is tud nyújtani, az alatta lévő rétegnek, mint például fűzfal, load balancing és biztonságos csatlakozás.
 A harmadik réteg pedig a Access réteg, ami Top of Rack switchek formájában nyilvánul meg.
 Ezen a ponton kapcsolódnak a szerverek fizikailag a hálózathoz.
-A Core rétegtől a ToR switchekig általában optikai kábellel van kivitelezve a hálózat. 
+A Core rétegtől a ToR switchekig általában optikai kábellel van kiépítve a hálózat. 
 ToR switchtől már hagyományos módszerekkel csatlakoznak a szerverek.
 Egy rackben nagyon sok szerver van elhelyezve, ezért azok általában egy köztes, úgy nevezett In-Rack switchre kapcsolódnak, amik végül csatlakoznak a hozzájuk legközelebbi ToR switchhez.
 
@@ -174,7 +174,7 @@ Az átlag hálózatok statikusan vannak konfigurálva, ezért nem sok lehetősé
 Egy kevésbé statikus megoldás az optikai swtich, ami képes megvalósítani az újrakonfigurálást, és ezt relatív gyorsan is csinálja.
 Az optikai switchektől egy még gyorsabb megoldás a Microsoft Research ProjecToR. 
 A \ref{projector-fig} ábrán látható eszköz szem számára láthatatlan lézer nyalábbal küld és fogad adatokat.
-Az adattárház belső kommunikációjának a gyorsítására szolgál, ezért a ToR switchek vannak lecserélve, ilyen ProjecToR eszközökre.
+Az adatközpont belső kommunikációjának a gyorsítására szolgál, ezért a ToR switchek vannak lecserélve, ilyen ProjecToR eszközökre.
 A rack tetejéről az eszköz a lézert mikrotükrökre irányítja, aminek a pontos beállíthatósága révén pontosan a megfelelő irányba tudja tükrözi tovább a nyalábot.
 Ennek az folyamatnak köszönhetően jelentősen gyorsabb átkonfigurálási időt érhetünk el mint az optikai switch.
 Váltásidő itt $12\mu s$ ami kétszázötvenezerszer gyorsabb mint az optikai switch.
@@ -188,25 +188,55 @@ Váltásidő itt $12\mu s$ ami kétszázötvenezerszer gyorsabb mint az optikai 
 
 \section{Diplomamunka célja}
 
-A diplomamunka célja a cikkben\cite{avin_demand-aware_nodate} bemutatott algoritmus implementálása, és annak alkalmazása különböző véletlen gráfokra. 
-A kapott eredményeket összehasonlítása a megadott elméleti korlátokkal.
+A diplomamunka célja a cikkben \cite{avin_demand-aware_nodate} bemutatott algoritmus implementálása.
+Ezt egy olyan környezetben megvalósítani, ahol empirikus módszerekkel tesztelhető az algoritmus hatékonysága.
+Ez mellet a keretrendszer könnyen kiegészíthető legyen tesztelés szempontjából.
+Továbbá lehetőséget biztosítson arra, hogy új algoritmust lehessen bevezetni és azt hasonlóan megvizsgálni, mint az eredetit.
+A megvalósítás így több független modulból áll, amik egyként fognak működni.
+Az így kapott összes eredményét összehasonlítjuk a cikkben megadott elméleti korlátokkal.
 
-\section{Laborban megvalósított munka}
+\section{Diplomamunka felépítése}
 
-A labor ideje alatt elkészült egy keretrendszer, ami segítségével tesztelhető a szerzők által felvázolt algoritmus. 
-A keretrendszer Python \cite{noauthor_python_nodate} nyelven íródott.
-Egy véletlen gráfok generálására a NetworkX külső csomag volt használva\cite{noauthor_networkx_nodate}.
+A diplomamunka felépítése több részre van bontva.
+\begin{itemize}
+	\item Először ismertetésre kerül az eredeti cikkben \cite{avin_demand-aware_nodate} publikált algoritmus és a hozzá tartozó szükséges háttérismeret.
+	\item A második részben szó fog esni a három véletlen gráfról, ami adta az alapot a tesztelésre.
+	\item Ezt folytatva ki lesz térve négy darab új algoritmusra, ami valamilyen szempontból változtat a fa építési stratégián annak érdekében, hogy jobb eredményt érjünk el.
+	\item A fa építési algoritmusok után, megvizsgáljuk azt az esetet, hogy mi történik, ha már a legelső lépésben módosítjuk az algoritmust, ezzel mérlegelve azt mi kerüljön valóban átépítésre a hálózatban.
+	\item Végül következik a tesztelés és annak kiértékelése, milyen teljesítményt nyújtanak a különböző algoritmusok a különböző véletlen gráfok esetén. 
+\end{itemize}
+
+
+\section{Diplomamunka eredménye}
+
+A diplomamunka véletlen gráfokkal modellezte a adatközpontokban kialakulható hálózati forgalmat.
+Az eredmények azt mutatják, hogy a cikkben meghatározott "optimális" eset egy határozottan magasabb felső korlát, mint amire valójában szükség van.
+Az cikkben felvázolt algoritmus némi helyet hagy az megvalósítónak, mivel nem teljesen írja le pár helyzetben mi a helyes lépés.
+
+Ez alapján született kettő algoritmus, az Eredeti és az EgoBalance, ami az egyik ilyen rész miatt más-más értelmezésben próbálta megoldani a felmerülő helyeztet.
+A teljesség érdekében egy másik megközelítési módszer is vizsgálva volt, mint fa építési stratégia, ami további három algoritmust eredményezett, ezek rendere a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
+Ezek az algoritmusok az úthosszt vették figyelembe és itt jól is teljesítettek, de torlódás szempontjából alul múlták a cikkben szereplőt közel egy kettes szorzóval.
+Ebből kifolyólag a cikkben szereplő algoritmus megfelelő a céljára, de nem zárja ki a lehetőséget egy másfajta javítási megközelítésre. 
+
+A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegeljük a hálózatban szereplő ténylegesen leterhelt pontokat és azokat építjük át csak.
+Ezzel elejét vehetjük az olyan esteknek, hol nincs szükség átépítésre.
+Ezzel csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el az új hálózatban.
+Ez a javítás nincs kihatással a torlódásra az esetek túlnyomó részében, de vannak elfajult esetek ahol rosszabbat eredményez.
+
 
 
 \chapter{Modell}
 
 \section{Forgalom igény tudatos hálózat tervezés probléma}
 
-\begin{itemize}
-	\item Vegyünk egy hálózatot meghatározott számú csomóponttal
-	\item A hálózathoz tartozik egy demand mátrix, ami leírja a valószínűségét annak, hogy $i$ forrásból mekkora eséllyel lesz adat küldve $j$ célba
-	\item A cél, hogy ezen adatból egy olyan hálózati séma készítése, ami kis torlódást és rövid utakat eredményez, ez mellett még skálázható is
-\end{itemize}
+Egy hálózat forgalomigényének nevezzük azt a mátrixot, mi leírja melyik csomópontok állnak kapcsolatban és mekkora valószínűséggel kommunikálnak.
+Ez a mátrix legtöbb esetben szimmetrikus, de lehetnek esetek egy oldali kommunikációra is, például egy archiváló szerver, ami nem küld vissza információt a küldőjének.
+
+Forgalom igény tudatos hálózat tervezés problémának nevezzük azt, mikor rendelkezésre áll egy meghatározott számú csomóponttal rendelkező hálózat és egy mátrix ami leírja a kommunikációs mintát.
+A mátrix elemei súlyozott valószínűségek, hogy $i$ forrásból mekkora eséllyel lesz adat küldve $j$ célba.
+A cél, hogy ezen adatból egy olyan hálózati sémát készítsünk, ami minimális torlódást és rövid utakat eredményezzen és ez mellett még skálázható is legyen nagy hálózatokra.
+
+A \ref{network_types} ábrán látható egy demand mátrix és a két megközelítés, ami alapján vizsgálni az új hálózatot.
 
 \begin{figure}[h]
 	\centering
@@ -215,18 +245,15 @@ Egy véletlen gráfok generálására a NetworkX külső csomag volt használva\
 	\label{network_types}
 \end{figure}
 
-\section{Formális felírás}
+\section{Formális definíció}
 
-\begin{itemize}
-	\item Adott $N$ darab csúcspont  $V = \{1, ..., N\}$, és egy kommunikációs séma $M_D$ ami egy $N\times N$ mátrix
-	\item A mátrix $(i, j)$ eleméhez tartozik egy $p(i, j)$ valószínűség, ahol $i$ a forrás csomópont és $j$ a cél
-	\item A bemeneti mátrix ábrázolható egy irányított
-	$G_D$ gráfban, ahol az élsúlyok a két pont közötti kommunikációs valószínűség
-	\item Az algoritmus feltétele, hogy a mátrix ritka legyen
-	\item Egy $N$ hálózatra a torlódást és az úthosszt útválasztási sémával fogjuk definiálni
-	\item Egy útválasztási séma az $N$ hálózatra $\Gamma(N)$, ami $\Gamma_{uv}$ utak halmaza, ahol $(u, v)$ párok különböző utakat jelölnek
-	\item $\Gamma_{uv}$ egy útsorozat, ami összeköti az $u$ pontot $v$ ponttal
-\end{itemize}
+Adott $N$ darab csúcspont  $V = \{1, ..., N\}$  és egy $M_D$ kommunikációs séma, ami egy $N\times N$ mátrix.
+A mátrix $(i, j)$ eleméhez tartozik egy $p(i, j)$ valószínűség, ahol $i$ a forrás, $j$ pedig cél csomópont.
+A bemeneti mátrix ábrázolható egy irányított $G_D$ gráfban, ahol az élsúlyok a két pont közötti kommunikációs valószínűséget írják le.
+Az algoritmus feltétele, hogy a \(M_D\) mátrix ritka legyen.
+Egy $N$ hálózatra a torlódást és az úthosszt az útválasztási sémával fogjuk definiálni.
+Egy útválasztási séma az $N$ hálózatra a $\Gamma(N)$, ami $\Gamma_{uv}$ utak halmaza, ahol $(u, v)$ párok különböző utakat jelölnek.
+$\Gamma_{uv}$ egy útsorozat, ami összeköti az $u$ pontot $v$ ponttal.
 
 \subsection{Torlódás}
 
@@ -234,57 +261,66 @@ Egy véletlen gráfok generálására a NetworkX külső csomag volt használva\
 	A torlódást egy \(\Gamma(N)\) útválasztási sémán a \(D\) demand mátrix segítségével írjuk fel: \[C(D, \Gamma(N)) = \max_{e \in \Gamma(N)}  \sum_{e \in \Gamma(uv)} p(u,v) \]
 \end{mydef}
 
+Szavakba foglalva, a torlódás megegyezik az útválasztási sémában szerepló legjobban leterhel úttal.
+
 \subsection{Úthossz}
 
 \begin{mydef}
-	Az átlag súlyozott úthosszt egy \(\Gamma(N)\) útválasztási sémán a \(D\) demand mátrix segítségével írjuk fel: \[L(D, \Gamma(N)) = \sum_{(u,v) \in D}  p(u,v)  \cdot d_{\Gamma(N)}(u, v) \] ahol a \(d_{\Gamma(N)}(u, v)\) az útvonal hosszát jelöli
+	Az átlag súlyozott úthosszt egy \(\Gamma(N)\) útválasztási sémán a \(D\) demand mátrix segítségével írjuk fel: \[L(D, \Gamma(N)) = \sum_{(u,v) \in D}  p(u,v)  \cdot d_{\Gamma(N)}(u, v) \] ahol a \(d_{\Gamma(N)}(u, v)\) az útvonal hosszát jelöli.
 \end{mydef}
+
+Szavakba foglalva, az átlag súlyozott úthossz, az összes út összege, ahol a csomópontok közötti utak hossza meg van szorozva a valósínűségükkel. 
 
 \subsection{Skálázhatóság}
 
-\begin{itemize}
-	\item A hálózatot skálázhatóra kell tervezni, ezért meghatározunk egy \(\Delta\) konstans fokszámot, ami a maximális csatlakozások számát fogja meghatározni egy adott csomóponthoz
-	\item \(N_\Delta\) jelölje az összes \(\Delta\) fokszámú gráfot, és elváruk, hogy \(N \in N_\Delta\)
-\end{itemize}
+A hálózatot skálázhatóra kell tervezni, ezért meghatározunk egy \(\Delta\) konstans fokszámot, ami a maximális csatlakozások számát fogja meghatározni egy adott csomóponthoz.
+\(N_\Delta\) jelölje az összes \(\Delta\) fokszámú gráfot, és elváruk, hogy \(N \in N_\Delta\).
+
 
 \subsection{Optimális torlódás}
 
-Az optimális torlódást egy  hálózatra, úgy határozzuk meg, hogy a csak a torlódást vesszük figyelembe számításkor \[C^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} C(D, \Gamma(N))\]
+
+Az optimális torlódást egy  hálózatra, úgy határozzuk meg, hogy a csak a torlódást vesszük figyelembe számításkor: 
+\[C^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} C(D, \Gamma(N))\]
+
 
 \subsection{Optimális úthossz}
 
-Az optimális úthosszt egy  hálózatra, úgy határozzuk meg, hogy a csak az úthosszt vesszük figyelembe számításkor \[L^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} L(D, \Gamma(N))\]
+Az optimális úthosszt egy  hálózatra, úgy határozzuk meg, hogy a csak az úthosszt vesszük figyelembe számításkor:
+\[L^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} L(D, \Gamma(N))\]
 
 \section{cl-DAN hálózat tervezése}
 
 \begin{mydef}
 	Adott egy \(D\) demand mátrix, és egy \(\Delta\) maximális fokszám, az \((\alpha, \beta)\)-cl-DAN hálózat tervezési probléma:
 	\begin{itemize}
-		\item Hogy tervezzünk egy olyan \(N \in N_\Delta\) hálózatot, és egy hozzá tartozó \(\Gamma(N)\) útválasztási sémát, ami közel optimális torlódásra és úthosszra is
+		\item Hogy tervezzünk egy olyan \(N \in N_\Delta\) hálózatot, és egy hozzá tartozó \(\Gamma(N)\) útválasztási sémát, ami közel optimális torlódásra és úthosszra is?
 	\end{itemize}
 	
-	Az algoritmus egy felső korlátot tud adni arra, hogy mennyivel fog eltérni a megoldás az optimálistól.
+	Az algoritmus egy felső korlátot tud adni arra, hogy mennyivel fog eltérni a megoldás az optimálistól, ami a következő:
 	\begin{itemize}
 		\item Torlódásra: \(C(D, \Gamma(N)) \le \alpha \cdot C^*(D, \Delta) + \alpha'\)
 		\item Úthosszra: \(L(D, \Gamma(N)) \le \beta \cdot L^*(D, \Delta) + \beta'\)
 	\end{itemize}
-	Az alfa vessző és béta vesszők olyan tényezők aki amik függetlenek a problémától
+	Az alfa vessző és béta vesszők olyan tényezők aki amik függetlenek a problémától.
 \end{mydef}
 
 \section{EgoTree}
 
-\begin{itemize}
-	\item Az Egofa egy torlódásra és úthosszra optimalizált fa hálózat egy csomópontra nézve
-	\item Az Egotree-t definiáljuk a következő módon, 
+Az Egófa egy torlódásra és úthosszra optimalizált fa hálózat egy csomópontra nézve.
+Az Egófát a következő módon definiáljuk:
 	
-	\(EgoTree(s, \bar{p}, \Delta) \):
+\begin{mydef}
+	Az \(EgoTree(s, \bar{p}, \Delta) \) egy fa hálózat, ahol
 	\begin{itemize}
 		\item \(s\) a forrás csomópont
 		\item \(\bar{p}\) a szomszédainak eloszlásai
 		\item \(\Delta\) fokszám
 	\end{itemize}
-	\item Ez közel optimális megoldást ad torlódásra és úthosszra
-\end{itemize}
+\end{mydef}
+
+Ez közel optimális megoldást ad torlódásra és úthosszra.
+
 
 \begin{mytetel}
 	Adott egy  \(\bar{p}\) frekvencia eloszlás az \(s\) forrás ponthoz, és adott egy \(\Delta\) fokszám, ekkor az \(EgoTree(s, \bar{p}, \Delta)\) egy \((\alpha, \beta)\)-cl-DAN a következő paraméterekkel:
@@ -294,42 +330,45 @@ Az optimális úthosszt egy  hálózatra, úgy határozzuk meg, hogy a csak az �
 	\end{itemize}
 \end{mytetel}
 
-\section{\(EgoTree(s, \bar{p}, \Delta)\) algoritmus}
+\subsection{EgoTree algoritmus}
+
+Az Egófa megépítésére a következő algoritmust használjuk:
 
 \begin{enumerate}
-	\item \(s\) a gyökér elem, \(\Delta\) fokszámmal, üres fa
-	\item Rendezzük sorba \(\bar{p} = \{p1, p2, ..., p_k\}\) valószínűségeket csökkenő sorrendben
-	\item Kezdjük rárakni a fára a csomópontokat, a gyökér elemre legfeljebb \(\Delta\) levél kerülhet
-	\item Mikor elértük a \(\Delta\) levelet, a következő csomópontokat mindig a legkisebb összesített súlyú levélre kapcsolok rá, itt már legfeljebb két levele lehet minden fának
+	\item \(s\) a gyökér elem, \(\Delta\) fokszámmal, kezdetben üres fa.
+	\item Rendezzük csökkenő sorrendbe a \(\bar{p} = \{p1, p2, ..., p_k\}\) valószínűségeket 
+	\item Kezdjük a gyökér elemre csatolni a csomópontokat, legfeljebb \(\Delta\) kapcsolat állhat fent a gyökérrel.
+	\item Mikor elértük a \(\Delta\) kapcsolatot a gyökér elemnél, a következő csomópontokat mindig a legkisebb összesített súlyú levélre kapcsolok rá, itt már legfeljebb két levele lehet minden fának.
 \end{enumerate}
 
 \subsection{Algoritmus elemzése}
 
-\begin{itemize}
-	\item A kapott eredményben látható, hogy a maximális torlódás a legnagyobb súlyú élen van
-	\item Minimalizálni ezt, lényegében egy időzítés probléma, hogy osszuk ki a munkákat \(\Delta\) processzornak, hogy minden leghamarabb kész legyen
-	\item Erre az optimális algoritmus NP-nehéz, de van közelítő módszer
-\end{itemize}
+A kapott eredményben látható, hogy a maximális torlódás a legnagyobb súlyú élen van.
+Minimalizálni ezt, lényegében egy időzítés probléma, hogy osszuk ki a munkákat \(\Delta\) processzornak, hogy a munka a leghamarabb kész legyen.
+Erre az optimális algoritmus NP-nehéz, de van közelítő módszer.
 
 \subsection{Longest Processing Time (LPT)}
 
+A Longest Processing Time algoritmus a következő:
+
 \begin{itemize}
-	\item Először sorba rendezzük a feladatokat hossz szerint csökkenő sorrendben
-	\item Ha van szabad processzor, akkor ahhoz rendeli a leghosszabb munkát
-	\item Ha nincs akkor ahhoz a processzorhoz rendeli, ahol a legkevesebb ideig tart a munka
+	\item Először rendezzük sorba a feladatokat hossz szerint csökkenő sorrendbe.
+	\item Ha van szabad processzor, akkor rendeljük hozzá a leghosszabb munkát
+	\item Ha nincs szabad processzor, akkor ahhoz a processzorhoz rendeljük hozzá a következő munkát, ahol a legkevesebb ideig tart a munka.
 \end{itemize}
+
 \begin{mytetel}
 	Legyen \(\omega_L\) a maximum idő, mielőtt egy processzor befejezi az összes munkát a mohó LPT algoritmus szerint, és \(\omega_0\) az optimális, ekkor \[\frac{\omega_L}{\omega_0} \le \frac{4}{3} - \frac{1}{3\Delta}\]
 \end{mytetel}
 
-Ez az algoritmus polinom időben lefut
+Ez az algoritmus polinom időben lefut.
 
 \begin{mylemma}
-	Az \(EgoTree(s, \bar{p}, \Delta)\) ad egy \(\frac{4}{3}\) szorzóval nagyobb közelítést a minimális torlódásra az optimális \(\Delta\) fokú fához képest, ami kiszolgál \(\bar{p}\) frekvencia eloszlást egy adott \(s\) forrás csomópontra
+	Az \(EgoTree(s, \bar{p}, \Delta)\) ad egy \(\frac{4}{3}\) szorzóval nagyobb közelítést a minimális torlódásra az optimális \(\Delta\) fokú fához képest, ami kiszolgál \(\bar{p}\) frekvencia eloszlást egy adott \(s\) forrás csomópontra.
 \end{mylemma}
 
 \begin{mylemma}
-	Az \(EgoTree(s, \bar{p}, \Delta)\) ad egy \(log^2(\Delta + 1)\) szorzóval nagyobb közelítést a minimális úthosszra az optimális \(\Delta\) fokú fához képest, ami kiszolgál \(\bar{p}\) frekvencia eloszlást egy adott \(s\) forrás csomópontra
+	Az \(EgoTree(s, \bar{p}, \Delta)\) ad egy \(log^2(\Delta + 1)\) szorzóval nagyobb közelítést a minimális úthosszra az optimális \(\Delta\) fokú fához képest, ami kiszolgál \(\bar{p}\) frekvencia eloszlást egy adott \(s\) forrás csomópontra.
 \end{mylemma}
 
 \section{cl-DAN algoritmus}
@@ -368,7 +407,7 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 		\end{itemize}
 		\item \(T'_v\) hasonlóan számítjuk ki, ezzel garantálva, hogy \(T'_u\) és \(T'_v\) közötti kommunikáció az \(l\) csomóponton keresztül fog áthaladni
 	\end{itemize}
-	\item Konstruáljuk meg az új N hálózatot, vegyük az előbb készített egofákat és vegyük az uniójukat, azaz húzzuk be az összes olyan élet amik szerepeltek a fákban
+	\item Konstruáljuk meg az új N hálózatot, vegyük az előbb készített egófákat és vegyük az uniójukat, azaz húzzuk be az összes olyan élet amik szerepeltek a fákban
 	\begin{itemize}
 		\item     De mivel nem csak magas fokú csomópontok közt történhetett adatforgalom, ezért még vegyük hozzá az N hálózathoz azokat az éleket is, ahol mindkét csomópont alacsony fokszámú volt
 	\end{itemize}
@@ -381,22 +420,24 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 A hálózat tesztelésnek céljából több különböző típusú véletlen gráfon lett tesztelve az algoritmus hatékonysága.
 A következő alfejezetekben ezek lesznek bemutatva.
 
-\subsection{Barabási-Albert gráf}
+\subsection{Barabási-Albert modell}
 
-A Barabási-Albert modell\cite{RevModPhys.74.47} a komplex hálózatok egy modellje. 
+A Barabási-Albert modell \cite{RevModPhys.74.47} a komplex hálózatok egy modellje. 
 A \(G(n, m)\) gráf felépítése az úgy nevezett "preferential attachment" mechanizmust használja, ami kimondja, hogy az újonnan becsatlakozó csomópontnak \(m\) már a hálózatban szereplő csomópontra kell kapcsolódnia. A \ref{barabasi} ábrán látható a gráf eredménye, attól függően, hogyan választjuk meg az \(m\) értéket.
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.9\linewidth]{pictures/Barabasi_albert_graph.eps}
-		\caption{Barabási-Albert gráf}
+		\caption{Barabási-Albert gráf \cite{wikipedia_barabasi}}
 		\label{barabasi}
 	\end{center}
 \end{figure}
 
-\subsection{Erdős-Rényi gráf}
+\pagebreak
 
-Az Erdős-Rényi modell\cite{erdos59a} a véletlen gráfok előállítására szolgáló modell.
+\subsection{Erdős-Rényi modell}
+
+Az Erdős-Rényi modell \cite{erdos59a} a véletlen gráfok előállítására szolgáló modell.
 A modellnek két változata van, amik szorosan összefüggenek.
 \begin{itemize}
 	\item A \(G(n, M)\) modellben egyenletes eloszlás szerint választunk egyet az összes lehetséges \(n\) csúcsú gráf közül, ahol az élek száma \(M\).
@@ -408,7 +449,7 @@ A \ref{erdos} ábrán látható egy lehetséges véletlen gráf \(p=0.01\) való
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.9\linewidth]{pictures/Erdos_generated_network-p001.jpg}
-		\caption{Erdős-Rényi gráf \(p=0.01\) valószínűséggel}
+		\caption{Erdős-Rényi gráf \(p=0.01\) valószínűséggel \cite{wikipedia_erdos}}
 		\label{erdos}
 	\end{center}
 \end{figure}
@@ -425,20 +466,20 @@ A munka során használt véletlen csillaggráfokban a csillagok számát lehet 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.4\linewidth]{pictures/Star_network_7.eps}
-		\caption{Csillaggráf hét fokszámmal, \(S_7\)}
+		\caption{Csillaggráf hét fokszámmal, \(S_7\) \cite{wikipedia_csillag}}
 		\label{star}
 	\end{center}
 \end{figure}
 
 \section{Fa építési stratégiák}
 
-A cikkben\cite{avin_demand-aware_nodate} már szereplő Egófa algoritmusából kiindulva több különböző fa építési stratégia is meg lett valósítva.
+A cikkben \cite{avin_demand-aware_nodate} már szereplő Egófa algoritmusából kiindulva több különböző fa építési stratégia is meg lett valósítva.
 A különböző fa építési stratégiák más-más szempontból közelítik meg a problémát.
 
 \subsection{EgoBalance}
 
 Az EgoBalance algoritmus majdnem teljes mértékben megegyezik az eredetivel.
-A cikk szerzői az Egofa algoritmus vázlatos összefoglalásában használtak egy csere lépést.
+A cikk szerzői az Egófa algoritmus vázlatos összefoglalásában használtak egy csere lépést.
 A csere lépés lényege, hogy mikor megépítettük a fát egy magas csúcsra, akkor a fában minden szomszédja megjelenik.
 A szomszédok között megtalálhatók a magas-magas fokszámú kapcsolatok, amiket ki kell cserélni a segítő csúcsokra.
 Három esetet különböztetünk meg itt, attól függően hol helyezkedik el a segítő csúcs a fában.
@@ -449,23 +490,26 @@ Mikor a segítő csúcs közelebb van a gyökérhez, akkor töröljük a magas p
 Ellenkező esetben, mikor magas pont helyezkedik el közelebb a forráshoz, akkor a segítő csúcs átveszi a helyét és gyerekeit, majd a segítő leveleinek kell új szülő csúcsot találni. 
 Ezt úgy oldja meg az eredeti algoritmus, hogy a nehezebb levél csúcs lesz az új szülő és a könnyebb csomópontnak ő lesz a szülője.
 
+\pagebreak
+
 Egy lehetséges eset ilyenkor, hogy az új szülő csúcsnak már ki van töltve mindkét levele, ekkor a szülő könnyebb levele fog egyel lejjebb szintre kerülni.
 Ezt a folyamatot addig ismételjük, még minden levél nem kerül egy megfelelő helyre.
-Az Egobalance logaritmus a függő pontok újra elhelyezését az Egofára bízza, azaz újra elosztásra kerülnek.
+
+Az Egobalance algoritmus a függő pontok újra elhelyezését az Egófára bízza, azaz újra elosztásra kerülnek.
 Ezzel elméletben mindig arra törekszik az algoritmus, hogy optimális legyen torlódásra nézve az új fa.
 Lényegi különbség úthossznál jelentkezik az eredetivel szemben.
 
 \subsection{Huffman fa}
 
-A eddigi két algoritmus az Egofát\cite{avin_demand-aware_nodate} használta, ami optimális torlódásra nézve, de mivel a hálózat nem csak torlódás szempontjából van vizsgálva, ezért meg kell vizsgálni a másik aspektust is, az optimális úthosszt.
-A Huffman kódolásnál\cite{huf52} használt fa tulajdonsága, hogy átlagosan rövidek legyenek az utak attól függően milyen gyakori egy elem.
+A eddigi két algoritmus az Egófát \cite{avin_demand-aware_nodate} használta, ami optimális torlódásra nézve, de mivel a hálózat nem csak torlódás szempontjából van vizsgálva, ezért meg kell vizsgálni a másik aspektust is, az optimális úthosszt.
+A Huffman kódolásnál \cite{huf52} használt fa tulajdonsága, hogy átlagosan rövidek legyenek az utak attól függően milyen gyakori egy elem.
 A cl-Dan probléma is ezt a tényezőt használja, ezért kitűnően lehet használni ezt a fát a hálózat alapjának.
 Egyetlen probléma a Huffman fával az, hogy a belső csomópontok nem tartalmaznak számunkra hasznos információt.
-Ezért szükséges egy kiegészítő lépés, ami segítségével belső pontok is ki lesznek töltve, azaz esetünkben csomópontokat fognak reprezentálni mint a levelek.
+Ezért szükséges egy kiegészítő lépés, ami segítségével belső pontok is ki lesznek töltve, azaz esetünkben csomópontokat fognak reprezentálni, mint a levelek.
 
 Az algoritmus első része teljesen megegyezik a Huffman kódolással.
-Rendezzük sorba növekedően a pontokat, és kettesével vonjuk össze őket, még nem kapunk egy teljes fát.
-Mint az Egofáknál, úgy a Huffman fánál is a legfelső szinten \(n\) darab csúcsot tudunk a forrás pontra kapcsolni.
+Rendezzük sorba növekedően a valószínűségeket, és kettesével vonjuk össze őket, még nem kapunk egy teljes fát.
+Mint az Egófáknál, úgy a Huffman fánál is a legfelső szinten \(n\) darab csúcsot tudunk a forrás pontra kapcsolni.
 Az összes többi alacsonyabb pont pedig marad bináris.
 
 A belső csúcsok kitöltésére a gyökér ágain a következő algoritmust végezzük el:
@@ -483,15 +527,15 @@ Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet
 
 \subsection{Sorfolytonos fa}
 
-Mint láthattuk korábban a Huffman fánál, a levelek felfelé mozgatását sorfolytonosan valósítottuk meg. A sorfolyonos fa is hasonló elvet követ.
+Mint láthattuk korábban a Huffman fa alapú algoritmusnál, a levelek felfelé mozgatását sorfolytonosan valósítottuk meg. A sorfolyonos fa is hasonló elvet követ.
 Lényegi különbség a kettő fa között, hogy a Huffman kódolási algoritmust kihagyjuk, és egyenest sorfolytonosan rakjuk fel csúcsokat a fa építésekor.
 Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem veszi figyelembe.
 
 \subsection{Random fa}
 
-Az eddigi fa építési stratégiák mindegyike valamilyen szempontból próbált egy jobb útválasztási sémát létrehozni.
-A Random fa olyan megközelítést használ, hogy szimulálja azt ha valaki véletlenszerűen kötögetné össze a csomópontokat.
-Az így létrehozott fák semmit nem használ olyan információt ami hatékonyabb eredményhez vezetne.
+Az eddigi fa építési stratégiák mindegyike valamilyen szempontból próbált egy jobb fát eredményezni.
+A Random fa olyan megközelítést használ, hogy szimulálja azt, ha valaki véletlenszerűen kötögetné össze a csomópontokat.
+Az így létrehozott fá nem használ semmi olyan információt ami hatékonyabb eredményhez vezetne.
 Az algoritmus a már korábban használt Sorfolytonos fára épít, azaz a csomópontokat sorfolytonosan helyezzük el.
 Egyetlen változás az algoritmusban, a fához tartozó vektor ami tartalmazza a kommunikációs valószínűségeket nincs sorba rendezve, hanem ötször meg vannak benne keverve az elemek. 
 
@@ -499,7 +543,7 @@ Egyetlen változás az algoritmusban, a fához tartozó vektor ami tartalmazza a
 \section{Módosított fa építés}
 
 
-A cikkben\cite{avin_demand-aware_nodate} szereplő cl-DAN algoritmus első lépése a csomópontok besorolása magas és alacsony halmazokba a fokszámuk alapján. 
+A cikkben \cite{avin_demand-aware_nodate} szereplő cl-DAN algoritmus első lépése a csomópontok besorolása magas és alacsony halmazokba a fokszámuk alapján. 
 A szerzők itt fele-fele arányban osztják el a pontokat és egy hozzáadott feltételként megnézik, hogy az alacsony fokszámúak között szerepel-e olyan csomópont, aminek a fokszáma meghaladja \(2\rho\)-t, azaz a kétszeres átlag fokszámot.
 
 A általam módosított cl-DAN algoritmus ezt a kiegészítő szabályt veszi alapul.
@@ -525,7 +569,7 @@ A módosított algoritmus nem lesz rosszabb mint az eredeti algoritmus, mivel ot
 
 \section{Keretrendszer}
 
-A keretrendszer Python 3 nyelven íródott, és a Networkx külső csomag volt használva a véletlen gráfok generálására.
+A keretrendszer Python 3 \cite{noauthor_python_nodate} nyelven íródott és a Networkx \cite{noauthor_networkx_nodate} külső csomag volt használva a véletlen gráfok generálására.
 A példakód megtalálható futtatható hagyományos Python programként és Jupyter notebookban \cite{noauthor_jupyter_nodate}.  
 Networkx csomag továbbá biztosít számunkra egy megjelenítési lehetőséget, amit a Jupyter notebookban tudunk legjobban kihasználni.
 Az adatok feldolgozása és kiértékelése is Jupyter notebookban történt. 
@@ -540,7 +584,7 @@ A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
 	\item \textbf{Edge} - a gráf pontjait összekötő él reprezentációja, ami \textit{Vertexet} vár paraméterként, és tartalmazza a kommunikációs valószínűséget, hasonlóan mint a \textit{Node}
 	\item \textbf{Tree} - ami adja az alapját majd a útvonal tervezési sémának. A fának két fajtája van megvalósítva:
 	\begin{itemize}
-		\item \textbf{EgoTree} - a $\Delta$ fokú Egofa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet
+		\item \textbf{EgoTree} - a $\Delta$ fokú Egófa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet
 		\item \textbf{HuffmanDanTree} - a $\Delta$ fokú Huffman fa, ahol a gyökérnek legfeljebb $\Delta$ levele lehet és a belső csúcsok állhatnak üresen
 	\end{itemize}
 	
@@ -594,7 +638,7 @@ Egy így megadott helyes konfiguráció pedig a következő:
 Fontos paraméterek az ilyen konfiguráció esetén a következők:
 \begin{itemize}
 	\item $graph$ - itt adjuk meg a bemeneti gráf típusát, esetünkben ez $"manual"$, azaz ezt a megadott mátrixot fogja használni az algoritmus.
-	\item $dan$ - ez a paraméter határozza meg a maximum fokszámot a magas fokú csomópontokra, itt megadható konkrét érték pl. 3, dinamikus érték pl. $"6d"$ vagy $null$ ami ekvivalens a $"12d"$ értékkel, ami a cikkben\cite{avin_demand-aware_nodate} meghatározott felső korlát.
+	\item $dan$ - ez a paraméter határozza meg a maximum fokszámot a magas fokú csomópontokra, itt megadható konkrét érték pl. 3, dinamikus érték pl. $"6d"$ vagy $null$ ami ekvivalens a $"12d"$ értékkel, ami a cikkben \cite{avin_demand-aware_nodate} meghatározott felső korlát.
 	\item $demand$ - maga a demand mátrix, listák listájaként egy négyzetes mátrix, ahol a diagonális elemek értéke $0$, mivel önmagával való kommunikáció nem befolyásolja a hálózatot
 \end{itemize}
 
@@ -752,7 +796,7 @@ Tesztek különböző metrikák alapján lettek kiértékelve, amit a következ�
 \section{Entrópia}
 
 A különböző gráf típusok különböző entrópiával rendelkeznek.
-Az entrópia diszkrét valószínűségi változóra felírható a következő képlettel\cite{DBLP:journals/corr/AvinMS17}:  
+Az entrópia diszkrét valószínűségi változóra felírható a következő képlettel \cite{DBLP:journals/corr/AvinMS17}:  
 
 \[H(X) = \sum_{i=1}^{n} p(x_i) \cdot log_2\frac{1}{p(x_i)}; \; \forall i\in[1, ..., n] \land x_i = \sum_{1}^{n} demaind\_matix[i][n]\] 
 
@@ -1020,12 +1064,12 @@ Szóval a torlódás összpontosul egy helyre, erre pedig példa a \ref{inbalanc
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[width=0.7\linewidth]{pictures/Figure_5.png}
-		\caption{Csillaggráf - Egofa az eredeti algoritmus alapján}
+		\caption{Csillaggráf - Egófa az eredeti algoritmus alapján}
 		\label{inbalance}
 	\end{center}
 \end{figure}
 
-A hálózat ami ezt az Egofát eredményezte az 30 csomópontból áll, 5 csillagot tartalmaz és maximális $\Delta$ fokszám pedig 12. 
+A hálózat ami ezt az Egófát eredményezte az 30 csomópontból áll, 5 csillagot tartalmaz és maximális $\Delta$ fokszám pedig 12. 
 Mint látható egységesen helyezkednek el a csomópontok és a legtávolabbi levél is csak kettő mélységre helyezkedik el.
 Abban az esetben, mikor a csomópontokból relatív kevés van, és alacsony fák kapcsolódnak a torlódás is várhatóan alacsony lesz. 
 Ahogy nő a csomópontok száma és eléri a többszörösét a maximális fokszámnak, nehéz utak alakulnak ki és így növekszik a torlódás is.
