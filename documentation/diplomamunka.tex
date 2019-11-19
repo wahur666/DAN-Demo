@@ -542,7 +542,7 @@ Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet
 		\item Ezt addig csináljuk elemek száma nem éri el a maximális fokszámot, $\Delta$-át
 	\end{enumerate}
 	\item Itt megépítettük a Huffman fát, ahol még nincsenek kitöltve a belső csomópontok
-	\item A köztes csomópontok kitöltése a következő módon történik
+	\item A köztes csomópontok kitöltése a következő módon történik:
 	\begin{enumerate}
 		\item A gyökérre kapcsolódó ágakon gyűjtsük össze az összes levelet
 		\item Rendezzük sorba a leveleket nehézség szerint csökkenő sorrendbe
@@ -1122,29 +1122,29 @@ Ahogy nő a csomópontok száma és eléri a többszörösét a maximális foksz
 
 \section{Diplomamunka eredménye}
 
-A diplomamunka keretén belül feldolgozásra került a \cite{avin_demand-aware_nodate}.
+A diplomamunka keretén belül feldolgozásra került a Demand-Aware Network Design with Minimal Congestion and Route Lengths \cite{avin_demand-aware_nodate} cikk.
 A szerzők arra kerestek megoldást, hogy lehetne csökkenteni a torlást és az úthosszt az adatközpontokban.
 A felvázolt megoldásuk mellett adtak egy felső korlátot, amivel az algoritmus ad egy közel optimális megoldást.
 
 \subsection{Keretrendszer}
 
-A diplomatikusában megvalósít keretrendszer segítségével a megoldásuk gyakorlati tesztelés alá lett vetve.
+A diplomatikusában megvalósít keretrendszer segítségével a szerzők megoldása gyakorlati tesztelés alá lett vetve.
 Itt több fajta véletlen gráffal lett szimulálva a lehetséges hálózatok és az azokon folyó adatforgalom.
-Az Erdős-Rényi modell segítségével modelleztük azt az esetet mikor a kommunikáció egyenletesen eloszlik a hálózaton és nem centralizálódik több nagyobb szerver köré a forgalom.
+Az Erdős-Rényi modell segítségével modelleztük azt az esetet, mikor a kommunikáció egyenletesen eloszlik a hálózaton és nem centralizálódik több nagyobb szerver köré a forgalom.
 A Barabási-Albert modell segítségével már nagyobb klasztereket kaptunk, mivel akik később csatlakoztak, azok mindig választottak még $m$ régi csomópontot.
-Így a legelsők voltak a hálózatban nagyobb eséllyel kaptak új kapcsolatokat.
-Végül pedig az extrém eset, a csillag gráf, mikor több nagyobb csomópont köré összpontosul a forgalom.
+Így a legelsők a hálózatban nagyobb eséllyel kaptak több kapcsolatot.
+Végül pedig az extrém eset, a csillaggráf, mikor több nagyobb csomópont köré összpontosul a forgalom.
 
 Az így megkonstruált gráfokon az eredmények azt mutatják, hogy a cikkben meghatározott "optimális" eset egy határozottan magasabb felső korlát, mint amire valójában szükség van.
 A megadott $\Delta = 12\rho$ fokszám egy túl nagy felső korlát, mivel olyan gyorsan nő ez a szám, hogy már $\Delta = 4\rho$ esetben is, az algoritmus lefuttatása után bőven meghaladja a valóban szükséges fokszámot.
-Ez azt eredményezi, hogy az összes kapcsolat, egy köztes segítő csomóponttal, majdnem direkt összekapcsolódnak.
+Ez azt eredményezi, hogy az összes kapcsolat egy köztes segítő csomópont segítségével majdnem direkt kapcsolódik.
 Ezért nem tudnak elég magas fák kialakulni, hogy a különböző algoritmusok érdemi különbséget nyújtsanak.
-Így tesztelés során, egy jól megválaszolt korlát mellett voltak a tesztek lefuttatva. 
-Az alapját a piacon jelenleg forgalomban lévő switchek portjainak száma alapján lettek megválasztva, ami $\Delta \in [10, 16, 24, 48]$ lett.
+Így tesztelés során, egy jól meghatározott korlát segítségével voltak a tesztek lefuttatva. 
+Az korlát alapját a piacon jelenleg forgalomban lévő Ethernet switch portok száma adta, ami $\Delta \in [10, 16, 24, 48]$ lett.
 
 \subsection{Algoritmusok}
 
-Az cikkben megfogalmazott cl-Dan algoritmus helyet hagy még némi finomításnak a részletek terén, mivel nem teljesen írja le pár helyzetben mi a helyes lépés.
+Az cikkben megfogalmazott cl-Dan algoritmus hagy némi helyet az implementálónak a részletek terén, mivel nem teljesen írja le egy helyzetben a helyes lépést.
 Ez alapján született kettő algoritmus, az Eredeti és az EgoBalance, ami a csere lépésben felmerülő szülő nélkül maradt gyerekek újra csatlakoztatását hivatott megoldani.
 Itt az Eredeti helyben mozgatta át a nehezebb gyereket a szülő pozíciójára, addig az EgoBalance egy természetesebb, az alapul szolgáló adatstruktúrára bízta az újra eloszlást.
 Eredmény szempontjából a kettő algoritmus nagyon hasonló, és lényegbeli különbség a mérési hiba korlátain belül szerepel.
@@ -1152,15 +1152,15 @@ Eredmény szempontjából a kettő algoritmus nagyon hasonló, és lényegbeli k
 Annak érdekében, hogy a valós hozzávetési alapunk legyen a módszer teljesítményéhez további másik fa építési módszerek is meg lettek vizsgálva.
 Ezek alapjául a Huffman fa szolgált és ezekből lett három különböző algoritmus, amik rendre a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
 
-A Huffman kódolásban is használt fá lett az első algoritmus, ami az úthosszt hivatott javítani.
+A Huffman kódolásban is használt fa lett az első algoritmus, ami az úthosszt hivatott javítani.
 Ennek eredménye helyenként tényleg jobb lett, mint az Eredeti esetben, de mivel nem csak ez az egy szempontból kell jól teljesíteni, így figyelembe kell venni a torlódást is.
-Ebből a szempontból már határozottan nem teljesített jól, mert a Huffman fa ágai között akár $1.5x$ szorzó különbség előfordulhat, így leterhelt utak jönnek létre. 
+Ebből a szempontból már határozottan nem teljesített jól, mert a Huffman fa ágai között akár másfélszeres szorzó különbség előfordulhat, így leterhelt utak jönnek létre. 
 
 Következő algoritmus ami létrejött az a Sorfolytonos fa.
 Itt egyelten szempont volt figyelembe véve, építsünk egy teljes fát.
 Ezzel a módszerrel mindig a legkisebb fák jöttek létre és így ez eredményezte mindig a legrövidebb utakat.
-Torlódás szempontjából ugyan olyan rosszul teljesített mint a Huffman fa, mivel itt sem volt figyelme véve ez a szempont.
-Mivel ez volt a legjobb úthosszra adott algoritmus, lehet érdemes lenne egy további kutatás folytatni annak a célnak az érdekében, hogy hogyan lehet a torlódást javítani egy ilyen hálózatban.
+Torlódás szempontjából ugyanolyan rosszul teljesített mint a Huffman fa, mivel itt sem volt figyelme véve ez a szempont.
+Mivel ez volt a legjobb úthosszra adott algoritmus, lehet érdemes lenne további kutatás folytatni annak érdekében, hogy hogyan lehet a torlódást javítani egy ilyen hálózatban.
 
 Végül a Random fa, ami nem különbözik különösebben a Sorfolyotnostól.
 Ennek az eredménye sem lett jobb, mint amire épül, ám lehetőség van arra, ha épp úgy helyezkednek el az elemek, hogy az torlódás szempontjából is kedvező, akkor van némi esély arra, jobb eredményt ad.
@@ -1173,9 +1173,9 @@ Ezekből az eredményekből az látszik, hogy a cikkben szereplő algoritmus meg
 
 A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegeljük a hálózatban szereplő ténylegesen leterhelt pontokat.
 Ezzel célzottabban tudjuk a hálózat kritikus pontjait orvosolni és elejét vehetjük az olyan esteknek, hol nincs szükség átépítésre.
-Ezzel csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el az új hálózatban a legtöbb esetben.
+Ezzel csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el a legtöbb esetben.
 Mivel ez a megközelítés csak finomítja a cl-Dan első lépését, ami alapján osztályozzuk a pontokat, így legrosszabb esetben is visszaértünk a kiindulási algoritmushoz és soha nem lesz rosszabb attól.
-A mérések azt mutatják, hogy az úthossz határozottan csökken, ám ez a javítás nincs kihatással a torlódásra az esetek túlnyomó részében, de vannak elfajult esetek ahol rosszabbat eredményez.
+A mérések azt mutatják, hogy az úthossz határozottan csökken, de a torlódásra az esetek túlnyomó részében nincs kihatással, ám vannak elfajult esetek, ahol rosszabbat eredményez.
 
 \section{Konklúzió}
 
