@@ -341,6 +341,19 @@ Az Egófa megépítésére a következő algoritmust használjuk:
 	\item Mikor elértük a \(\Delta\) kapcsolatot a gyökér elemnél, a következő csomópontokat mindig a legkisebb összesített súlyú levélre kapcsolok rá, itt már legfeljebb két levele lehet minden fának.
 \end{enumerate}
 
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/egofa1.png}
+		\includegraphics[width=0.49\linewidth]{pictures/egofa2.png}
+		\includegraphics[width=0.49\linewidth]{pictures/egofa3.png}
+		\includegraphics[width=0.49\linewidth]{pictures/egofa4.png}
+		\caption{Egófa algoritmus lépéseinek vizualizációja a következő valószínűségekre: 
+			\( \{.24, .2, .1, .1, .1, .1, .07, .05, .02, .01, .01\}\)}
+		\label{egotree-algorithm}
+	\end{center}
+\end{figure}
+
+
 \subsection{Algoritmus elemzése}
 
 A kapott eredményben látható, hogy a maximális torlódás a legnagyobb súlyú élen van.
@@ -550,6 +563,20 @@ Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet
 	\end{enumerate} 
 \end{itemize}
 
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/huffman1.png}
+		\includegraphics[width=0.49\linewidth]{pictures/huffman2.png}
+		\includegraphics[width=0.49\linewidth]{pictures/huffman3.png}
+		\includegraphics[width=0.49\linewidth]{pictures/huffman4.png}
+		\includegraphics[width=0.49\linewidth]{pictures/huffman5.png}
+		\includegraphics[width=0.49\linewidth]{pictures/huffman6.png}
+		\caption{Huffman fa algoritmus lépéseinek vizualizációja a következő valószínűségekre: 
+			 \( \{.24, .2, .1, .1, .1, .1, .07, .05, .02, .01, .01\}\) }
+		\label{huffman-algorithm}
+	\end{center}
+\end{figure}
+
 
 \subsection{Sorfolytonos fa}
 
@@ -567,6 +594,19 @@ Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem ves
 		\item Építsünk teljes fát, ahol $\Delta$ csomópont kapcsolódik a gyökér elemre
 	\end{enumerate}
 \end{itemize}
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.49\linewidth]{pictures/bfs1.png}
+		\includegraphics[width=0.49\linewidth]{pictures/bfs2.png}
+		\includegraphics[width=0.49\linewidth]{pictures/bfs3.png}
+		\includegraphics[width=0.49\linewidth]{pictures/bfs4.png}
+		\caption{Sorfolytonos algoritmus lépéseinek vizualizációja a következő valószínűségekre: 
+			\( \{.24, .2, .1, .1, .1, .1, .07, .05, .02, .01, .01\}\)}
+		\label{bfs-algorithm}
+	\end{center}
+\end{figure}
+
 
 
 \subsection{Random fa}
