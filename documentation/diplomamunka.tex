@@ -687,23 +687,23 @@ A modell alapját pár egyszerű alaptípus adja. Ezek rendre a következők:
 \section{Hálózat modell}
 
 A \textbf{Network} osztály valósítja meg az algoritmus legnagyobb részét, de magában nem használható, mivel nem tartalmazza a fa építési stratégiát.
-Ahhoz, hogy a teljes legyen az osztály, le kell származtatni és meg kell valósítani milyen algoritmussal építse meg a fákat.
+Ahhoz, hogy teljes legyen az osztály, le kell származtatni és meg kell valósítani milyen algoritmussal építse meg a fákat.
 Ennek segítségével nagyon egyszerűen lehet új algoritmust illeszteni a már meglévő rendszerhez.
 
 A Network osztály bemenete a demand mátrix, kimenete egy útválasztási séma.
 Az algoritmus futtatásához szükség van még egy paraméterre, ahol megadjuk a maximális fokszámot a rendszernek, ami alapján elkészülnek a fák.
-Itt kettő lehetőségünk van, kötött és dinamikus fokszám, attól függően mit szeretnénk elérni.
+Itt két lehetőségünk van, kötött és dinamikus fokszám, attól függően mit szeretnénk elérni.
 A dinamikus fokszám esetén az átlag fokszám függvényében lehet megadni a maximális fokszámot.
 Erre egy példa a "6d", ahol azt fejezzük ki, hogy az átlag fokszám hatszorosát szeretnénk használni az adott gráfban, mint maximális fokszám a megépítendő fák esetén.
 Az útválasztási séma létrehozásakor a csere lépéssorozatot követően megváltozik a demand mátrix, ezért fontos, hogy a \(\Delta\) fokszámot ne haladjuk meg, de ez nem garantált.
 Az algoritmus kimenete mellett további metaadatok tartalmazzák a kiszámított maximális $\Delta$ fokszámot és a valós fokszámot.
-A valós fokszám adja azt a fokszámot amire algoritmusnak tényleg szüksége volt.  
-Ezekből az adatból lehet következtetést levonni, hogy valóban megfelelő-e a felső korlátja az algoritmusnak, amit a szerzők adtak és lehetőséget ad egy jobb felső korlát becslésre. 
+A valós fokszám adja azt a fokszámot, amire az algoritmusnak tényleg szüksége volt.  
+Ezekből az adatokból lehet következtetést levonni, hogy valóban megfelelő-e a felső korlátja az algoritmusnak, amit a szerzők adtak és lehetőséget ad egy jobb felső korlát becslésre. 
 
 
-Az algoritmushoz szükséges bemeneti demand mátrix több módos is megadható konfiguráción keresztül.
-A konfigurációk egy  \textit{JSON} fájl tartalmazza, amiben egyszerre több konfiguráció is megadható. 
-A lehetséges konfigurációk pedig a következők módon adhatók meg.
+Az algoritmushoz szükséges bemeneti demand mátrix több módon is megadható konfiguráción keresztül.
+A konfigurációt egy  \textit{JSON} fájl tartalmazza, amiben egyszerre több konfiguráció is megadható. 
+A lehetséges konfigurációk pedig a következő módon adhatók meg.
 
 Először is, van lehetőségünk egy konkrét mátrixra elkészíteni az útválasztási sémát.
 Egy így megadott helyes konfiguráció pedig a következő:
@@ -778,7 +778,7 @@ A paraméterek rendre a következők:
 
 \section{Kimenet}
 
-Az program kimenete, az algoritmus által kiszámolt metrikák köztük az átlag súlyozott úthossz és a torlódás. 
+A program kimenete az algoritmus által kiszámolt metrikák, köztük az átlag súlyozott úthossz és a torlódás. 
 Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egófák és az új hálózat 
 útválasztási sémája lesz kirajzolva.
 
@@ -790,7 +790,7 @@ Ha a rajzolás opció be van kapcsolva, akkor a kiindulási hálózat, az egóf�
 	\end{center}
 \end{figure}
 
-A \ref{starting-network} ábrán látható a bemeneti hálózat, aminek a demand mátrixa már a korábban fel lett írva. Az algoritmus ezek után a cl-DAN algoritmust használva, először elkészíti az egófákat \ref{ego-trees} ábra, majd végül az új hálózat választási sémát ami a \ref{routing-scheme} ábrán látható.
+A \ref{starting-network} ábrán látható a bemeneti hálózat, aminek a demand mátrixa már korábban fel lett írva. Az algoritmus ezek után a cl-DAN algoritmust használva, először elkészíti az egófákat \ref{ego-trees} ábra, majd végül az új hálózat választási sémát, ami a \ref{routing-scheme} ábrán látható.
 
 \begin{figure}[H]
 	\begin{center}
@@ -806,7 +806,7 @@ A \ref{starting-network} ábrán látható a bemeneti hálózat, aminek a demand
 A \ref{routing-scheme} ábrán látható gráfon pár extra információ megfigyelhető. 
 Pirosra vannak festve a magas fokszámú csúcsok és zöldre az alacsony fokszámúak.
 Az algoritmus fő célja az volt, hogy ne legyen egymással közvetlen kapcsolatban két magas fokszámú csúcs, azaz ne legyen két piros csúcs összekötve, és ez maradéktalanul teljesül is.
-Két magas fokszú csúcs csak egy alacsony fokszámú segítő csúcson keresztül tud kommunikálni.
+Két magas fokú csúcs csak egy alacsony fokszámú segítő csúcson keresztül tud kommunikálni.
 Fokszámok szempontjából a csúcsok rendben vannak, mivel nem haladják meg $\Delta$ fokszámot. 
 A gráf esetén a delta \(\Delta = 12\rho = 12 \cdot \lceil\frac{25}{7}\rceil = 43  \).
 
@@ -834,8 +834,8 @@ A megfelelő teszt mennyiség eléréséhez véletlen gráfok lettek generálva.
 Mind a három gráf típus lett tesztelésre használva, ezek paramétere pedig változott egy és tíz között.
 
 A különböző kapacitás szimulálására a maximum fokszám meg lett határozva, hogy a 
-következő halmaz elemit veheti fel $\Delta\in[10, 16, 24, 48]$.
-A tesztek segítségével ki lett mutatva, hogy egy ponton túl, már annyira nagy lesz a $\Delta$ értéke dinamikus esetben, hogy minden csúcs a gyökérre kapcsolódik.
+következő halmaz elemeit veheti fel $\Delta\in[10, 16, 24, 48]$.
+A tesztek segítségével ki lett mutatva, hogy egy ponton túl már annyira nagy lesz a $\Delta$ értéke dinamikus esetben, hogy minden csúcs a gyökérre kapcsolódik.
 Ezzel teljesen értelmét vesztve, hogy milyen fa építési stratégia volt használva, mivel a fa nem éri azt az elemszámot, hogy legyen nem direkt csatlakozó csomópont a gyökérhez. 
 A \ref{delta} ábrán látható ez:  
 
@@ -851,10 +851,10 @@ A \ref{delta} ábrán látható ez:
 A következő szempont amiben változtak a gráfok, hogy mekkora terhelés legyen az éleken.
 Itt két csoportba lehet sorolni a teszteket, ahol egytől tízig véletlenszerűen volt kiválasztva, a második esetben pedig minden él egységesen egy terhelést kapott.
 
-Következő szempont amit figyelve volt az maga az algoritmus változtatása, hogy mennyi fa készüljön el, és hogy milyen stratégiával.
+Következő szempont, amit figyelve volt, az maga az algoritmus változtatása, hogy mennyi fa készüljön el, és hogy milyen stratégiával.
 
-Végül pedig, hogy a mérési hiba minimalizálásának érdekében az fent említett paraméterek összes kombinációjára húsz teszt futott le. 
-Összességében 384.000 teszt készült le, amit meg lehet találni a projekt GitHub oldalán.
+Végül pedig, hogy a mérési hiba minimalizálásának érdekében a fent említett paraméterek összes kombinációjára húsz teszt futott le. 
+Összességében 384.000 teszt készült el, amit meg lehet találni a projekt GitHub oldalán.
 
 \section{Metrikák}
 
@@ -885,13 +885,13 @@ Tesztek különböző metrikák alapján lettek kiértékelve, amik a következ�
 \section{Entrópia}
 
 A különböző gráf típusok különböző entrópiával rendelkeznek.
-Az entrópia diszkrét valószínűségi változóra felírható a következő képlettel \cite{DBLP:journals/corr/AvinMS17}:  
+Az entrópia diszkrét valószínűségi változóra felírható a következő képlet \cite{DBLP:journals/corr/AvinMS17}:  
 
 \[H(X) = \sum_{i=1}^{n} p(x_i) \cdot log_2\frac{1}{p(x_i)}; \; \forall i\in[1, ..., n] \land x_i = \sum_{1}^{n} demaind\_matix[i][n]\] 
 
 Megjegyzés: mikor \(0\cdot log_2\frac{1}{0}\) értéket vesz fel az \(x_i\) változó, akkor legyen \(x_i=0\). 
 Legyen \(\bar{p}\) a demand mátrix, ekkor \(H(\bar{p})\) megegyezik a következővel \(H(p_1, p_2, ..., p_n)\), ahol \(p_i\) a mátrix egy sorában szereplő valószínűségek összege.
-Ha teljesül, hogy \(p_i > 0\) és $\sum_{i}p_i = 1$ és a \(\bar{p}\) egyenletes eloszlást követ, akkor a véletlen gráfban az entrópiára felső korlátja \(H(\bar{p}) = \log n\), ahol $n$ a csomópontok száma.
+Ha teljesül, hogy \(p_i > 0\) és $\sum_{i}p_i = 1$ és a \(\bar{p}\) egyenletes eloszlást követ, akkor a véletlen gráfban az entrópia felső korlátja \(H(\bar{p}) = \log n\), ahol $n$ a csomópontok száma.
 
 A fenti képlet segítségével ki lehet számolni az entrópiát a különböző véletlen gráfokra.
 A következő grafikon mutatja, hogy a tesztek során használt véletlen gráfoknak mennyi az entrópiájuk.
@@ -926,7 +926,7 @@ Eredmény a \ref{density-len} ábrán.
 	\end{center}
 \end{figure}
 
-A grafikonon a Barabási-Albert gráf eredményei látható, az eredeti mennyiségű fa megépítésével, azaz legalább minden második csúcsponthoz elkészült, és a fák pedig az eredeti algoritmussal készültek el.
+A grafikonon a Barabási-Albert gráf eredményei láthatók, az eredeti mennyiségű fa megépítésével, azaz legalább minden második csúcsponthoz elkészült, és a fák pedig az eredeti algoritmussal készültek el.
 A hálózatban az összes szereplő él súlya 1, normalizálás után pedig
 \(\frac{1}{|E|}\).
 Mint látható a grafikonon, minél ritkább a mátrix, annál rövidebbek az úthosszak is.
@@ -936,7 +936,7 @@ A további grafikonoknál már csak a konstans 5 értékű eredményeket fogom v
 
 \subsubsection{Eredeti megépített fa mennyiség}
 
-Az általános esetben csak egy véletlen gráfnak a konkrét esetét néztük meg, most vizsgáljuk meg, hogy a különböző fa építési stratégiák, hogy befolyásolják az úthosszt.
+Az általános esetben csak egy véletlen gráfnak a konkrét esetét néztük meg, most vizsgáljuk meg, hogy a különböző fa építési stratégiák hogy befolyásolják az úthosszt.
 
 Első véletlen gráf típus a Barabási-Albert gráf, ahol az eredeti számú fát építettük meg. 
 Eredmény a \ref{barabasi-len} ábrán.
@@ -955,10 +955,10 @@ Ezek rendelkeznek a legnagyobb átlagos úthosszal és szinte ugyanazt az eredm�
 A következő a sorban a Huffman fa alapú algoritmus, ami kezdetben alacsonyabbról indul, de végül csatlakozik az első kettőhöz.
 Legjobb két algoritmus pedig a Sorfolytonos fa és a Random fa.
 Ez várható volt, mivel mindkettő ugyanazt az algoritmust használja, csak az értékekben különböznek.
-Úthossz szempontjából ez a kettő adja mindig legkisebb fát, mivel egy teljes fát épít az algoritmus.
+Úthossz szempontjából ez a kettő adja mindig a legkisebb fát, mivel egy teljes fát épít az algoritmus.
 
 
-Következő véletlen gráf típus amit vizsgálunk az az Erdős-Rényi gráf, itt is az eredeti számú fát építjük meg.
+Következő véletlen gráf típus, amit vizsgálunk, az az Erdős-Rényi gráf, itt is az eredeti számú fát építjük meg.
 Eredmény a \ref{erdos-len} ábrán.
 
 \begin{figure}[H]
@@ -969,7 +969,7 @@ Eredmény a \ref{erdos-len} ábrán.
 	\end{center}
 \end{figure}
 
-A grafikon itt már kicsit érdekesebb, mivel kicsit nagyobb mozgása van az értékeknek, de ha megnézzük, legfeljebb kettő százalékos eltérés mérhető.
+A grafikon itt már kicsit érdekesebb, mivel kicsit nagyobb mozgása van az értékeknek, de ha megnézzük, legfeljebb két százalékos eltérés mérhető.
 Az összes algoritmus hasonlóan teljesít.   
 
 Végül pedig nézzük meg a csillaggráfot az eredeti számú fa mennyiséggel a \ref{star-len} ábrán.
@@ -988,7 +988,7 @@ Mint már láttuk a Barabási-Albert gráf esetében, itt is megvan a három egy
 
 Az előző részben láthattuk milyen eredményeket adnak az eredeti feltétel alapján a különböző algoritmusaink.
 Most nézzük meg, hogyan változik az úthossz a megépített fák számának függvényében. 
-Azokat a fákat építjük meg amit ténylegesen nagyfokú, teljesül a magas fokszámú pontokra, hogy a fokszámuk legalább kétszerese az átlag fokszámnak.
+Azokat a fákat építjük meg, amelyek ténylegesen nagyfokúak, teljesül a magas fokszámú pontokra, hogy a fokszámuk legalább kétszerese az átlag fokszámnak.
 
 Hasonlítsuk össze a Barabási-Albert gráf eredményeit a \ref{barabasi-tree-difference-len} ábrán.
 
@@ -1029,7 +1029,7 @@ Végül nézzük meg a csillaggráfot a \ref{star-tree-difference-len} ábrán.
 	\end{center}
 \end{figure}
 
-Itt történt egy fordulat a grafikonon, először is amíg a Huffman fa alapú stratégia a közép értéket adta a két másik csoport között, itt most jelentősen rosszabb eredmény produkált.
+Itt történt egy fordulat a grafikonon, először is amíg a Huffman fa alapú stratégia a közép értéket adta a két másik csoport között, itt most jelentősen rosszabb eredményt produkált.
 A másik négy algoritmus meg javult az úthosszara nézve és megmaradt a relatív pozíciójuk.
 
 \section{Torlódás}
@@ -1047,18 +1047,18 @@ Eredmény a \ref{density-con} ábrán.
 	\end{center}
 \end{figure}
 
-A grafikonon a Barabási-Albert gráf eredményei látható, az eredeti számú megépített fa mennyiséggel és a fák pedig az eredeti algoritmussal készültek el.
+A grafikonon a Barabási-Albert gráf eredményei láthatók, az eredeti számú megépített fa mennyiséggel és a fák pedig az eredeti algoritmussal készültek el.
 A hálózatban szereplő összes él súlya 1.
 Mint látható a grafikonon, minél ritkább a mátrix, annál nagyobb a torlódás. 
-Egy fontos észrevétel a két metrika között, még az úthossz átlagosan az egész mátrixra nézve adta meg az eredményt, addig a torlódás az egyértelműen a legnagyobb torlódás az útválasztási sémán.
+Egy fontos észrevétel a két metrika között, míg az úthossz átlagosan az egész mátrixra nézve adta meg az eredményt, addig a torlódás az egyértelműen a legnagyobb torlódás az útválasztási sémán.
 Ezért ha kevés éllel rendelkezik a gráf, annál kevesebb lehetősége van olyan élt választani az algoritmusnak, ahol még alacsony a torlódás.
-A további grafikonoknál már csak a konstans 5 értékű eredményeket fogom vizsgálni, mivel az ad egy jó közelítést az átlagos torlódása.
+A további grafikonoknál már csak a konstans 5 értékű eredményeket fogom vizsgálni, mivel az ad egy jó közelítést az átlagos torlódásra.
 
 \subsection{A fa építő algoritmusok összehasonlítása}
 
 \subsubsection{Eredeti megépített fa mennyiség}
 
-Az általános eset után, most vizsgáljuk meg, hogy a különböző fa építési stratégiák, hogy befolyásolják a torlódást.
+Az általános eset után most vizsgáljuk meg, hogy a különböző fa építési stratégiák hogy befolyásolják a torlódást.
 
 Első véletlen gráf ismét a Barabási-Albert gráf, ahol az eredeti mennyiségű fát építjük meg. 
 Eredmény a \ref{barabasi-con} ábrán.
@@ -1088,7 +1088,7 @@ Eredmény a \ref{erdos-con} ábrán.
 	\end{center}
 \end{figure}
 
-A grafikon szinte megegyezően ugyanazt az eredmény mutatja mint a Barabási-Albert gráf esetén.
+A grafikon szinte megegyezően ugyanazt az eredmény mutatja, mint a Barabási-Albert gráf esetén.
 Két csoport, ahol még mindig az Eredeti és az EgoBalance teljesítenek a legjobban.
 
 Végül pedig nézzük meg a csillaggráfot az eredeti fa mennyiséggel a \ref{star-con} ábrán.
@@ -1107,7 +1107,7 @@ Itt már elhatárolódik a Huffman fa a Sorfolytonos és Random fáktól, de nem
 
 Az előző részben láthattuk milyen eredményeket adnak az eredeti feltétel alapján a különböző algoritmusaink.
 Most nézzük meg, ha változik a torlódás a megépített fák mennyiségének függvényében. 
-Azokat a fákat építjük meg amit ténylegesen nagyfokúak.
+Azokat a fákat építjük meg amelyek ténylegesen nagyfokúak.
 
 Hasonlítsuk össze a Barabási-Albert gráf eredményeit a \ref{barabasi-tree-difference-con} ábrán.
 
@@ -1158,8 +1158,8 @@ Szóval a torlódás összpontosul egy helyre, erre pedig példa a \ref{inbalanc
 	\end{center}
 \end{figure}
 
-A hálózat ami ezt az Egófát eredményezte az 30 csomópontból áll, 5 csillagot tartalmaz és maximális $\Delta$ fokszám pedig 12. 
-Mint látható egységesen helyezkednek el a csomópontok és a legtávolabbi levél is csak kettő mélységre helyezkedik el.
+A hálózat ami ezt az Egófát eredményezte, az 30 csomópontból áll, 5 csillagot tartalmaz és maximális $\Delta$ fokszám pedig 12. 
+Mint látható, egységesen helyezkednek el a csomópontok és a legtávolabbi levél is csak kettő mélységre helyezkedik el.
 Abban az esetben, mikor a csomópontokból relatív kevés van, és alacsony fák kapcsolódnak össze, a torlódás is várhatóan alacsony lesz. 
 Ahogy nő a csomópontok száma és eléri a többszörösét a maximális fokszámnak, nehéz utak alakulnak ki és így növekszik a torlódás is.
 
@@ -1173,8 +1173,8 @@ A felvázolt megoldásuk mellett adtak egy felső korlátot, amivel az algoritmu
 
 \subsection{Keretrendszer}
 
-A diplomatikusában megvalósít keretrendszer segítségével a szerzők megoldása gyakorlati tesztelés alá lett vetve.
-Itt több fajta véletlen gráffal lett szimulálva a lehetséges hálózatok és az azokon folyó adatforgalom.
+A diplomamunkában megvalósít keretrendszer segítségével a szerzők megoldása gyakorlati tesztelés alá lett vetve.
+Itt több fajta véletlen gráffal lettek szimulálva a lehetséges hálózatok és az azokon folyó adatforgalom.
 Az Erdős-Rényi modell segítségével modelleztük azt az esetet, mikor a kommunikáció egyenletesen eloszlik a hálózaton és nem centralizálódik több nagyobb szerver köré a forgalom.
 A Barabási-Albert modell segítségével már nagyobb klasztereket kaptunk, mivel akik később csatlakoztak, azok mindig választottak még $m$ régi csomópontot.
 Így a legelsők a hálózatban nagyobb eséllyel kaptak több kapcsolatot.
@@ -1185,32 +1185,32 @@ A megadott $\Delta = 12\rho$ fokszám egy túl nagy felső korlát, mivel olyan 
 Ez azt eredményezi, hogy az összes kapcsolat egy köztes segítő csomópont segítségével majdnem direkt kapcsolódik.
 Ezért nem tudnak elég magas fák kialakulni, hogy a különböző algoritmusok érdemi különbséget nyújtsanak.
 Így tesztelés során, egy jól meghatározott korlát segítségével voltak a tesztek lefuttatva. 
-Az korlát alapját a piacon jelenleg forgalomban lévő Ethernet switch portok száma adta, ami $\Delta \in [10, 16, 24, 48]$ lett.
+A korlát alapját a piacon jelenleg forgalomban lévő Ethernet switch portok száma adta, ami $\Delta \in [10, 16, 24, 48]$ lett.
 
 \subsection{Algoritmusok}
 
-Az cikkben megfogalmazott cl-Dan algoritmus hagy némi helyet az implementálónak a részletek terén, mivel nem teljesen írja le egy helyzetben a helyes lépést.
-Ez alapján született kettő algoritmus, az Eredeti és az EgoBalance, ami a csere lépésben felmerülő szülő nélkül maradt gyerekek újra csatlakoztatását hivatott megoldani.
+A cikkben megfogalmazott cl-Dan algoritmus hagy némi helyet az implementálónak a részletek terén, mivel nem teljesen írja le egy helyzetben a helyes lépést.
+Ez alapján született két algoritmus, az Eredeti és az EgoBalance, ami a csere lépésben felmerülő szülő nélkül maradt gyerekek újra csatlakoztatását hivatott megoldani.
 Itt az Eredeti helyben mozgatta át a nehezebb gyereket a szülő pozíciójára, addig az EgoBalance egy természetesebb, az alapul szolgáló adatstruktúrára bízta az újra eloszlást.
 Eredmény szempontjából a kettő algoritmus nagyon hasonló, és lényegbeli különbség a mérési hiba korlátain belül szerepel.
 
-Annak érdekében, hogy a valós hozzávetési alapunk legyen a módszer teljesítményéhez további másik fa építési módszerek is meg lettek vizsgálva.
-Ezek alapjául a Huffman fa szolgált és ezekből lett három különböző algoritmus, amik rendre a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
+Annak érdekében, hogy valós hozzávetési alapunk legyen a módszer teljesítményéhez, további másik fa építési módszerek is meg lettek vizsgálva.
+Ezek alapjául a Huffman fa szolgált és ezekből lett három különböző algoritmus, amelyek rendre a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
 
 A Huffman kódolásban is használt fa lett az első algoritmus, ami az úthosszt hivatott javítani.
 Ennek eredménye helyenként tényleg jobb lett, mint az Eredeti esetben, de mivel nem csak ez az egy szempontból kell jól teljesíteni, így figyelembe kell venni a torlódást is.
-Ebből a szempontból már határozottan nem teljesített jól, mert a Huffman fa ágai között akár másfélszeres szorzó különbség előfordulhat, így leterhelt utak jönnek létre. 
+Ebből a szempontból már határozottan nem teljesített jól, mert a Huffman fa ágai között akár másfélszeres szorzó különbség is előfordulhat, így leterhelt utak jönnek létre. 
 
 Következő algoritmus ami létrejött az a Sorfolytonos fa.
-Itt egyelten szempont volt figyelembe véve, építsünk egy teljes fát.
+Itt egyetlen szempont volt figyelembe véve, építsünk egy teljes fát.
 Ezzel a módszerrel mindig a legkisebb fák jöttek létre és így ez eredményezte mindig a legrövidebb utakat.
-Torlódás szempontjából ugyanolyan rosszul teljesített mint a Huffman fa, mivel itt sem volt figyelme véve ez a szempont.
-Mivel ez volt a legjobb úthosszra adott algoritmus, lehet érdemes lenne további kutatás folytatni annak érdekében, hogy hogyan lehet a torlódást javítani egy ilyen hálózatban.
+Torlódás szempontjából ugyanolyan rosszul teljesített mint a Huffman fa, mivel itt sem volt figyelembe véve ez a szempont.
+Mivel ez volt a legjobb úthosszra adott algoritmus, lehet érdemes lenne további kutatást folytatni annak érdekében, hogy hogyan lehet a torlódást javítani egy ilyen hálózatban.
 
 Végül a Random fa, ami nem különbözik különösebben a Sorfolyotnostól.
-Ennek az eredménye sem lett jobb, mint amire épül, ám lehetőség van arra, ha épp úgy helyezkednek el az elemek, hogy az torlódás szempontjából is kedvező, akkor van némi esély arra, jobb eredményt ad.
+Ennek az eredménye sem lett jobb, mint amire épül, ám lehetőség van arra, ha épp úgy helyezkednek el az elemek, hogy az torlódás szempontjából is kedvező, akkor van némi esély arra, hogy jobb eredményt ad.
 
-Ezekből az eredményekből az látszik, hogy a cikkben szereplő algoritmus megfelelő a céljára, ám ez nem zárja ki annak a lehetőséget, hogy egy másfajta javításibeli megközelítést is kivizsgáljuk. 
+Ezekből az eredményekből az látszik, hogy a cikkben szereplő algoritmus megfelelő a céljára, ám ez nem zárja ki annak a lehetőségét, hogy egy másfajta javításibeli megközelítést is kivizsgáljunk. 
 
 \pagebreak
 
@@ -1225,14 +1225,14 @@ A mérések azt mutatják, hogy az úthossz határozottan csökken, de a torlód
 \section{Konklúzió}
 
 A cikkben \cite{avin_demand-aware_nodate} meghatározott algoritmus a mérések alapján megfelel a céljára.
-Az Eredeti és EgoBalance megközelítések között különbség minimális így, az olvasónak lehetősége van kicsit kísérletezni, milyen megközelítést szeretne használni.
+Az Eredeti és EgoBalance megközelítések közötti különbség minimális így, az olvasónak lehetősége van kicsit kísérletezni, milyen megközelítést szeretne használni.
 A hasonló célra létrehozott algoritmusok közül pedig a Sorfolyonos ami érdekes információval szolgált, ezért érdemes lenne még ez irányban kutatást végezni.
 
 
 \chapter{Köszönetnyilvánítás}
 
 Szeretnék köszönetet nyilvánítani témavezetőmnek Lukovszki Tamás, PhD egyetemi docensnek, amiért felajánlotta és vezetett a téma kidolgozásában és megvalósításában.
-Továbbá még szeretném megköszönni Veress Orsolya támogatását is, a munka korrektúrájában nyújtott segítségért.  
+Továbbá még szeretném megköszönni Veress Orsolya támogatását is, a munka korrektúrájában nyújtott segítségéért.  
 
 
 \bibliographystyle{abbrv}
