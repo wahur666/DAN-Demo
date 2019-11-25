@@ -70,7 +70,7 @@
 		\textit{Témavezető:} & \textit{Készítette:} \\
 		\textbf{Lukovszki Tamás} &  \textbf{Szecsődi Imre} \\
 		Egyetemi docens, PhD & Programtervező informatikus \\
-		Információs Rendszerek tanszék & MSC\\ 
+		Információs Rendszerek tanszék & MSc\\ 
 	\end{tabular*}
 	
 	\vfill
@@ -88,24 +88,24 @@ A diplomamunka a Demand-Aware Network Design with Minimal Congestion and Route L
 \section{Motiváció}
 
 Az adatközpontok kritikus infrastruktúrák lettek a mai digitális társadalomban. 
-A megnövekedett adatmennyiség miatt, hatékony hálózati megoldások szükségesek arra, hogy az adatközpontok minél hamarabb fel tudják dolgozni az adatokat. 
-A jelenlegi hálózatok egy adatközpontban a legrosszabb esetre vannak optimalizálva, azaz az infrastruktúra által biztosított kapcsolatokon közel maximális sebességgel tudjon kommunikálni bármelyik kettő szerver. 
-A gyakorlati tapasztalatok azt mutatják, hogy a kommunikáció túlnyomó része néhány szerverek között történik. 
-Mikor a kommunikációs mintát ábrázoljuk egy gráfban, ahol az élek az egymással kommunikáció szervereket ábrázolják, akkor ez egy ritka gráfot eredményez.
+A megnövekedett adatmennyiség miatt hatékony hálózati megoldások szükségesek arra, hogy az adatközpontok minél hamarabb fel tudják dolgozni az adatokat. 
+A jelenlegi hálózatok egy adatközpontban a legrosszabb esetre vannak optimalizálva, azaz az infrastruktúra által biztosított kapcsolatokon közel maximális sebességgel tudjon kommunikálni bármelyik két szerver. 
+A gyakorlati tapasztalatok azt mutatják, hogy a kommunikáció túlnyomó része néhány szerver között történik. 
+Mikor a kommunikációs mintát ábrázoljuk egy gráfban, ahol az élek az egymással kommunikáló szervereket ábrázolják, akkor ez egy ritka gráfot eredményez.
 
 A kommunikációs technológiák fejlődésével lehetőségünk van futás időben a fizikai hálózatok újra konfigurálására. 
 Az ilyen technológiák segítségével lehet növelni az adatközpontok hatékonyságát. 
 A változó adatforgalomhoz lehet alkalmazkodni és a topológiát átalakítani az szerint, hogy mekkora terhelés éri a hálózat egyes részeit. 
 A hálózat fizikai újra konfigurálására egy megoldás a Microsoft Research ProjecToR \cite{ghobadi_projector:_2016}, ami lézer technológia segítségével köti össze a szervereket egy adatközpontban. 
-Az új technológiák új problémákat eredményeztek és új kihívások elé állították a hálózat tervezést.
+Az új technológiák új problémákat eredményeztek, és új kihívások elé állították a hálózat tervezést.
 Napjainkban intenzív kutatás folyik ezen a területen.
 
 \pagebreak
 
 \subsection{Valós forgalmi adatok}
 
-A Microsoft Research ProjecToR kutatás keretén belül, a szerzők adatokat gyűjtöttek Microsoft adatközpontokban. 
-Adatokat kétszázötvenezer szerverről rögzítettek, ami öt productionban használt klaszterben voltak elosztva. 
+A Microsoft Research ProjecToR kutatás keretén belül a szerzők adatokat gyűjtöttek Microsoft adatközpontokban. 
+Adatokat kétszázötvenezer szerverről rögzítettek, amelyek öt productionban használt klaszterben voltak elosztva. 
 
 
 \begin{figure}[h]
@@ -119,23 +119,23 @@ Adatokat kétszázötvenezer szerverről rögzítettek, ami öt productionban ha
 	\label{microsoft-clasters}
 \end{figure}
 
-Amint a \ref{microsoft-clasters} ábrán látható, a kommunikáció főleg megadott szerverek között történik.
+Amint az \ref{microsoft-clasters} ábrán látható, a kommunikáció főleg megadott szerverek között történik.
 Korábban már említve volt, az adatközpontok jelenleg a legrosszabb esetre vannak tervezve, hogy bármelyik két szerver tudjon kommunikálni.
 Az ábrán látszik, hogy melyik szerverek között nem szükséges feltétlen direkt kapcsolatot kiépíteni, hanem elég egy már meglévő közvetett útvonalat használni, ahol kicsi a torlódás.
-Az ilyen hálózat megtervezéséhez először szükségünk van arra, hogy tudjuk milyen tervezési stratégiák vannak és, hogy az adatközpontok milyen topológiával rendelkeznek jelenleg.
+Az ilyen hálózat megtervezéséhez először szükségünk van arra, hogy tudjuk milyen tervezési stratégiák vannak, és hogy az adatközpontok milyen topológiával rendelkeznek jelenleg.
 
 \subsection{Hálózat tervezési stratégiák}
 
-A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újrakonfiguráljunk, attól függően milyen terhelés éri.
+A technika fejlődésével elérhetővé váltak eszközök arra, hogy egy adott hálózatot újrakonfiguráljunk, attól függően, hogy milyen terhelés éri.
 Egy hálózat korábbi kommunikációs mintái tudnak adni egy jó közelítést arra, hogyan történik a kommunikáció a szerverek között.
-Az előző példában láthattuk, hogy a Microsoft adatközpontban milyen a forgalomeloszlást rögzítettek, 
+Az előző példában láthattuk, hogy a Microsoft adatközpontban milyen forgalomeloszlást rögzítettek, 
 és ez alapján lehet majd újratervezni a hálózatot, figyelve a terheléseloszlásra.
 Lehetőség szerint, periodikus újrakonfigurálással akár még nagyobb hatékonyságot is elérhetünk az adatközpontokban.
 
 Két fő optimalizációs megközelítést fogunk megnézni a munka során, ezek a rövid úthossz és a minimális torlódás.
-Rövid úthossz alatt azt értjük, hogy minél kevesebb pontok kelljen áthaladnia az adatnak mielőtt az eljut a céljába, \ref{network_strategies} ábrán az (a) eset.
+Rövid úthossz alatt azt értjük, hogy minél kevesebb ponton kelljen áthaladnia az adatnak mielőtt az eljut a céljába, \ref{network_strategies} ábrán az (a) eset.
 A minimális torlódás alatt pedig azt értjük, ha több adatfolyam halad át egy élen, akkor az élek egyenletesen legyenek kihasználva, ezzel csökkentve a várakozási időt, \ref{network_strategies} ábra (b) pontja.
-A cikk célja, egy olyan módszer bemutatása, ahol mindkét esetet figyelembe veszik és az alapján adnak egy olyan algoritmust, ami közel optimális mint úthosszra, mint torlódásra nézve, ez a \ref{network_strategies} ábra (c) esete.
+A cikk célja egy olyan módszer bemutatása, ahol mindkét esetet figyelembe veszik és az alapján adnak egy olyan algoritmust, ami közel optimális mint úthosszra, mint torlódásra nézve, ez az \ref{network_strategies} ábra (c) esete.
 
 
 \begin{figure}[h]
@@ -154,12 +154,12 @@ A cikk célja, egy olyan módszer bemutatása, ahol mindkét esetet figyelembe v
 	\label{datacenter_topology}
 \end{figure}
 
-Mielőtt még bármi nemű átalakítást végeznénk az adatközpont hálózatán, először még meg kell nézni azt, hogy hogyan is épül fel az.
+Mielőtt még bármi nemű átalakítást végeznénk az adatközpont hálózatán, először meg kell nézni azt, hogy hogyan is épül fel az.
 Az \ref{datacenter_topology} ábrán látható a felépítés, ahol három szintre tudjuk felosztani a hálózat architektúráját \cite{noauthor_you_nodate} \cite{noauthor_cisco_nodate}.
 Legfelső szinten van a Core réteg, ami adja a gerincét a hálózatnak, ezen a ponton érkeznek és távoznak a csomagok az adatközpontból.
 A Core réteg további szerepe még, hogy adatot szolgáltasson az alatta lévő Aggregációs rétegnek.
 Ez a réteg nagyobb csoportokra osztja az adatközpontot, ezzel minimalizálva a routing táblák számát.
-Az aggregációs réteg további szolgáltatásokat is tud nyújtani, az alatta lévő rétegnek, mint például fűzfal, load balancing és biztonságos csatlakozás.
+Az aggregációs réteg további szolgáltatásokat is tud nyújtani az alatta lévő rétegnek, mint például tűzfal, load balancing és biztonságos csatlakozás.
 A harmadik réteg pedig a Access réteg, ami Top of Rack switchek formájában nyilvánul meg.
 Ezen a ponton kapcsolódnak a szerverek fizikailag a hálózathoz.
 A Core rétegtől a ToR switchekig általában optikai kábellel van kiépítve a hálózat. 
@@ -170,14 +170,15 @@ Egy rackben nagyon sok szerver van elhelyezve, ezért azok általában egy közt
 
 \subsection{Újrakonfigurálás megvalósítása}
 
-Az átlag hálózatok statikusan vannak konfigurálva, ezért nem sok lehetőség van arra annak megváltoztatására, ide tartoznak a hagyományos Ethernet switchek.
+Az átlag hálózatok statikusan vannak konfigurálva, ezért nem sok lehetőség van arra annak megváltoztatására.
+Ide tartoznak a hagyományos Ethernet switchek.
 Egy kevésbé statikus megoldás az optikai swtich, ami képes megvalósítani az újrakonfigurálást, és ezt relatív gyorsan is csinálja.
 Az optikai switchektől egy még gyorsabb megoldás a Microsoft Research ProjecToR. 
-A \ref{projector-fig} ábrán látható eszköz szem számára láthatatlan lézer nyalábbal küld és fogad adatokat.
-Az adatközpont belső kommunikációjának a gyorsítására szolgál, ezért a ToR switchek vannak lecserélve, ilyen ProjecToR eszközökre.
+Az \ref{projector-fig} ábrán látható eszköz szem számára láthatatlan lézer nyalábbal küld és fogad adatokat.
+Az adatközpont belső kommunikációjának a gyorsítására szolgál, ezért a ToR switchek vannak lecserélve ilyen ProjecToR eszközökre.
 A rack tetejéről az eszköz a lézert mikrotükrökre irányítja, aminek a pontos beállíthatósága révén pontosan a megfelelő irányba tudja tükrözi tovább a nyalábot.
-Ennek az folyamatnak köszönhetően jelentősen gyorsabb átkonfigurálási időt érhetünk el mint az optikai switch.
-Váltásidő itt $12\mu s$ ami kétszázötvenezerszer gyorsabb mint az optikai switch.
+Ennek az folyamatnak köszönhetően jelentősen gyorsabb átkonfigurálási időt érhetünk el, mint az optikai switch.
+A váltásidő itt $12\mu s$, ami kétszázötvenezerszer gyorsabb, mint az optikai switch.
 
 \begin{figure}[h]
 	\centering
@@ -190,10 +191,9 @@ Váltásidő itt $12\mu s$ ami kétszázötvenezerszer gyorsabb mint az optikai 
 
 A diplomamunka célja a cikkben \cite{avin_demand-aware_nodate} bemutatott algoritmus implementálása.
 Ezt egy olyan környezetben megvalósítani, ahol empirikus módszerekkel tesztelhető az algoritmus hatékonysága.
-Ez mellet a keretrendszer könnyen kiegészíthető legyen tesztelés szempontjából.
-Továbbá lehetőséget biztosítson arra, hogy új algoritmust lehessen bevezetni és azt hasonlóan megvizsgálni, mint az eredetit.
-A megvalósítás így több független modulból áll, amik egyként fognak működni.
-Az így kapott összes eredményét összehasonlítjuk a cikkben megadott elméleti korlátokkal.
+Ez mellet a keretrendszer könnyen kiegészíthető legyen tesztelés szempontjából, továbbá lehetőséget biztosítson arra, hogy új algoritmust lehessen bevezetni, és azt hasonlóan megvizsgálni, mint az eredetit.
+A megvalósítás így több független modulból áll, amelyek egyként fognak működni.
+Az így kapott összes eredményt összehasonlítjuk a cikkben megadott elméleti korlátokkal.
 
 \section{Diplomamunka felépítése}
 
@@ -201,27 +201,27 @@ A diplomamunka felépítése több részre van bontva.
 \begin{itemize}
 	\item Először ismertetésre kerül az eredeti cikkben \cite{avin_demand-aware_nodate} publikált algoritmus és a hozzá tartozó szükséges háttérismeret.
 	\item A második részben szó fog esni a három véletlen gráfról, ami adta az alapot a tesztelésre.
-	\item Ezt folytatva ki lesz térve négy darab új algoritmusra, ami valamilyen szempontból változtat a fa építési stratégián annak érdekében, hogy jobb eredményt érjünk el.
-	\item A fa építési algoritmusok után, megvizsgáljuk azt az esetet, hogy mi történik, ha már a legelső lépésben módosítjuk az algoritmust, ezzel mérlegelve azt mi kerüljön valóban átépítésre a hálózatban.
-	\item Végül következik a tesztelés és annak kiértékelése, milyen teljesítményt nyújtanak a különböző algoritmusok a különböző véletlen gráfok esetén. 
+	\item Ezt folytatva kitérünk négy darab új algoritmusra, ami valamilyen szempontból változtat a fa építési stratégián annak érdekében, hogy jobb eredményt érjünk el.
+	\item A fa építési algoritmusok után, megvizsgáljuk azt az esetet, hogy mi történik, ha már a legelső lépésben módosítjuk az algoritmust, ezzel mérlegelve azt, hogy mi kerüljön valóban átépítésre a hálózatban.
+	\item Végül következik a tesztelés, és annak kiértékelése, hogy milyen teljesítményt nyújtanak a különböző algoritmusok a különböző véletlen gráfok esetén. 
 \end{itemize}
 
 
 \section{Diplomamunka eredménye}
 
-A diplomamunka véletlen gráfokkal modellezte a adatközpontokban kialakulható hálózati forgalmat.
+A diplomamunka véletlen gráfokkal modellezte az adatközpontokban kialakulható hálózati forgalmat.
 Az eredmények azt mutatják, hogy a cikkben meghatározott "optimális" eset egy határozottan magasabb felső korlát, mint amire valójában szükség van.
-Az cikkben felvázolt algoritmus némi helyet hagy az megvalósítónak, mivel nem teljesen írja le pár helyzetben mi a helyes lépés.
+A cikkben felvázolt algoritmus némi helyet hagy az megvalósítónak, mivel nem teljesen írja le, hogy pár helyzetben mi a helyes lépés.
 
-Ez alapján született kettő algoritmus, az Eredeti és az EgoBalance, ami az egyik ilyen rész miatt más-más értelmezésben próbálta megoldani a felmerülő helyeztet.
+Ez alapján született két algoritmus, az Eredeti és az EgoBalance, ami az egyik ilyen rész miatt más-más értelmezésben próbálta megoldani a felmerülő helyeztet.
 A teljesség érdekében egy másik megközelítési módszer is vizsgálva volt, mint fa építési stratégia, ami további három algoritmust eredményezett, ezek rendere a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
-Ezek az algoritmusok az úthosszt vették figyelembe és itt jól is teljesítettek, de torlódás szempontjából alul múlták a cikkben szereplőt közel egy kettes szorzóval.
+Ezek az algoritmusok az úthosszt vették figyelembe, és itt jól is teljesítettek, de torlódás szempontjából alul múlták a cikkben szereplőt közel egy kettes szorzóval.
 Ebből kifolyólag a cikkben szereplő algoritmus megfelelő a céljára, de nem zárja ki a lehetőséget egy másfajta javítási megközelítésre. 
 
-A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegeljük a hálózatban szereplő ténylegesen leterhelt pontokat és azokat építjük át csak.
-Ezzel elejét vehetjük az olyan esteknek, hol nincs szükség átépítésre.
-Ezzel csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el az új hálózatban.
-Ez a javítás nincs kihatással a torlódásra az esetek túlnyomó részében, de vannak elfajult esetek ahol rosszabbat eredményez.
+A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegeljük a hálózatban szereplő ténylegesen leterhelt pontokat, és azokat építjük át csak.
+Ezzel elejét vehetjük az olyan esteknek, ahol nincs szükség átépítésre.
+Így csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el az új hálózatban.
+Ez a javítás nincs kihatással a torlódásra az esetek túlnyomó részében, de vannak elfajult esetek, ahol rosszabbat eredményez.
 
 
 
