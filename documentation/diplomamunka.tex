@@ -228,18 +228,18 @@ Ez a javítás nincs kihatással a torlódásra az esetek túlnyomó részében,
 \chapter{Modell}
 
 
-A diplomamunkában a \cite{avin_demand-aware_nodate} cikkben leírt modell és definíciók lettek használva.
+Diplomamunkában a \cite{avin_demand-aware_nodate} cikkben leírt modellt és definíciókat használjuk.
 
 \section{Forgalom igény tudatos hálózat tervezés probléma}
 
-Egy hálózat forgalomigényének nevezzük azt a mátrixot, mi leírja melyik csomópontok állnak kapcsolatban és mekkora valószínűséggel kommunikálnak.
+Egy hálózat forgalomigényének nevezzük azt a mátrixot, ami leírja melyik csomópontok állnak kapcsolatban és mekkora valószínűséggel kommunikálnak.
 Ez a mátrix legtöbb esetben szimmetrikus, de lehetnek esetek egy oldali kommunikációra is, például egy archiváló szerver, ami nem küld vissza információt a küldőjének.
 
-Forgalom igény tudatos hálózat tervezés problémának nevezzük azt, mikor rendelkezésre áll egy meghatározott számú csomóponttal rendelkező hálózat és egy mátrix ami leírja a kommunikációs mintát.
+Forgalom igény tudatos hálózat tervezés problémának nevezzük azt, mikor rendelkezésre áll egy meghatározott számú csomóponttal rendelkező hálózat és egy mátrix, ami leírja a kommunikációs mintát.
 A mátrix elemei súlyozott valószínűségek, hogy $i$ forrásból mekkora eséllyel lesz adat küldve $j$ célba.
-A cél, hogy ezen adatból egy olyan hálózati sémát készítsünk, ami minimális torlódást és rövid utakat eredményezzen és ez mellett még skálázható is legyen nagy hálózatokra.
+A cél, hogy ezen adatból egy olyan hálózati sémát készítsünk, ami minimális torlódást és rövid utakat eredményezzen, és ez mellett még skálázható is legyen nagy hálózatokra.
 
-A \ref{network_types} ábrán látható egy demand mátrix és a két megközelítés, ami alapján vizsgálni az új hálózatot.
+A \ref{network_types} ábrán látható egy demand mátrix és a két megközelítés, ami alapján vizsgáljuk az új hálózatot.
 
 \begin{figure}[h]
 	\centering
@@ -274,7 +274,7 @@ Szavakba foglalva, a torlódás megegyezik az útválasztási sémában szerepl�
 	Az átlag súlyozott úthosszt egy \(\Gamma(N)\) útválasztási sémán a \(D\) demand mátrix segítségével írjuk fel: \[L(D, \Gamma(N)) = \sum_{(u,v) \in D}  p(u,v)  \cdot d_{\Gamma(N)}(u, v) \] ahol a \(d_{\Gamma(N)}(u, v)\) az útvonal hosszát jelöli.
 \end{mydef}
 
-Szavakba foglalva, az átlag súlyozott úthossz, az összes út összege, ahol a csomópontok közötti utak hossza meg van szorozva a valósínűségükkel. 
+Szavakba foglalva, az átlag súlyozott úthossz, az összes út összege, ahol a csomópontok közötti utak hossza meg van szorozva a valószínűségükkel. 
 
 \subsection{Skálázhatóság}
 
@@ -285,13 +285,13 @@ A hálózatot skálázhatóra kell tervezni, ezért meghatározunk egy \(\Delta\
 \subsection{Optimális torlódás}
 
 
-Az optimális torlódást egy  hálózatra, úgy határozzuk meg, hogy a csak a torlódást vesszük figyelembe számításkor: 
+Az optimális torlódást egy  hálózatra úgy határozzuk meg, hogy csak a torlódást vesszük figyelembe számításkor: 
 \[C^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} C(D, \Gamma(N))\]
 
 
 \subsection{Optimális úthossz}
 
-Az optimális úthosszt egy  hálózatra, úgy határozzuk meg, hogy a csak az úthosszt vesszük figyelembe számításkor:
+Az optimális úthosszt egy  hálózatra úgy határozzuk meg, hogy csak az úthosszt vesszük figyelembe számításkor:
 \[L^*(D, \Delta) = \min_{N \in N_\Delta, \Gamma(N)} L(D, \Gamma(N))\]
 
 \section{cl-DAN hálózat tervezése}
@@ -307,7 +307,7 @@ Az optimális úthosszt egy  hálózatra, úgy határozzuk meg, hogy a csak az �
 		\item Torlódásra: \(C(D, \Gamma(N)) \le \alpha \cdot C^*(D, \Delta) + \alpha'\)
 		\item Úthosszra: \(L(D, \Gamma(N)) \le \beta \cdot L^*(D, \Delta) + \beta'\)
 	\end{itemize}
-	Az alfa vessző és béta vesszők olyan tényezők aki amik függetlenek a problémától.
+	Az $\alpha'$ és $\beta'$ olyan tényezők amik függetlenek a problémától.
 \end{mydef}
 
 \section{EgoTree}
@@ -341,9 +341,9 @@ Az Egófa megépítésére a következő algoritmust használjuk:
 
 \begin{enumerate}
 	\item \(s\) a gyökér elem, \(\Delta\) fokszámmal, kezdetben üres fa.
-	\item Rendezzük csökkenő sorrendbe a \(\bar{p} = \{p1, p2, ..., p_k\}\) valószínűségeket 
+	\item Rendezzük csökkenő sorrendbe a \(\bar{p} = \{p1, p2, ..., p_k\}\) valószínűségeket.
 	\item Kezdjük a gyökér elemre csatolni a csomópontokat, legfeljebb \(\Delta\) kapcsolat állhat fent a gyökérrel.
-	\item Mikor elértük a \(\Delta\) kapcsolatot a gyökér elemnél, a következő csomópontokat mindig a legkisebb összesített súlyú levélre kapcsolok rá, itt már legfeljebb két levele lehet minden fának.
+	\item Mikor elértük a \(\Delta\) kapcsolatot a gyökér elemnél, a következő csomópontokat mindig a legkisebb összesített súlyú levélre kapcsoljuk rá, itt már legfeljebb két levele lehet minden fának.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -362,7 +362,7 @@ Az Egófa megépítésére a következő algoritmust használjuk:
 \subsection{Algoritmus elemzése}
 
 A kapott eredményben látható, hogy a maximális torlódás a legnagyobb súlyú élen van.
-Minimalizálni ezt, lényegében egy időzítés probléma, hogy osszuk ki a munkákat \(\Delta\) processzornak, hogy a munka a leghamarabb kész legyen.
+Minimalizálni ezt, lényegében egy időzítés probléma, hogy hogyan osszuk ki a munkákat \(\Delta\) processzornak, hogy a munka a leghamarabb kész legyen.
 Erre az optimális algoritmus NP-nehéz, de van közelítő módszer.
 
 \subsection{Longest Processing Time (LPT)}
@@ -371,7 +371,7 @@ A Longest Processing Time algoritmus a következő:
 
 \begin{itemize}
 	\item Először rendezzük sorba a feladatokat hossz szerint csökkenő sorrendbe.
-	\item Ha van szabad processzor, akkor rendeljük hozzá a leghosszabb munkát
+	\item Ha van szabad processzor, akkor rendeljük hozzá a leghosszabb munkát.
 	\item Ha nincs szabad processzor, akkor ahhoz a processzorhoz rendeljük hozzá a következő munkát, ahol a legkevesebb ideig tart a munka.
 \end{itemize}
 
@@ -392,13 +392,13 @@ Ez az algoritmus polinom időben lefut.
 \section{cl-DAN algoritmus}
 
 \begin{mytetel}
-	Legyen \(D\) egy szimmetrikus kommunikáció kéréseloszlás , ahol az átlag csúcs fokszáma \(\rho\), (azaz az élek száma \(\rho \cdot \frac{n}{2}\). Ekkor a maximum fokszám \(\Delta = 12\rho\), ehhez lehetséges generálni egy \((\alpha, \beta)\)-cl-DAN hálózatot, ahol:
+	Legyen \(D\) egy szimmetrikus kommunikáció kéréseloszlás, ahol az átlag csúcs fokszáma \(\rho\), (azaz az élek száma \(\rho \cdot \frac{n}{2}\). Ekkor a maximum fokszám \(\Delta = 12\rho\), ehhez lehetséges generálni egy \((\alpha, \beta)\)-cl-DAN hálózatot, ahol:
 	\begin{itemize}
 		\item \(\alpha = 1 + (\frac{8}{9})\Delta\)
 		\item \(\beta = 1 + 4log^2(\Delta + 1)\)
 	\end{itemize}
 \end{mytetel}
-Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra és az optimális úthosszra
+Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra és az optimális úthosszra.
 
 \begin{enumerate}
 	\item Felosszuk a hálózat csúcsait két halmazra, \(H\) - magas és \(L\) - alacsony fokszámúakra fele-fele arányban
@@ -412,8 +412,8 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 	\end{itemize}
 	\item Meghatározunk egy mátrixot, ami első lépésben az eredeti
 	\begin{itemize}
-		\item Ahol segítő csomópontot vettünk fel, ott az útvonal hosszúhoz hozzá kell még adni az \(l\)-el való áthaladást is, és törölni kell az eredeti pontok közti élt
-		\item Ezután elkészítjük a magas halmaz csúcsaira a \(T_u\) fát, ahol a valószínűségeket a mátrixból kiolvassuk, \(\Delta = 12\rho\) fokszámmal, ez közel optimális megoldást ad mindkét fel
+		\item Ahol segítő csomópontot vettünk fel, ott az útvonal hosszához hozzá kell még adni az \(l\)-el való áthaladást is, és törölni kell az eredeti pontok közti élt
+		\item Ezután elkészítjük a magas halmaz csúcsaira a \(T_u\) fát, ahol a valószínűségeket a mátrixból kiolvassuk, \(\Delta = 12\rho\) fokszámmal, ez közel optimális megoldást ad mindkét megközelítésre
 	\end{itemize}
 	\item Mivel \(u\) és \(v\) pontok közt egy \(l\) segítő csomópont van használva ezért \(T_u\) és \(T_v\) módosításra szorul. Alakítsuk át először \(T_u\)-t \(T'_u\)-ra
 	\begin{itemize}
@@ -435,7 +435,7 @@ Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra
 
 \section{Véletlen gráfok}
 
-A hálózat tesztelésnek céljából több különböző típusú véletlen gráfon lett tesztelve az algoritmus hatékonysága.
+A hálózat tesztelésének céljából több különböző típusú véletlen gráfon lett tesztelve az algoritmus hatékonysága.
 A következő alfejezetekben ezek lesznek bemutatva.
 
 \subsection{Barabási-Albert modell}
@@ -472,13 +472,13 @@ A \ref{erdos} ábrán látható egy lehetséges véletlen gráf \(p=0.01\) való
 	\end{center}
 \end{figure}
 
-A munka során a második megközelítést volt használva a véletlen gráfok generálására.
+A munka során a második megközelítés volt használva a véletlen gráfok generálására.
 
 \subsection{Csillaggráf}
 
-A csillaggráf vagy röviden csillag, egy olyan gráf, ahol \(n\) csúcs esetén, van egy központi csúcs a gráfban amivel a maradék \(n-1\) csúcs kapcsolatban áll.
+A csillaggráf vagy röviden csillag, egy olyan gráf, ahol \(n\) csúcs esetén van egy központi csúcs a gráfban, amivel a maradék \(n-1\) csúcs kapcsolatban áll.
 Bármely két csúcs, amelyek közül egyik sem a csillag közepe, nem áll kapcsolatban.
-A \ref{star} ábrán látható egy példa a nyolc csúcs gráfra ahol egy csillag van.
+A \ref{star} ábrán látható egy példa a nyolc csúcs gráfra, ahol egy csillag van.
 A munka során használt véletlen csillaggráfokban a csillagok számát lehet megadni.
 
 \begin{figure}[H]
@@ -510,8 +510,8 @@ Ezt úgy oldja meg az eredeti algoritmus, hogy a nehezebb levél csúcs lesz az 
 
 \pagebreak
 
-Egy lehetséges eset ilyenkor, hogy az új szülő csúcsnak már ki van töltve mindkét levele, ekkor a szülő könnyebb levele fog egyel lejjebb szintre kerülni.
-Ezt a folyamatot addig ismételjük, még minden levél nem kerül egy megfelelő helyre.
+Egy lehetséges eset ilyenkor, hogy az új szülő csúcsnak már ki van töltve mindkét levele, ekkor a szülő könnyebb levele fog egyel lejjebbi szintre kerülni.
+Ezt a folyamatot addig ismételjük, amíg minden levél nem kerül egy megfelelő helyre.
 
 Az Egobalance algoritmus a függő pontok újra elhelyezését az Egófára bízza, azaz újra elosztásra kerülnek.
 Ezzel elméletben mindig arra törekszik az algoritmus, hogy optimális legyen torlódásra nézve az új fa.
@@ -525,29 +525,29 @@ Lényegi különbség úthossznál jelentkezik az eredetivel szemben.
 
 \subsection{Huffman fa}
 
-A eddigi két algoritmus az Egófát \cite{avin_demand-aware_nodate} használta, ami optimális torlódásra nézve, de mivel a hálózat nem csak torlódás szempontjából van vizsgálva, ezért meg kell vizsgálni a másik aspektust is, az optimális úthosszt.
+Az eddigi két algoritmus az Egófát \cite{avin_demand-aware_nodate} használta, ami optimális torlódásra nézve, de mivel a hálózat nem csak torlódás szempontjából van vizsgálva, ezért meg kell vizsgálni a másik aspektust is, az optimális úthosszt.
 A Huffman kódolásnál \cite{huf52} használt fa tulajdonsága, hogy átlagosan rövidek legyenek az utak attól függően milyen gyakori egy elem.
 A cl-Dan probléma is ezt a tényezőt használja, ezért kitűnően lehet használni ezt a fát a hálózat alapjának.
 Egyetlen probléma a Huffman fával az, hogy a belső csomópontok nem tartalmaznak számunkra hasznos információt.
 Ezért szükséges egy kiegészítő lépés, ami segítségével belső pontok is ki lesznek töltve, azaz esetünkben csomópontokat fognak reprezentálni, mint a levelek.
 
 Az algoritmus első része teljesen megegyezik a Huffman kódolással.
-Rendezzük sorba növekedően a valószínűségeket, és kettesével vonjuk össze őket, még nem kapunk egy teljes fát.
+Rendezzük sorba növekedően a valószínűségeket, és kettesével vonjuk össze őket, amíg nem kapunk egy teljes fát.
 Mint az Egófáknál, úgy a Huffman fánál is a legfelső szinten \(n\) darab csúcsot tudunk a forrás pontra kapcsolni.
 Az összes többi alacsonyabb pont pedig marad bináris.
 
 A belső csúcsok kitöltésére a gyökér ágain a következő algoritmust végezzük el:
 \begin{enumerate}
-	\item Gyűjtsük össze a levelet az ágon, a levelek tartalmazzák a számunkra hasznos pontokat 
+	\item Gyűjtsük össze a levelet az áganként, mivel a levelek tartalmazzák a számunkra hasznos pontokat 
 	\item Az ág gyökerétől indulva sorfolytonosan helyezzük el a leveleket, ahol a valószínűségek csökkenő sorrendben vannak rendezve
 \end{enumerate}
 
 Felmerülhet a kérdés, hogy miért nem a legnehezebb levél jön fel mindig?
 Ez azért van, mert a Huffman kódolásnál megtörténik az eset, hogy két csomópont összesített értéke megegyezik egy harmadikkal.
 Ez egy olyan fát eredményez, ahol az egyik oldalon egy nehéz csúcs, a másik oldalon pedig két könnyű csúcs szerepel.
-A naiv megoldás azt eredményezi, hogy az a nehéz pont lesz a belső csúcs és az ág ahonnan jött megüresedik.
+A naiv megoldás azt eredményezi, hogy az a nehéz pont lesz a belső csúcs, és az ág ahonnan jött megüresedik.
 A könnyebb fa levelei nem fognak ágat változtatni, annak ellenére, hogy megüresedett az ág feljebb, ezért hosszú egyenes utak jöhetnek létre.
-Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet, hogy fa egyik belső pontja sem marad kitöltetlen.
+Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet, hogy a fa egyik belső pontja sem marad kitöltetlen.
 
 \subsubsection{Huffman fa algoritmus}
 \begin{itemize}
@@ -556,8 +556,8 @@ Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet
 	\begin{enumerate}
 		\item Vegyük a gyökérhez kapcsolódó csúcsok valószínűségét egy vektorba
 		\item Rendezzük a vektort növekvő sorrendbe
-		\item Vonjuk össze a vektor legelső két elemét, majd helyezzük vissza a vektorba és rendezzük újra a növekvő sorrendbe
-		\item Ezt addig csináljuk elemek száma nem éri el a maximális fokszámot, $\Delta$-át
+		\item Vonjuk össze a vektor legelső két elemét, majd helyezzük vissza a vektorba és rendezzük újra növekvő sorrendbe
+		\item Ezt addig csináljuk amíg az elemek száma nem éri el a maximális fokszámot, $\Delta$-át
 	\end{enumerate}
 	\item Itt megépítettük a Huffman fát, ahol még nincsenek kitöltve a belső csomópontok
 	\item A köztes csomópontok kitöltése a következő módon történik:
@@ -586,7 +586,7 @@ Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet
 \subsection{Sorfolytonos fa}
 
 Mint láthattuk korábban a Huffman fa alapú algoritmusnál, a levelek felfelé mozgatását sorfolytonosan valósítottuk meg. A sorfolyonos fa is hasonló elvet követ.
-Lényegi különbség a kettő fa között, hogy a Huffman kódolási algoritmust kihagyjuk, és egyenest sorfolytonosan rakjuk fel csúcsokat a fa építésekor.
+Lényegi különbség a két fa között, hogy a Huffman kódolási algoritmust kihagyjuk, és egyenest sorfolytonosan rakjuk fel a csúcsokat a fa építésekor.
 Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem veszi figyelembe.
 
 \subsubsection{Sorfolytonos fa algoritmus}
@@ -618,9 +618,9 @@ Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem ves
 
 Az eddigi fa építési stratégiák mindegyike valamilyen szempontból próbált egy jobb fát eredményezni.
 A Random fa olyan megközelítést használ, hogy szimulálja azt, ha valaki véletlenszerűen kötögetné össze a csomópontokat.
-Az így létrehozott fá nem használ semmi olyan információt ami hatékonyabb eredményhez vezetne.
+Az így létrehozott fa nem használ semmi olyan információt, ami hatékonyabb eredményhez vezetne.
 Az algoritmus a már korábban használt Sorfolytonos fára épít, azaz a csomópontokat sorfolytonosan helyezzük el.
-Egyetlen változás az algoritmusban, a fához tartozó vektor ami tartalmazza a kommunikációs valószínűségeket nincs sorba rendezve, hanem ötször meg vannak benne keverve az elemek. 
+Egyetlen változás az algoritmusban, a fához tartozó vektor, ami tartalmazza a kommunikációs valószínűségeket, ami nincs sorba rendezve, hanem ötször meg vannak benne keverve az elemek. 
 
 \subsubsection{Random fa algoritmus}
 \begin{itemize}
@@ -639,15 +639,15 @@ Egyetlen változás az algoritmusban, a fához tartozó vektor ami tartalmazza a
 A cikkben \cite{avin_demand-aware_nodate} szereplő cl-DAN algoritmus első lépése a csomópontok besorolása magas és alacsony halmazokba a fokszámuk alapján. 
 A szerzők itt fele-fele arányban osztják el a pontokat és egy hozzáadott feltételként megnézik, hogy az alacsony fokszámúak között szerepel-e olyan csomópont, aminek a fokszáma meghaladja \(2\rho\)-t, azaz a kétszeres átlag fokszámot.
 
-A általam módosított cl-DAN algoritmus ezt a kiegészítő szabályt veszi alapul.
-Mi lenne ha, nem szabályosan fele-fele arányba lenne elosztva, hanem magán a \(2\rho\) feltételen?
+Az általam módosított cl-DAN algoritmus ezt a kiegészítő szabályt veszi alapul.
+Mi lenne, ha nem szabályosan fele-fele arányban lenne elosztva, hanem magán a \(2\rho\) feltételen?
 
 Nézzünk egy példát, ahol ez jelentőséggel bír.
 Tegyük fel, hogy van egy 25 csúcsú csillaggráfunk két csillaggal.
 A csillaggráfban a csillag közepére kapcsolódik rá az összes másik csomópont, így van kettő 24 fokú csomópontunk, és huszonhárom darab 2 fokú csomópont. 
 Az átlag fokszám így \(\rho=23\cdot2+2\cdot23=3.68\), ennek a kétszerese \(2\rho=7.36\).
 
-Az eredeti esetben a nagy fokú csomópontokhoz a csillagok közepei fog tartozni és további tizenegy darab 2 fokú csomópont. 
+Az eredeti esetben a nagy fokú csomópontokhoz a csillagok közepei fognak tartozni és további tizenegy darab 2 fokú csomópont. 
 Így legalább $\lceil\frac{n}{2}\rceil$ fát fogunk építeni, ahol a pontok nagy része olyan kapcsolatban van, hogy két 2 fokszámú között egy segítő csúcs van, ami hasonló hozzájuk és eredetileg 2 fokszámú volt. 
 Ezzel a módszerrel jelentősen növeltük meg a torlódást a gráfban.
 
@@ -655,7 +655,7 @@ A módosított algoritmus az eredetivel ellenben a magas halmazban csak két dar
 Ezen esetben ténylegesen magas csomópontok közé helyezünk egy kisegítőt, ami bármelyik lehet a maradék 2 fokszámú csúcsok közül, ezzel redukáltuk is az épített fák számát.
 %A torlódásra tekintette, meg azt tapasztalhatjuk, hogy kevesebb lesz, mintha az eredeti módszer segítségével csináltuk volna. 
 
-A módosított algoritmus nem lesz rosszabb mint az eredeti algoritmus, mivel ott mit kiegészítő feltétel szerepel a fokszám ellenőrzés, még itt az alapot adja, így legrosszabb esetben is visszatérünk az eredetihez. 
+A módosított algoritmus nem lesz rosszabb, mint az eredeti algoritmus, mivel ott mint kiegészítő feltétel szerepel a fokszám ellenőrzés, míg itt az alapot adja, így legrosszabb esetben is visszatérünk az eredetihez. 
 
 \chapter{Megvalósítás}
 
