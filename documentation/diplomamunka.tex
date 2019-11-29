@@ -115,7 +115,7 @@ Adatokat kétszázötvenezer szerverről rögzítettek, amelyek öt productionba
 	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR3.png}
 	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR4.png}
 	\includegraphics[width=0.3\linewidth]{pictures/ProjecToR5.png}
-	\caption{Microsoft adatközpont adatok klaszterenként}
+	\caption{Microsoft adatközpont adatok klaszterenként \cite{ghobadi_projector:_2016}}
 	\label{microsoft-clasters}
 \end{figure}
 
@@ -141,7 +141,7 @@ A cikk célja egy olyan módszer bemutatása, ahol mindkét esetet figyelembe ve
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=8cm]{pictures/optimalshemes.png}
-	\caption{Hálózat tervezési stratégiák, (a) rövid utakra való optimalizálás, (b) minimális torlódásra való optimalizálás, (c) mindkét esetre való optimalizálás}
+	\caption{Hálózat tervezési stratégiák, (a) rövid utakra való optimalizálás, (b) minimális torlódásra való optimalizálás, (c) mindkét esetre való optimalizálás \cite{avin_demand-aware_nodate}}
 	\label{network_strategies}
 \end{figure}
 
@@ -183,7 +183,7 @@ A váltásidő itt $12\mu s$, ami kétszázötvenezerszer gyorsabb, mint az opti
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\linewidth]{pictures/laserswitch.png}
-	\caption{ProjecToR}
+	\caption{ProjecToR \cite{ghobadi_projector:_2016}}
 	\label{projector-fig}
 \end{figure}
 
@@ -194,18 +194,6 @@ Ezt egy olyan környezetben megvalósítani, ahol empirikus módszerekkel teszte
 Ez mellet a keretrendszer könnyen kiegészíthető legyen tesztelés szempontjából, továbbá lehetőséget biztosítson arra, hogy új algoritmust lehessen bevezetni, és azt hasonlóan megvizsgálni, mint az eredetit.
 A megvalósítás így több független modulból áll, amelyek egyként fognak működni.
 Az így kapott összes eredményt összehasonlítjuk a cikkben megadott elméleti korlátokkal.
-
-\section{Diplomamunka felépítése}
-
-A diplomamunka felépítése több részre van bontva.
-\begin{itemize}
-	\item Először ismertetésre kerül az eredeti cikkben \cite{avin_demand-aware_nodate} publikált algoritmus és a hozzá tartozó szükséges háttérismeret.
-	\item A második részben szó fog esni a három véletlen gráfról, ami adta az alapot a tesztelésre.
-	\item Ezt folytatva kitérünk négy darab új algoritmusra, ami valamilyen szempontból változtat a fa építési stratégián annak érdekében, hogy jobb eredményt érjünk el.
-	\item A fa építési algoritmusok után, megvizsgáljuk azt az esetet, hogy mi történik, ha már a legelső lépésben módosítjuk az algoritmust, ezzel mérlegelve azt, hogy mi kerüljön valóban átépítésre a hálózatban.
-	\item Végül következik a tesztelés, és annak kiértékelése, hogy milyen teljesítményt nyújtanak a különböző algoritmusok a különböző véletlen gráfok esetén. 
-\end{itemize}
-
 
 \section{Diplomamunka eredménye}
 
@@ -222,6 +210,17 @@ A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegelj�
 Ezzel elejét vehetjük az olyan esteknek, ahol nincs szükség átépítésre.
 Így csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el az új hálózatban.
 Ez a javítás nincs kihatással a torlódásra az esetek túlnyomó részében, de vannak elfajult esetek, ahol rosszabbat eredményez.
+
+\section{Diplomamunka felépítése}
+
+A diplomamunka felépítése több részre van bontva.
+\begin{itemize}
+	\item Először ismertetésre kerül az eredeti cikkben \cite{avin_demand-aware_nodate} publikált algoritmus és a hozzá tartozó szükséges háttérismeret.
+	\item A második részben szó fog esni a három véletlen gráfról, ami adta az alapot a tesztelésre.
+	\item Ezt folytatva kitérünk négy darab új algoritmusra, ami valamilyen szempontból változtat a fa építési stratégián annak érdekében, hogy jobb eredményt érjünk el.
+	\item A fa építési algoritmusok után, megvizsgáljuk azt az esetet, hogy mi történik, ha már a legelső lépésben módosítjuk az algoritmust, ezzel mérlegelve azt, hogy mi kerüljön valóban átépítésre a hálózatban.
+	\item Végül következik a tesztelés, és annak kiértékelése, hogy milyen teljesítményt nyújtanak a különböző algoritmusok a különböző véletlen gráfok esetén. 
+\end{itemize}
 
 
 
@@ -244,7 +243,7 @@ A \ref{network_types} ábrán látható egy demand mátrix és a két megközel�
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=14cm]{pictures/example.png}
-	\caption{Forgalom igény tudatos hálózat tervezés probléma, (a) demand mátrix, (b) hálózat optimális úthosszra és (c) hálózat optimális torlódásra}
+	\caption{Forgalom igény tudatos hálózat tervezés probléma, (a) demand mátrix, (b) hálózat optimális úthosszra és (c) hálózat optimális torlódásra \cite{avin_demand-aware_nodate}}
 	\label{network_types}
 \end{figure}
 
@@ -362,12 +361,13 @@ Az Egófa megépítésére a következő algoritmust használjuk:
 \subsection{Algoritmus elemzése}
 
 A kapott eredményben látható, hogy a maximális torlódás a legnagyobb súlyú élen van.
-Minimalizálni ezt, lényegében egy időzítés probléma, hogy hogyan osszuk ki a munkákat \(\Delta\) processzornak, hogy a munka a leghamarabb kész legyen.
-Erre az optimális algoritmus NP-nehéz, de van közelítő módszer.
+Minimalizálása a tolódásnak megfeleltethető egy időzítés problémának, ahol gyökérre kapcsolódó csúcsok lesznek a processzorok.
+Minimalizálás probléma, hogy hogyan osszuk ki a munkákat \(\Delta\) processzornak úgy, hogy a munka a leghamarabb kész legyen.
+Erre az optimális algoritmus NP-nehéz \cite{Schreiber:2018:OMN:3208081.3184400}, de van közelítő módszer.
 
 \subsection{Longest Processing Time (LPT)}
 
-A Longest Processing Time algoritmus a következő:
+A Longest Processing Time \cite{Graham1969BoundsOM} algoritmus a következő:
 
 \begin{itemize}
 	\item Először rendezzük sorba a feladatokat hossz szerint csökkenő sorrendbe.
@@ -887,7 +887,7 @@ Tesztek különböző metrikák alapján lettek kiértékelve, amik a következ�
 A különböző gráf típusok különböző entrópiával rendelkeznek.
 Az entrópia diszkrét valószínűségi változóra felírható a következő képlet \cite{DBLP:journals/corr/AvinMS17}:  
 
-\[H(X) = \sum_{i=1}^{n} p(x_i) \cdot log_2\frac{1}{p(x_i)}; \; \forall i\in[1, ..., n] \land x_i = \sum_{1}^{n} demaind\_matix[i][n]\] 
+\[H(X) = \sum_{i=1}^{n} p(x_i) \cdot log_2\frac{1}{p(x_i)}; \; \forall i\in[1, ..., n] \] 
 
 Megjegyzés: mikor \(0\cdot log_2\frac{1}{0}\) értéket vesz fel az \(x_i\) változó, akkor legyen \(x_i=0\). 
 Legyen \(\bar{p}\) a demand mátrix, ekkor \(H(\bar{p})\) megegyezik a következővel \(H(p_1, p_2, ..., p_n)\), ahol \(p_i\) a mátrix egy sorában szereplő valószínűségek összege.
@@ -913,7 +913,8 @@ A $\log_2n$ pedig az elméleti felső korlát.
 
 \subsection{Általános eset}
 
-A tesztek során a konstans érték határozta meg, hogy mennyire volt kitöltve a demand mátrix.
+A tesztek során a véletlen gráfok típusától függően a konstans érték határozta meg, hogy mennyire volt kitöltve a demand mátrix.
+A Barabási-Albert gráf esetén a konstans meghatározta a "preferential attachment" számát, Erdős-Rényi gráf esetén meghatározta valósínűségét annak, hogy két csomópont kapcsolatban áll, és a csillaggráf esetén pedig a csillagok számát adja meg. 
 Ezért először nézzük meg mennyire van kihatással a mátrix kitöltöttsége az eredményekre.
 
 Eredmény a \ref{density-len} ábrán.
@@ -1047,7 +1048,7 @@ Eredmény a \ref{density-con} ábrán.
 	\end{center}
 \end{figure}
 
-A grafikonon a Barabási-Albert gráf eredményei láthatók, az eredeti számú megépített fa mennyiséggel és a fák pedig az eredeti algoritmussal készültek el.
+A grafikonon a Barabási-Albert gráf eredményei láthatók, az eredeti számú megépített fa mennyiséggel, és a fák pedig az eredeti algoritmussal készültek el.
 A hálózatban szereplő összes él súlya 1.
 Mint látható a grafikonon, minél ritkább a mátrix, annál nagyobb a torlódás. 
 Egy fontos észrevétel a két metrika között, míg az úthossz átlagosan az egész mátrixra nézve adta meg az eredményt, addig a torlódás az egyértelműen a legnagyobb torlódás az útválasztási sémán.
@@ -1167,13 +1168,17 @@ Ahogy nő a csomópontok száma és eléri a többszörösét a maximális foksz
 
 \section{Diplomamunka eredménye}
 
-A diplomamunka keretén belül feldolgozásra került a Demand-Aware Network Design with Minimal Congestion and Route Lengths \cite{avin_demand-aware_nodate} cikk.
+A diplomamunka kiinduló pontjául szolgált a Demand-Aware Network Design with Minimal Congestion and Route Lengths \cite{avin_demand-aware_nodate} cikk.
 A szerzők arra kerestek megoldást, hogy lehetne csökkenteni a torlást és az úthosszt az adatközpontokban.
 A felvázolt megoldásuk mellett adtak egy felső korlátot, amivel az algoritmus ad egy közel optimális megoldást.
+A megvalósított munkában széleskörűen lett tesztelve az algoritmusra adott felső korlát.
+Ez mellett módosított algoritmusok is hozzá lettek adva a teszteléshez, amik hivatottak voltak az úthosszra nézve jobb eredményt produkálni.
+Ezek teljesítménye jobb volt úthossz szempontból, ám a torlódás terén nem teljesítettek kiválóan.
 
-\subsection{Keretrendszer}
 
-A diplomamunkában megvalósít keretrendszer segítségével a szerzők megoldása gyakorlati tesztelés alá lett vetve.
+\section{Keretrendszer}
+
+A diplomamunkában megvalósított keretrendszer segítségével a szerzők megoldása gyakorlati tesztelés alá lett vetve.
 Itt több fajta véletlen gráffal lettek szimulálva a lehetséges hálózatok és az azokon folyó adatforgalom.
 Az Erdős-Rényi modell segítségével modelleztük azt az esetet, mikor a kommunikáció egyenletesen eloszlik a hálózaton és nem centralizálódik több nagyobb szerver köré a forgalom.
 A Barabási-Albert modell segítségével már nagyobb klasztereket kaptunk, mivel akik később csatlakoztak, azok mindig választottak még $m$ régi csomópontot.
@@ -1187,7 +1192,7 @@ Ezért nem tudnak elég magas fák kialakulni, hogy a különböző algoritmusok
 Így tesztelés során, egy jól meghatározott korlát segítségével voltak a tesztek lefuttatva. 
 A korlát alapját a piacon jelenleg forgalomban lévő Ethernet switch portok száma adta, ami $\Delta \in [10, 16, 24, 48]$ lett.
 
-\subsection{Algoritmusok}
+\section{Algoritmusok}
 
 A cikkben megfogalmazott cl-Dan algoritmus hagy némi helyet az implementálónak a részletek terén, mivel nem teljesen írja le egy helyzetben a helyes lépést.
 Ez alapján született két algoritmus, az Eredeti és az EgoBalance, ami a csere lépésben felmerülő szülő nélkül maradt gyerekek újra csatlakoztatását hivatott megoldani.
@@ -1212,21 +1217,14 @@ Ennek az eredménye sem lett jobb, mint amire épül, ám lehetőség van arra, 
 
 Ezekből az eredményekből az látszik, hogy a cikkben szereplő algoritmus megfelelő a céljára, ám ez nem zárja ki annak a lehetőségét, hogy egy másfajta javításibeli megközelítést is kivizsgáljunk. 
 
-\pagebreak
 
-\subsection{Kritikus pontok megfontolása}
+\section{Magas fokszámú csomópontok}
 
 A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegeljük a hálózatban szereplő ténylegesen leterhelt pontokat.
-Ezzel célzottabban tudjuk a hálózat kritikus pontjait orvosolni és elejét vehetjük az olyan esteknek, hol nincs szükség átépítésre.
+Ezzel célzottabban tudjuk a hálózat magas fokszámú csomópontjait azonosítani és elejét vehetjük az olyan esteknek, ahol nincs szükség átépítésre.
 Ezzel csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el a legtöbb esetben.
 Mivel ez a megközelítés csak finomítja a cl-Dan első lépését, ami alapján osztályozzuk a pontokat, így legrosszabb esetben is visszaértünk a kiindulási algoritmushoz és soha nem lesz rosszabb attól.
 A mérések azt mutatják, hogy az úthossz határozottan csökken, de a torlódásra az esetek túlnyomó részében nincs kihatással, ám vannak elfajult esetek, ahol rosszabbat eredményez.
-
-\section{Konklúzió}
-
-A cikkben \cite{avin_demand-aware_nodate} meghatározott algoritmus a mérések alapján megfelel a céljára.
-Az Eredeti és EgoBalance megközelítések közötti különbség minimális így, az olvasónak lehetősége van kicsit kísérletezni, milyen megközelítést szeretne használni.
-A hasonló célra létrehozott algoritmusok közül pedig a Sorfolyonos ami érdekes információval szolgált, ezért érdemes lenne még ez irányban kutatást végezni.
 
 
 \chapter{Köszönetnyilvánítás}
