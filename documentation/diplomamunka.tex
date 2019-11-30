@@ -170,7 +170,7 @@ Egy rackben nagyon sok szerver van elhelyezve, ezért azok általában egy közt
 
 \subsection{Újrakonfigurálás megvalósítása}
 
-Az átlag hálózatok statikusan vannak konfigurálva, ezért nem sok lehetőség van arra annak megváltoztatására.
+Az átlag hálózatok statikusan vannak konfigurálva, ezért nem sok lehetőség van annak megváltoztatására.
 Ide tartoznak a hagyományos Ethernet switchek.
 Egy kevésbé statikus megoldás az optikai swtich, ami képes megvalósítani az újrakonfigurálást, és ezt relatív gyorsan is csinálja.
 Az optikai switchektől egy még gyorsabb megoldás a Microsoft Research ProjecToR. 
@@ -191,7 +191,7 @@ A váltásidő itt $12\mu s$, ami kétszázötvenezerszer gyorsabb, mint az opti
 
 A diplomamunka célja a cikkben \cite{avin_demand-aware_nodate} bemutatott algoritmus implementálása.
 Ezt egy olyan környezetben megvalósítani, ahol empirikus módszerekkel tesztelhető az algoritmus hatékonysága.
-Ez mellet a keretrendszer könnyen kiegészíthető legyen tesztelés szempontjából, továbbá lehetőséget biztosítson arra, hogy új algoritmust lehessen bevezetni, és azt hasonlóan megvizsgálni, mint az eredetit.
+Emellett a keretrendszer könnyen kiegészíthető legyen tesztelés szempontjából, továbbá lehetőséget biztosítson arra, hogy új algoritmust lehessen bevezetni, és azt hasonlóan megvizsgálni, mint az eredetit.
 A megvalósítás így több független modulból áll, amelyek egyként fognak működni.
 Az így kapott összes eredményt összehasonlítjuk a cikkben megadott elméleti korlátokkal.
 
@@ -199,10 +199,10 @@ Az így kapott összes eredményt összehasonlítjuk a cikkben megadott elmélet
 
 A diplomamunka véletlen gráfokkal modellezte az adatközpontokban kialakulható hálózati forgalmat.
 Az eredmények azt mutatják, hogy a cikkben meghatározott "optimális" eset egy határozottan magasabb felső korlát, mint amire valójában szükség van.
-A cikkben felvázolt algoritmus némi helyet hagy az megvalósítónak, mivel nem teljesen írja le, hogy pár helyzetben mi a helyes lépés.
+A cikkben felvázolt algoritmus némi helyet hagy a megvalósítónak, mivel nem teljesen írja le, hogy pár helyzetben mi a helyes lépés.
 
 Ez alapján született két algoritmus, az Eredeti és az EgoBalance, ami az egyik ilyen rész miatt más-más értelmezésben próbálta megoldani a felmerülő helyeztet.
-A teljesség érdekében egy másik megközelítési módszer is vizsgálva volt, mint fa építési stratégia, ami további három algoritmust eredményezett, ezek rendere a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
+A teljesség érdekében egy másik megközelítési módszer is vizsgálva volt, mint fa építési stratégia, ami további három algoritmust eredményezett, ezek rendre a Huffman-, Sorfolyotonos- és Véletlen fák voltak.
 Ezek az algoritmusok az úthosszt vették figyelembe, és itt jól is teljesítettek, de torlódás szempontjából alul múlták a cikkben szereplőt közel egy kettes szorzóval.
 Ebből kifolyólag a cikkben szereplő algoritmus megfelelő a céljára, de nem zárja ki a lehetőséget egy másfajta javítási megközelítésre. 
 
@@ -236,7 +236,7 @@ Ez a mátrix legtöbb esetben szimmetrikus, de lehetnek esetek egy oldali kommun
 
 Forgalom igény tudatos hálózat tervezés problémának nevezzük azt, mikor rendelkezésre áll egy meghatározott számú csomóponttal rendelkező hálózat és egy mátrix, ami leírja a kommunikációs mintát.
 A mátrix elemei súlyozott valószínűségek, hogy $i$ forrásból mekkora eséllyel lesz adat küldve $j$ célba.
-A cél, hogy ezen adatból egy olyan hálózati sémát készítsünk, ami minimális torlódást és rövid utakat eredményezzen, és ez mellett még skálázható is legyen nagy hálózatokra.
+A cél, hogy ezen adatból egy olyan hálózati sémát készítsünk, ami minimális torlódást és rövid utakat eredményezzen, és emellett még skálázható is legyen nagy hálózatokra.
 
 A \ref{network_types} ábrán látható egy demand mátrix és a két megközelítés, ami alapján vizsgáljuk az új hálózatot.
 
@@ -401,7 +401,7 @@ Ez az algoritmus polinom időben lefut.
 Konstans \(\rho\) esetén ez konstans közelítést ad a minimális torlódásra és az optimális úthosszra.
 
 \begin{enumerate}
-	\item Felosszuk a hálózat csúcsait két halmazra, \(H\) - magas és \(L\) - alacsony fokszámúakra fele-fele arányban
+	\item Felosztjuk a hálózat csúcsait két halmazra, \(H\) - magas és \(L\) - alacsony fokszámúakra fele-fele arányban
 	\begin{itemize}
 		\item Az alacsony fokszámú csúcsok fokszáma legfeljebb \(2\rho\)
 	\end{itemize}
@@ -497,7 +497,7 @@ A különböző fa építési stratégiák más-más szempontból közelítik me
 \subsection{EgoBalance}
 
 Az EgoBalance algoritmus majdnem teljes mértékben megegyezik az eredetivel.
-A cikk szerzői a cl-Dan algoritmus vázlatos összefoglalásában használtak egy csere lépést.
+A cikk szerzői a cl-DAN algoritmus vázlatos összefoglalásában használtak egy csere lépést.
 A csere lépés lényege, hogy mikor megépítettük a fát egy magas csúcsra, akkor a fában minden szomszédja megjelenik.
 A szomszédok között megtalálhatók a magas-magas fokszámú kapcsolatok, amiket ki kell cserélni a segítő csúcsokra.
 Három esetet különböztetünk meg itt, attól függően hol helyezkedik el a segítő csúcs a fában.
@@ -519,7 +519,7 @@ Lényegi különbség úthossznál jelentkezik az eredetivel szemben.
 
 \subsubsection{EgoBalance algoritmus}
 \begin{enumerate}
-	\item Végezzük el a csere lépésig a cl-Dan algoritmust
+	\item Végezzük el a csere lépésig a cl-DAN algoritmust
 	\item Mikor csere lépés történik a szülő nélküli csúcsokat kapcsoljuk vissza a fába az Egófa algoritmussal
 \end{enumerate}
 
@@ -527,7 +527,7 @@ Lényegi különbség úthossznál jelentkezik az eredetivel szemben.
 
 Az eddigi két algoritmus az Egófát \cite{avin_demand-aware_nodate} használta, ami optimális torlódásra nézve, de mivel a hálózat nem csak torlódás szempontjából van vizsgálva, ezért meg kell vizsgálni a másik aspektust is, az optimális úthosszt.
 A Huffman kódolásnál \cite{huf52} használt fa tulajdonsága, hogy átlagosan rövidek legyenek az utak attól függően milyen gyakori egy elem.
-A cl-Dan probléma is ezt a tényezőt használja, ezért kitűnően lehet használni ezt a fát a hálózat alapjának.
+A cl-DAN probléma is ezt a tényezőt használja, ezért kitűnően lehet használni ezt a fát a hálózat alapjának.
 Egyetlen probléma a Huffman fával az, hogy a belső csomópontok nem tartalmaznak számunkra hasznos információt.
 Ezért szükséges egy kiegészítő lépés, ami segítségével belső pontok is ki lesznek töltve, azaz esetünkben csomópontokat fognak reprezentálni, mint a levelek.
 
@@ -538,12 +538,12 @@ Az összes többi alacsonyabb pont pedig marad bináris.
 
 A belső csúcsok kitöltésére a gyökér ágain a következő algoritmust végezzük el:
 \begin{enumerate}
-	\item Gyűjtsük össze a levelet az áganként, mivel a levelek tartalmazzák a számunkra hasznos pontokat 
+	\item Gyűjtsük össze a levelet áganként, mivel a levelek tartalmazzák a számunkra hasznos pontokat 
 	\item Az ág gyökerétől indulva sorfolytonosan helyezzük el a leveleket, ahol a valószínűségek csökkenő sorrendben vannak rendezve
 \end{enumerate}
 
 Felmerülhet a kérdés, hogy miért nem a legnehezebb levél jön fel mindig?
-Ez azért van, mert a Huffman kódolásnál megtörténik az eset, hogy két csomópont összesített értéke megegyezik egy harmadikkal.
+Ez azért van, mert a Huffman kódolásnál megtörténik az az eset, hogy két csomópont összesített értéke megegyezik egy harmadikkal.
 Ez egy olyan fát eredményez, ahol az egyik oldalon egy nehéz csúcs, a másik oldalon pedig két könnyű csúcs szerepel.
 A naiv megoldás azt eredményezi, hogy az a nehéz pont lesz a belső csúcs, és az ág ahonnan jött megüresedik.
 A könnyebb fa levelei nem fognak ágat változtatni, annak ellenére, hogy megüresedett az ág feljebb, ezért hosszú egyenes utak jöhetnek létre.
@@ -551,7 +551,7 @@ Ennek kiküszöbölésére van a sorfolytonos algoritmus, ahol garantálni lehet
 
 \subsubsection{Huffman fa algoritmus}
 \begin{itemize}
-	\item Végezzük el a fa építés lépésig a cl-Dan algoritmust, demand mátrix itt már a megváltozott állapotban van, nincs két magas csomópont között direkt kapcsolat
+	\item Végezzük el a fa építés lépésig a cl-DAN algoritmust, demand mátrix itt már a megváltozott állapotban van, nincs két magas csomópont között direkt kapcsolat
 	\item Építsük meg a fákat a következő módon:
 	\begin{enumerate}
 		\item Vegyük a gyökérhez kapcsolódó csúcsok valószínűségét egy vektorba
@@ -591,7 +591,7 @@ Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem ves
 
 \subsubsection{Sorfolytonos fa algoritmus}
 \begin{itemize}
-	\item Végezzük el a fa építés lépésig a cl-Dan algoritmust, demand mátrix itt már a megváltozott állapotban van, nincs két magas csomópont között direkt kapcsolat
+	\item Végezzük el a fa építés lépésig a cl-DAN algoritmust, demand mátrix itt már a megváltozott állapotban van, nincs két magas csomópont között direkt kapcsolat
 	\item Építsük meg a fákat a következő módon:
 	\begin{enumerate}
 		\item Vegyük a gyökérhez kapcsolódó csúcsok valószínűségét egy vektorba
@@ -617,14 +617,14 @@ Ezzel mindig a legkisebb fákat kapjuk, de ez a torlódást egyáltalán nem ves
 \subsection{Random fa}
 
 Az eddigi fa építési stratégiák mindegyike valamilyen szempontból próbált egy jobb fát eredményezni.
-A Random fa olyan megközelítést használ, hogy szimulálja azt, ha valaki véletlenszerűen kötögetné össze a csomópontokat.
+A Random fa olyan megközelítést használ, ami szimulálja azt, ha valaki véletlenszerűen kötögetné össze a csomópontokat.
 Az így létrehozott fa nem használ semmi olyan információt, ami hatékonyabb eredményhez vezetne.
 Az algoritmus a már korábban használt Sorfolytonos fára épít, azaz a csomópontokat sorfolytonosan helyezzük el.
 Egyetlen változás az algoritmusban, a fához tartozó vektor, ami tartalmazza a kommunikációs valószínűségeket, ami nincs sorba rendezve, hanem ötször meg vannak benne keverve az elemek. 
 
 \subsubsection{Random fa algoritmus}
 \begin{itemize}
-	\item Végezzük el a fa építés lépésig a cl-Dan algoritmust, demand mátrix itt már a megváltozott állapotban van, nincs két magas csomópont között direkt kapcsolat
+	\item Végezzük el a fa építés lépésig a cl-DAN algoritmust, demand mátrix itt már a megváltozott állapotban van, nincs két magas csomópont között direkt kapcsolat
 	\item Építsük meg a fákat a következő módon:
 	\begin{enumerate}
 		\item Vegyük a gyökérhez kapcsolódó csúcsok valószínűségét egy vektorba
@@ -645,13 +645,13 @@ Mi lenne, ha nem szabályosan fele-fele arányban lenne elosztva, hanem magán a
 Nézzünk egy példát, ahol ez jelentőséggel bír.
 Tegyük fel, hogy van egy 25 csúcsú csillaggráfunk két csillaggal.
 A csillaggráfban a csillag közepére kapcsolódik rá az összes másik csomópont, így van kettő 24 fokú csomópontunk, és huszonhárom darab 2 fokú csomópont. 
-Az átlag fokszám így \(\rho=23\cdot2+2\cdot23=3.68\), ennek a kétszerese \(2\rho=7.36\).
+Az átlag fokszám így \(\rho=\frac{24\cdot2+2\cdot23}{25}=3.76\), ennek a kétszerese \(2\rho=7.52\).
 
 Az eredeti esetben a nagy fokú csomópontokhoz a csillagok közepei fognak tartozni és további tizenegy darab 2 fokú csomópont. 
 Így legalább $\lceil\frac{n}{2}\rceil$ fát fogunk építeni, ahol a pontok nagy része olyan kapcsolatban van, hogy két 2 fokszámú között egy segítő csúcs van, ami hasonló hozzájuk és eredetileg 2 fokszámú volt. 
 Ezzel a módszerrel jelentősen növeltük meg a torlódást a gráfban.
 
-A módosított algoritmus az eredetivel ellenben a magas halmazban csak két darab csúcsot tartalmaz, a középpontokat.
+A módosított algoritmus az eredetivel ellentétben a magas halmaz csak két darab csúcsot tartalmaz, a középpontokat.
 Ezen esetben ténylegesen magas csomópontok közé helyezünk egy kisegítőt, ami bármelyik lehet a maradék 2 fokszámú csúcsok közül, ezzel redukáltuk is az épített fák számát.
 %A torlódásra tekintette, meg azt tapasztalhatjuk, hogy kevesebb lesz, mintha az eredeti módszer segítségével csináltuk volna. 
 
@@ -760,7 +760,7 @@ A paraméterek rendre a következők:
 \begin{itemize}
 	\item $graph$ - véletlen gráf típusa, aminek a lehetséges értékei:
 	\begin{itemize}
-		\item $"barabasai-albert"$ - Barabási-Albert gráf
+		\item $"barabasi-albert"$ - Barabási-Albert gráf
 		\item $"erdos-renyi"$ - Erdős-Rényi gráf
 		\item $"star"$ - Csillaggráf
 	\end{itemize}
@@ -849,9 +849,9 @@ A \ref{delta} ábrán látható ez:
 \end{figure}
 
 A következő szempont amiben változtak a gráfok, hogy mekkora terhelés legyen az éleken.
-Itt két csoportba lehet sorolni a teszteket, ahol egytől tízig véletlenszerűen volt kiválasztva, a második esetben pedig minden él egységesen egy terhelést kapott.
+Itt két csoportba lehet sorolni a teszteket, ahol egytől tízig véletlenszerűen volt kiválasztva az összes él terhelése, a második esetben pedig minden él egységesen egy terhelést kapott.
 
-Következő szempont, amit figyelve volt, az maga az algoritmus változtatása, hogy mennyi fa készüljön el, és hogy milyen stratégiával.
+Következő szempont, ami figyelve volt, az maga az algoritmus változtatása, hogy mennyi fa készüljön el, és hogy milyen stratégiával.
 
 Végül pedig, hogy a mérési hiba minimalizálásának érdekében a fent említett paraméterek összes kombinációjára húsz teszt futott le. 
 Összességében 384.000 teszt készült el, amit meg lehet találni a projekt GitHub oldalán.
@@ -914,7 +914,7 @@ A $\log_2n$ pedig az elméleti felső korlát.
 \subsection{Általános eset}
 
 A tesztek során a véletlen gráfok típusától függően a konstans érték határozta meg, hogy mennyire volt kitöltve a demand mátrix.
-A Barabási-Albert gráf esetén a konstans meghatározta a "preferential attachment" számát, Erdős-Rényi gráf esetén meghatározta valósínűségét annak, hogy két csomópont kapcsolatban áll, és a csillaggráf esetén pedig a csillagok számát adja meg. 
+A Barabási-Albert gráf esetén a konstans meghatározta a "preferential attachment" számát, Erdős-Rényi gráf esetén meghatározta valószínűségét annak, hogy két csomópont kapcsolatban áll, és a csillaggráf esetén pedig a csillagok számát adja meg. 
 Ezért először nézzük meg mennyire van kihatással a mátrix kitöltöttsége az eredményekre.
 
 Eredmény a \ref{density-len} ábrán.
@@ -1048,6 +1048,8 @@ Eredmény a \ref{density-con} ábrán.
 	\end{center}
 \end{figure}
 
+\pagebreak
+
 A grafikonon a Barabási-Albert gráf eredményei láthatók, az eredeti számú megépített fa mennyiséggel, és a fák pedig az eredeti algoritmussal készültek el.
 A hálózatban szereplő összes él súlya 1.
 Mint látható a grafikonon, minél ritkább a mátrix, annál nagyobb a torlódás. 
@@ -1160,7 +1162,7 @@ Szóval a torlódás összpontosul egy helyre, erre pedig példa a \ref{inbalanc
 \end{figure}
 
 A hálózat ami ezt az Egófát eredményezte, az 30 csomópontból áll, 5 csillagot tartalmaz és maximális $\Delta$ fokszám pedig 12. 
-Mint látható, egységesen helyezkednek el a csomópontok és a legtávolabbi levél is csak kettő mélységre helyezkedik el.
+Mint látható, egységesen helyezkednek el a csomópontok és a legtávolabbi levél is csak kettő mélyen van.
 Abban az esetben, mikor a csomópontokból relatív kevés van, és alacsony fák kapcsolódnak össze, a torlódás is várhatóan alacsony lesz. 
 Ahogy nő a csomópontok száma és eléri a többszörösét a maximális fokszámnak, nehéz utak alakulnak ki és így növekszik a torlódás is.
 
@@ -1169,10 +1171,10 @@ Ahogy nő a csomópontok száma és eléri a többszörösét a maximális foksz
 \section{Diplomamunka eredménye}
 
 A diplomamunka kiinduló pontjául szolgált a Demand-Aware Network Design with Minimal Congestion and Route Lengths \cite{avin_demand-aware_nodate} cikk.
-A szerzők arra kerestek megoldást, hogy lehetne csökkenteni a torlást és az úthosszt az adatközpontokban.
+A szerzők arra kerestek megoldást, hogy lehetne csökkenteni a torlódást és az úthosszt az adatközpontokban.
 A felvázolt megoldásuk mellett adtak egy felső korlátot, amivel az algoritmus ad egy közel optimális megoldást.
 A megvalósított munkában széleskörűen lett tesztelve az algoritmusra adott felső korlát.
-Ez mellett módosított algoritmusok is hozzá lettek adva a teszteléshez, amik hivatottak voltak az úthosszra nézve jobb eredményt produkálni.
+Emellett módosított algoritmusok is hozzá lettek adva a teszteléshez, amik hivatottak voltak az úthosszra nézve jobb eredményt produkálni.
 Ezek teljesítménye jobb volt úthossz szempontból, ám a torlódás terén nem teljesítettek kiválóan.
 
 
@@ -1194,7 +1196,7 @@ A korlát alapját a piacon jelenleg forgalomban lévő Ethernet switch portok s
 
 \section{Algoritmusok}
 
-A cikkben megfogalmazott cl-Dan algoritmus hagy némi helyet az implementálónak a részletek terén, mivel nem teljesen írja le egy helyzetben a helyes lépést.
+A cikkben megfogalmazott cl-DAN algoritmus hagy némi helyet az implementálónak a részletek terén, mivel nem teljesen írja le egy helyzetben a helyes lépést.
 Ez alapján született két algoritmus, az Eredeti és az EgoBalance, ami a csere lépésben felmerülő szülő nélkül maradt gyerekek újra csatlakoztatását hivatott megoldani.
 Itt az Eredeti helyben mozgatta át a nehezebb gyereket a szülő pozíciójára, addig az EgoBalance egy természetesebb, az alapul szolgáló adatstruktúrára bízta az újra eloszlást.
 Eredmény szempontjából a kettő algoritmus nagyon hasonló, és lényegbeli különbség a mérési hiba korlátain belül szerepel.
@@ -1223,14 +1225,14 @@ Ezekből az eredményekből az látszik, hogy a cikkben szereplő algoritmus meg
 A második javítási mód előtérbe helyezi azt a szempontot, hogy mérlegeljük a hálózatban szereplő ténylegesen leterhelt pontokat.
 Ezzel célzottabban tudjuk a hálózat magas fokszámú csomópontjait azonosítani és elejét vehetjük az olyan esteknek, ahol nincs szükség átépítésre.
 Ezzel csökkenthetjük a számítás igényét az algoritmusnak és egyúttal még rövidebb utakat is érünk el a legtöbb esetben.
-Mivel ez a megközelítés csak finomítja a cl-Dan első lépését, ami alapján osztályozzuk a pontokat, így legrosszabb esetben is visszaértünk a kiindulási algoritmushoz és soha nem lesz rosszabb attól.
+Mivel ez a megközelítés csak finomítja a cl-DAN első lépését, ami alapján osztályozzuk a pontokat, így legrosszabb esetben is visszaértünk a kiindulási algoritmushoz és soha nem lesz rosszabb annál.
 A mérések azt mutatják, hogy az úthossz határozottan csökken, de a torlódásra az esetek túlnyomó részében nincs kihatással, ám vannak elfajult esetek, ahol rosszabbat eredményez.
 
 
 \chapter{Köszönetnyilvánítás}
 
 Szeretnék köszönetet nyilvánítani témavezetőmnek Lukovszki Tamás, PhD egyetemi docensnek, amiért felajánlotta és vezetett a téma kidolgozásában és megvalósításában.
-Továbbá még szeretném megköszönni Veress Orsolya támogatását is, a munka korrektúrájában nyújtott segítségéért.  
+Továbbá még szeretném megköszönni Veress Orsolya és Naberschnig Dominika támogatását is, a munka korrektúrájában nyújtott segítségükért.  
 
 
 \bibliographystyle{abbrv}
